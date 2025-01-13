@@ -3,7 +3,7 @@ name: "✅ ISSUE TEMPLATE"
 about: Develop Issue Template
 title: ''
 labels: ''
-assignees: suzinlim
+assignees: ''
 
 ---
 
