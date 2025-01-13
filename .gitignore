@@ -1,4 +1,4 @@
-HELP.md
+ending-credits-api/HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
