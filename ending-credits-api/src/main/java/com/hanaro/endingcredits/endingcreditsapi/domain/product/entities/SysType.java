@@ -1,4 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.entities;
 
-public class ProductEntity {
+public enum SysType {
+    DB,
+    DC,
+    IRP;
 }
