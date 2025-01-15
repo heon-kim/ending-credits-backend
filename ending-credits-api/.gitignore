@@ -21,6 +21,9 @@ bin/
 .env
 /postgresql
 
+###
+application.properties
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
