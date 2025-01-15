@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductSummaryDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionResponse;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductArea;
@@ -73,11 +74,14 @@ public class RetirementPensionService {
     }
 
     @Transactional(readOnly = true)
-    public List<RetirementPensionProductEntity> getPensionProducts(int areaCode, int sysTypeCode) {
+    public List<RetirementPensionProductSummaryDto> getPensionProducts(int areaCode, int sysTypeCode) {
         ProductArea productArea = ProductArea.fromCode(areaCode);
         SysType sysType = SysType.fromCode(sysTypeCode);
 
-        return retirementPensionRepository.findByProductAreaAndSysType(productArea, sysType);
+        return retirementPensionRepository.findByProductAreaAndSysType(productArea, sysType)
+                .stream()
+                .map(product -> new RetirementPensionProductSummaryDto(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

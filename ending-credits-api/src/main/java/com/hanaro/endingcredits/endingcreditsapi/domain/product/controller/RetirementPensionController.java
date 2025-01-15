@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductSummaryDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,11 @@ public class RetirementPensionController {
     private final RetirementPensionService retirementPensionService;
 
     @GetMapping("/annuity")
-    public List<RetirementPensionProductEntity> getPensionProducts(
+    public ResponseEntity<List<RetirementPensionProductSummaryDto>> getPensionProducts(
             @RequestParam int areaCode,
             @RequestParam int sysTypeCode) {
-        return retirementPensionService.getPensionProducts(areaCode, sysTypeCode);
+        List<RetirementPensionProductSummaryDto> productList = retirementPensionService.getPensionProducts(areaCode, sysTypeCode);
+        return ResponseEntity.ok(productList);
     }
 
     @GetMapping("/annuity/{productId}")
