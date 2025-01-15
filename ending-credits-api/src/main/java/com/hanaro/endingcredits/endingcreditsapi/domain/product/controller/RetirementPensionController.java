@@ -32,4 +32,10 @@ public class RetirementPensionController {
         return product.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/annuity/all")
+    public ResponseEntity<List<RetirementPensionProductSummaryDto>> getAllPensionProducts() {
+        List<RetirementPensionProductSummaryDto> allProducts = retirementPensionService.getAllPensionProducts();
+        return ResponseEntity.ok(allProducts);
+    }
 }

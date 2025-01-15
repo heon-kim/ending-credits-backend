@@ -89,6 +89,14 @@ public class RetirementPensionService {
         return retirementPensionRepository.findById(productId);
     }
 
+    @Transactional(readOnly = true)
+    public List<RetirementPensionProductSummaryDto> getAllPensionProducts() {
+        return retirementPensionRepository.findAll()
+                .stream()
+                .map(product -> new RetirementPensionProductSummaryDto(product.getProductId(), product.getProductName()))
+                .collect(Collectors.toList());
+    }
+
     private RetirementPensionProductEntity mapToEntity(RetirementPensionProductDto dto, ProductArea productArea, SysType sysType) {
         return RetirementPensionProductEntity.builder()
                 .productName(dto.getProduct())
