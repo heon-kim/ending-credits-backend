@@ -72,6 +72,19 @@ public class RetirementPensionService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<RetirementPensionProductEntity> getPensionProducts(int areaCode, int sysTypeCode) {
+        ProductArea productArea = ProductArea.fromCode(areaCode);
+        SysType sysType = SysType.fromCode(sysTypeCode);
+
+        return retirementPensionRepository.findByProductAreaAndSysType(productArea, sysType);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<RetirementPensionProductEntity> getPensionProductById(UUID productId) {
+        return retirementPensionRepository.findById(productId);
+    }
+
     private RetirementPensionProductEntity mapToEntity(RetirementPensionProductDto dto, ProductArea productArea, SysType sysType) {
         return RetirementPensionProductEntity.builder()
                 .productName(dto.getProduct())
