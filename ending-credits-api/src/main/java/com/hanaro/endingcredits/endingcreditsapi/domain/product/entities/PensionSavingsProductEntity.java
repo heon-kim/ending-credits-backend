@@ -1,6 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.entities;
 
-import com.hanaro.endingcredits.endingcreditsapi.utils.annotations.JsonListConverter;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,6 +30,5 @@ public class PensionSavingsProductEntity {
     private String productArea;
 
     @Column(name="product_detail", length = 10000)
-    @Convert(converter = JsonListConverter.class)
-    private List<Map<String, Object>> productDetail;
+    private String productDetail; // JSON 문자열 그대로 저장
 }
