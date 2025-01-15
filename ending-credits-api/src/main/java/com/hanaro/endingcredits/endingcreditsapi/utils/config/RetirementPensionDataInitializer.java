@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.config;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
@@ -12,10 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RetirementPensionDataInitializer {
 
+    private final PensionSavingsService pensionSavingsService;
     private final RetirementPensionService retirementPensionService;
 
     @Bean
-    public ApplicationRunner initPensionData() {
+    public ApplicationRunner initRetirementPensionData() {
         return args -> {
             List<Integer> areaCodes = List.of(1, 3, 4, 5); // 기본 지역 코드 리스트
             String reportDate = "2024/07";  // 기본 보고 날짜
