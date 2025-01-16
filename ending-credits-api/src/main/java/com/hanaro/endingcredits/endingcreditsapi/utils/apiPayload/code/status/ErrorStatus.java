@@ -19,7 +19,8 @@ public enum ErrorStatus implements BaseErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "존재하지 않는 사용자입니다."),
 
     // 금융 상품 관련 에러
-    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "PRODUCT4001", "존재하지 않는 상품입니다.");
+    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "PRODUCT4001", "존재하지 않는 상품입니다."),
+    RECOMMEND_NOT_FOUND(HttpStatus.BAD_REQUEST, "PRODUCT4002", "추천상품 결과가 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

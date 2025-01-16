@@ -24,7 +24,7 @@ public class ApiResponseEntity<T> {
         return new ApiResponseEntity<>(SuccessStatus._OK.getCode(), message, result);
     }
 
-    public static <T> ApiResponseEntity<T> onFailure(String code, String message, T data) {
-        return new ApiResponseEntity<>(code, message, data);
+    public static <T> ApiResponseEntity<T> onFailure(String code, String message, T result) {
+        return new ApiResponseEntity<>(code, message, result);
     }
 }
