@@ -12,5 +12,5 @@ public interface MemberRepository extends JpaRepository<MemberEntity, UUID> {
     @Query("SELECT m FROM member m WHERE m.identifier = :identifier AND m.isActive = true")
     Optional<MemberEntity> findByIdentifier(String identifier);
 
-    Optional<MemberEntity> findById(UUID id);
+    Optional<MemberEntity> findByMemberId(UUID memberId);
 }

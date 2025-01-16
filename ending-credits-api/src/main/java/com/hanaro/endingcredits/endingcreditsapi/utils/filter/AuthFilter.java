@@ -89,7 +89,7 @@ public class AuthFilter extends OncePerRequestFilter {
             List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
             return Optional.of(new UsernamePasswordAuthenticationToken(id, accessToken, authorities));
         } catch (InvalidJwtException e) {
-            throw new JwtHandler(ErrorStatus.INVALID_TOKEN); // 예외 발생
+            throw new JwtHandler(ErrorStatus.INVALID_TOKEN); // 예외 발생 처리
         }
     }
 }

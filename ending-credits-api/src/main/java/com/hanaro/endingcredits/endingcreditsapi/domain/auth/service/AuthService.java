@@ -23,6 +23,7 @@ import java.util.UUID;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberMapper memberMapper;
     private final JwtProvider jwtProvider;
 
     private TokenPairResponseDto generateTokenPair(Map<String, ?> claims) {
@@ -43,7 +44,7 @@ public class AuthService {
             throw new MemberHandler(ErrorStatus.WRONG_PASSWORD);
         }
         Map<String, Object> memberClaims = Map.of("identifier", loginForm.getIdentifier(),
-                "id", member.getId());
+                "id", member.getMemberId());
         return generateTokenPair(memberClaims);
     }
 
@@ -66,16 +67,16 @@ public class AuthService {
             throw new MemberHandler(ErrorStatus.DUPLICATED_IDENTIFIER);
         }
 
-        MemberEntity member = memberRepository.save(MemberMapper.toEntitySignUp(signUpForm, passwordEncoder.encode(signUpForm.getPassword())));
+        MemberEntity member = memberRepository.save(memberMapper.toMemberEntity(signUpForm, passwordEncoder.encode(signUpForm.getPassword())));
 
-        return member.getId();
+        return member.getMemberId();
     }
 
     public void unsubscribe(UUID memberId) {
-        memberRepository.findById(memberId).ifPresentOrElse(member -> {
-            MemberDto memberDto = MemberMapper.toDto(member);
+        memberRepository.findByMemberId(memberId).ifPresentOrElse(member -> {
+            MemberDto memberDto = memberMapper.toMemberDto(member);
             memberDto.setActive(false);
-            memberRepository.save(MemberMapper.toEntity(memberDto, memberId));
+            memberRepository.save(memberMapper.toMemberEntity(memberDto, memberId));
         }, () -> {
             throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
         });

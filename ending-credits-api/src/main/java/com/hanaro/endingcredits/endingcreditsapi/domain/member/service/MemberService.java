@@ -15,10 +15,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MemberMapper memberMapper;
 
-    public MemberInfoDto getMemberInfo(UUID id) {
-        MemberEntity member = memberRepository.findById(id)
+    public MemberInfoDto getMemberInfo(UUID memberId) {
+        MemberEntity member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        return MemberMapper.toMemberInfoDto(member);
+        return memberMapper.toMemberInfoDto(member);
     }
 }

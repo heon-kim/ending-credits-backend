@@ -25,6 +25,9 @@ public class JwtProvider {
     private static final String ACCESS_TOKEN = "access";
     private static final String REFRESH_TOKEN = "refresh";
 
+    private static final String HEADER_KEY = "typ";
+    private static final String HEADER_VALUE = "JWT";
+
     public JwtProvider(long accessTokenExpirationInterval, long refreshTokenExpirationInterval) {
         this.accessTokenExpirationInterval = accessTokenExpirationInterval;
         this.refreshTokenExpirationInterval = refreshTokenExpirationInterval;
@@ -46,7 +49,7 @@ public class JwtProvider {
         Date expiresAt = new Date(date.getTime() + interval * 1000);
         return Jwts.builder()
                 .header()
-                .add("typ", "JWT")
+                .add(HEADER_KEY, HEADER_VALUE)
                 .and()
                 .subject(SUBJECT)
                 .claims(claims)

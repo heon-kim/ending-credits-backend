@@ -38,8 +38,8 @@ public class AuthController {
     @PostMapping("/signup")
     public ApiResponseEntity signup(SignUpForm signUpForm) {
         try{
-            UUID userId = authService.signUp(signUpForm);
-            return ApiResponseEntity.onSuccess(userId);
+            UUID memberId = authService.signUp(signUpForm);
+            return ApiResponseEntity.onSuccess(memberId);
         } catch (MemberHandler e) {
             // MemberHandler 예외 처리
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
@@ -73,7 +73,7 @@ public class AuthController {
     }
 
     @Operation(summary = "JWT 재발급", description = "refresh token을 이용해 새로운 access token과 refresh token을 발급합니다.")
-    @PostMapping("/refresh")
+    @PostMapping("/reissue")
     public ApiResponseEntity<TokenPairResponseDto> refresh(TokenRefreshForm refreshForm) {
         return ApiResponseEntity.onSuccess(authService.refreshTokenPair(refreshForm.getRefreshToken()));
     }

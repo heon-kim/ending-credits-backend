@@ -23,7 +23,7 @@ public class MemberEntity {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(updatable = false, nullable = false)
-    private UUID id;
+    private UUID memberId;
 
     @Column(nullable = false)
     private String identifier;
