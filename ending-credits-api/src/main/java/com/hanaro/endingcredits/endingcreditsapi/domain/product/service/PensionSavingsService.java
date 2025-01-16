@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductArea;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.SysType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.PensionSavingsRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
@@ -102,7 +100,20 @@ public class PensionSavingsService {
     }
 
     @Transactional(readOnly = true)
-    public List<PensionSavingsListResponseDto> getSavingsProductList(int areaCode) {
+    public List<PensionSavingsListResponseDto> getAllSavingsProductList() {
+
+        return pensionProductRepository.findAll()
+                .stream()
+                .map(product -> PensionSavingsListResponseDto.builder()
+                        .productId(product.getProductId())
+                        .productName(product.getProductName())
+                        .company(product.getCompany())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PensionSavingsListResponseDto> getSavingsProductListByAreaCode(int areaCode) {
         ProductArea productArea = ProductArea.fromCode(areaCode);
 
         return pensionProductRepository.findByProductArea(productArea)
