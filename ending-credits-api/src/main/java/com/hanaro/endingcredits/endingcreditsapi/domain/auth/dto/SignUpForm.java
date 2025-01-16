@@ -17,9 +17,6 @@ public class SignUpForm {
     private String password;
 
     @NotBlank
-    private String confirmPassword;
-
-    @NotBlank
     private LoginType loginType;
 
     @NotBlank

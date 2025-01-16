@@ -58,9 +58,6 @@ public class AuthService {
     }
 
     public UUID signUp(SignUpForm signUpForm) {
-        if (!signUpForm.getPassword().equals(signUpForm.getConfirmPassword())) {
-            throw new MemberHandler(ErrorStatus.WRONG_PASSWORD);
-        }
         String identifier = signUpForm.getIdentifier();
 
         if (checkIdentifierExists(identifier)) {
