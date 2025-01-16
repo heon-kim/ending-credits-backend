@@ -4,8 +4,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.auth.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.auth.service.AuthService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,10 +47,8 @@ public class AuthController {
 
     @Operation(summary = "회원탈퇴")
     @PostMapping("/unsubscribe")
-    public ApiResponseEntity unsubscribe() {
+    public ApiResponseEntity unsubscribe(@AuthenticationPrincipal UUID memberId) {
         try{
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            UUID memberId = UUID.fromString(auth.getPrincipal().toString());
             authService.unsubscribe(memberId);
             return ApiResponseEntity.onSuccess(null);
         } catch (MemberHandler e) {

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Entity(name = "member")
 @Getter
+@Setter
 @ToString
 @Builder
 @EqualsAndHashCode

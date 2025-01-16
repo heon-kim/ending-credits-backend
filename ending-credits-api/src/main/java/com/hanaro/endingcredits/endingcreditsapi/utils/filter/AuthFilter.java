@@ -88,8 +88,8 @@ public class AuthFilter extends OncePerRequestFilter {
             UUID id = UUID.fromString(claims.get("id").toString());
             List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
             return Optional.of(new UsernamePasswordAuthenticationToken(id, accessToken, authorities));
-        } catch (InvalidJwtException e) {
-            throw new JwtHandler(ErrorStatus.INVALID_TOKEN); // 예외 발생 처리
+        } catch (JwtHandler e) {
+            throw new JwtHandler(e.getCode()); // 예외 발생 처리
         }
     }
 }
