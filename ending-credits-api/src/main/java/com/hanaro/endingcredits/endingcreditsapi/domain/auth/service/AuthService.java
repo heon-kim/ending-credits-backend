@@ -36,14 +36,14 @@ public class AuthService {
                 .build();
     }
 
-    public TokenPairResponseDto generateTokenPairWithLoginForm(LoginForm loginForm) {
-        MemberEntity member = memberRepository.findByIdentifier(loginForm.getIdentifier()).orElse(null);
+    public TokenPairResponseDto generateTokenPairWithLoginDto(LoginDto loginDto) {
+        MemberEntity member = memberRepository.findByIdentifier(loginDto.getIdentifier()).orElse(null);
         if (member == null) {
             throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
-        } else if (!passwordEncoder.matches(loginForm.getPassword(), member.getPassword())) {
+        } else if (!passwordEncoder.matches(loginDto.getPassword(), member.getPassword())) {
             throw new MemberHandler(ErrorStatus.WRONG_PASSWORD);
         }
-        Map<String, Object> memberClaims = Map.of("identifier", loginForm.getIdentifier(),
+        Map<String, Object> memberClaims = Map.of("identifier", loginDto.getIdentifier(),
                 "id", member.getMemberId());
         return generateTokenPair(memberClaims);
     }
@@ -57,14 +57,14 @@ public class AuthService {
         }
     }
 
-    public UUID signUp(SignUpForm signUpForm) {
-        String identifier = signUpForm.getIdentifier();
+    public UUID signUp(SignUpDto signUpDto) {
+        String identifier = signUpDto.getIdentifier();
 
         if (checkIdentifierExists(identifier)) {
             throw new MemberHandler(ErrorStatus.DUPLICATED_IDENTIFIER);
         }
 
-        MemberEntity member = memberRepository.save(memberMapper.toMemberEntity(signUpForm, passwordEncoder.encode(signUpForm.getPassword())));
+        MemberEntity member = memberRepository.save(memberMapper.toMemberEntity(signUpDto, passwordEncoder.encode(signUpDto.getPassword())));
 
         return member.getMemberId();
     }
@@ -83,8 +83,8 @@ public class AuthService {
         return memberRepository.findByIdentifier(identifier).isPresent();
     }
 
-    public void checkIdentifier(IdentifierForm identifierForm) {
-        boolean exists = checkIdentifierExists(identifierForm.getIdentifier());
+    public void checkIdentifier(IdentifierDto identifierDto) {
+        boolean exists = checkIdentifierExists(identifierDto.getIdentifier());
 
         if(exists) {
             throw new MemberHandler(ErrorStatus.DUPLICATED_IDENTIFIER);

@@ -1,6 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.mapper;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.auth.dto.SignUpForm;
+import com.hanaro.endingcredits.endingcreditsapi.domain.auth.dto.SignUpDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.MemberDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.MemberInfoDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface MemberMapper {
     @Mapping(source = "password", target = "password")
     @Mapping(target = "isActive", constant = "true")
-    MemberEntity toMemberEntity(SignUpForm signUpForm, String password);
+    MemberEntity toMemberEntity(SignUpDto signUpDto, String password);
 
     MemberDto toMemberDto(MemberEntity memberEntity);
 

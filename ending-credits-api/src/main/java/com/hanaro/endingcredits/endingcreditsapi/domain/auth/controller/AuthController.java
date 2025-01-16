@@ -22,9 +22,9 @@ public class AuthController {
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public ApiResponseEntity<TokenPairResponseDto> login(LoginForm loginForm) {
+    public ApiResponseEntity<TokenPairResponseDto> login(LoginDto loginDto) {
         try {
-            TokenPairResponseDto tokenPair = authService.generateTokenPairWithLoginForm(loginForm);
+            TokenPairResponseDto tokenPair = authService.generateTokenPairWithLoginDto(loginDto);
             return ApiResponseEntity.onSuccess(tokenPair);
         } catch (MemberHandler e) {
             // MemberHandler 예외 처리
@@ -35,9 +35,9 @@ public class AuthController {
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ApiResponseEntity signup(SignUpForm signUpForm) {
+    public ApiResponseEntity signup(SignUpDto signUpDto) {
         try{
-            UUID memberId = authService.signUp(signUpForm);
+            UUID memberId = authService.signUp(signUpDto);
             return ApiResponseEntity.onSuccess(memberId);
         } catch (MemberHandler e) {
             // MemberHandler 예외 처리
@@ -59,9 +59,9 @@ public class AuthController {
 
     @Operation(summary = "아이디 중복 확인")
     @PostMapping("/id")
-    public ApiResponseEntity checkIdentifier(IdentifierForm identifierForm) {
+    public ApiResponseEntity checkIdentifier(IdentifierDto identifierDto) {
         try {
-            authService.checkIdentifier(identifierForm);
+            authService.checkIdentifier(identifierDto);
             return ApiResponseEntity.onSuccess("사용 가능한 아이디입니다.", null);
         } catch (MemberHandler e) {
             // MemberHandler 예외 처리
@@ -71,8 +71,8 @@ public class AuthController {
 
     @Operation(summary = "JWT 재발급", description = "refresh token을 이용해 새로운 access token과 refresh token을 발급합니다.")
     @PostMapping("/reissue")
-    public ApiResponseEntity<TokenPairResponseDto> refresh(TokenRefreshForm refreshForm) {
-        return ApiResponseEntity.onSuccess(authService.refreshTokenPair(refreshForm.getRefreshToken()));
+    public ApiResponseEntity<TokenPairResponseDto> refresh(TokenRefreshDto refreshDto) {
+        return ApiResponseEntity.onSuccess(authService.refreshTokenPair(refreshDto.getRefreshToken()));
     }
 }
 
