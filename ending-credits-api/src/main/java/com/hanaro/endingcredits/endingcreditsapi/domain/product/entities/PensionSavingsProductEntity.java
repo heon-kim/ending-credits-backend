@@ -25,8 +25,12 @@ public class PensionSavingsProductEntity {
     @Column(name="product_name")
     private String productName;
 
-    @Column(name="product_area")
-    private String productArea;
+    @Column(name="company", nullable = false, length = 50)
+    private String company;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="product_area", nullable = false)
+    private ProductArea productArea;
 
     @Column(name="product_detail", length = 10000)
     @Convert(converter = JsonListConverter.class)
