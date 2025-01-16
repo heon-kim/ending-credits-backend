@@ -13,7 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RetirementPensionDataInitializer {
 
-    private final PensionSavingsService pensionSavingsService;
     private final RetirementPensionService retirementPensionService;
 
     @Bean

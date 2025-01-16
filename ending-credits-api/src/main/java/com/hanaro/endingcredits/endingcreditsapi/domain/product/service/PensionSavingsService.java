@@ -1,10 +1,13 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductArea;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.SysType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.PensionSavingsRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
@@ -56,7 +59,7 @@ public class PensionSavingsService {
                         .queryParam("areaCode", areaCode)
                         .toUriString();
 
-                fetchAndSavePensionProducts(requestUrl);
+                fetchAndSavePensionProducts(requestUrl, areaCode);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -64,31 +67,33 @@ public class PensionSavingsService {
     }
 
     @Transactional
-    public void fetchAndSavePensionProducts(String apiUrl) throws JsonProcessingException {
+    public void fetchAndSavePensionProducts(String apiUrl, int areaCode) throws JsonProcessingException {
         PensionSavingsResponse response = restTemplate.getForObject(apiUrl, PensionSavingsResponse.class);
         if (response == null) return;
 
         List<Map<String, Object>> limitedList = response.getList()
                 .stream()
-                .limit(50)  // 리스트에서 처음 50개만 가져옴
+                .limit(100)  // 리스트에서 처음 100개만 가져옴
                 .collect(Collectors.toList());
 
         if (response.getList() != null && !response.getList().isEmpty()) {
             for (Map<String, Object> productData : response.getList()) {
                 String productName = (String) productData.get("product");
-                String productArea = (String) productData.get("area");
+                String company = (String) productData.get("company");
 
-                if (productName == null || productArea == null) {
-                    log.warn("product 또는 area가 존재하지 않습니다." + productData);
+                if (productName == null || company == null) {
+                    log.warn("product 또는 company가 존재하지 않습니다." + productData);
                     continue;
                 }
 
                 List<Map<String, Object>> productDetail = new ArrayList<>();
                 productDetail.add(productData);
+                ProductArea productArea = ProductArea.fromCode(areaCode);
 
                 PensionSavingsProductEntity entity = PensionSavingsProductEntity.builder()
                         .productName(productName)
                         .productArea(productArea)
+                        .company(company)
                         .productDetail(productDetail)
                         .build();
                 pensionProductRepository.save(entity);
@@ -96,6 +101,21 @@ public class PensionSavingsService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<PensionSavingsListResponseDto> getSavingsProductList(int areaCode) {
+        ProductArea productArea = ProductArea.fromCode(areaCode);
+
+        return pensionProductRepository.findByProductArea(productArea)
+                .stream()
+                .map(product -> PensionSavingsListResponseDto.builder()
+                        .productId(product.getProductId())
+                        .productName(product.getProductName())
+                        .company(product.getCompany())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public PensionSavingsResponseDto getSavingsProduct(UUID productId) {
         PensionSavingsProductEntity product = pensionProductRepository.findById(productId)
                 .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
@@ -108,7 +128,7 @@ public class PensionSavingsService {
         Map<String, Object> detail = productDetail.get(0);
 
         return PensionSavingsResponseDto.builder()
-                .area(product.getProductArea())  // 권역
+                .area(product.getProductArea().getDescription())  // 권역
                 .company((String) detail.get("company"))  // 은행명
                 .product(product.getProductName())  // 상품명
                 .productType((String) detail.get("productType"))  // 상품 유형
