@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductSummaryDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionEsEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,14 @@ public class RetirementPensionController {
 
         return product.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/search")
+    public List<RetirementPensionEsEntity> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam int areaCode,
+            @RequestParam int sysType) {
+        return retirementPensionService.searchProducts(keyword, areaCode, sysType);
     }
 
     @GetMapping("/annuity/all")

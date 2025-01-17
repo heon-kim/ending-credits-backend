@@ -6,7 +6,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavin
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductArea;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.PensionSavingsRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
 import jakarta.annotation.PostConstruct;
@@ -33,7 +33,7 @@ public class PensionSavingsService {
     private String apiKey;
 
     private final RestTemplate restTemplate;
-    private final PensionSavingsRepository pensionProductRepository;
+    private final PensionSavingsJpaRepository pensionProductRepository;
 
     private static final String API_URL = "https://www.fss.or.kr/openapi/api/psProdList.json";
 
