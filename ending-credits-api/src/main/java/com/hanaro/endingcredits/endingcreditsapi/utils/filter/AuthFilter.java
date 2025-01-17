@@ -9,7 +9,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
-import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.InvalidJwtException;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.JwtHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.security.JwtProvider;
 import jakarta.servlet.FilterChain;

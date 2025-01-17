@@ -10,9 +10,9 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.hand
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.MemberMapper;
 import com.hanaro.endingcredits.endingcreditsapi.utils.security.JwtProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 import java.util.Map;
@@ -83,11 +83,29 @@ public class AuthService {
         return memberRepository.findByIdentifier(identifier).isPresent();
     }
 
-    public void checkIdentifier(IdentifierDto identifierDto) {
-        boolean exists = checkIdentifierExists(identifierDto.getIdentifier());
+    public void checkIdentifier(String identifier) {
+        boolean exists = checkIdentifierExists(identifier);
 
         if(exists) {
             throw new MemberHandler(ErrorStatus.DUPLICATED_IDENTIFIER);
         }
+    }
+
+    public void changePassword(UUID memberId, String newPassword) {
+        MemberEntity member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        member.setPassword(passwordEncoder.encode(newPassword));
+
+        memberRepository.save(member);
+    }
+
+    public void changeSimplePassword(String identifier, String newSimplePassword) {
+        MemberEntity member = memberRepository.findByIdentifier(identifier)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        member.setSimplePassword(newSimplePassword);
+
+        memberRepository.save(member);
     }
 }

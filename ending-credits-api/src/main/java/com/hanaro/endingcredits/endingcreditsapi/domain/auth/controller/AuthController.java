@@ -5,9 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.auth.service.AuthService
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,9 +57,9 @@ public class AuthController {
 
     @Operation(summary = "아이디 중복 확인")
     @PostMapping("/id")
-    public ApiResponseEntity checkIdentifier(IdentifierDto identifierDto) {
+    public ApiResponseEntity checkIdentifier(String identifier) {
         try {
-            authService.checkIdentifier(identifierDto);
+            authService.checkIdentifier(identifier);
             return ApiResponseEntity.onSuccess("사용 가능한 아이디입니다.", null);
         } catch (MemberHandler e) {
             // MemberHandler 예외 처리
@@ -71,8 +69,22 @@ public class AuthController {
 
     @Operation(summary = "JWT 재발급", description = "refresh token을 이용해 새로운 access token과 refresh token을 발급합니다.")
     @PostMapping("/reissue")
-    public ApiResponseEntity<TokenPairResponseDto> refresh(TokenRefreshDto refreshDto) {
-        return ApiResponseEntity.onSuccess(authService.refreshTokenPair(refreshDto.getRefreshToken()));
+    public ApiResponseEntity<TokenPairResponseDto> refresh(String refreshToken) {
+        return ApiResponseEntity.onSuccess(authService.refreshTokenPair(refreshToken));
+    }
+
+//    @Operation(summary = "비밀번호 재설정")
+//    @PatchMapping("/password")
+//    public ApiResponseEntity changePassword(@AuthenticationPrincipal UUID memberId, String password) {
+//        authService.changePassword(memberId, password);
+//        return ApiResponseEntity.onSuccess(null);
+//    }
+
+    @Operation(summary = "간편 비밀번호 재설정")
+    @PatchMapping("/simple-password")
+    public ApiResponseEntity changeSimplePassword(String identifier, String simplePassword) {
+        authService.changeSimplePassword(identifier, simplePassword);
+        return ApiResponseEntity.onSuccess(null);
     }
 }
 
