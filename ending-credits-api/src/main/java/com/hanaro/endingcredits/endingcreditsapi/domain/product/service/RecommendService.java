@@ -3,7 +3,7 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Strategy;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.PensionSavingsRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
 import jakarta.transaction.Transactional;
@@ -17,12 +17,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RecommendService {
 
-    private final PensionSavingsRepository pensionSavingsRepository;
+    private final PensionSavingsJpaRepository pensionSavingsJpaRepository;
 
     // 가장 높은 점수를 가진 상품을 반환
     @Transactional
     public PensionSavingsResponseDto recommendProduct(Strategy strategy) {
-        List<PensionSavingsProductEntity> products = pensionSavingsRepository.findAll();
+        List<PensionSavingsProductEntity> products = pensionSavingsJpaRepository.findAll();
 
         PensionSavingsProductEntity bestProduct = products.stream()
                 .max((p1, p2) -> Double.compare(calculateScore(p1, strategy), calculateScore(p2, strategy)))

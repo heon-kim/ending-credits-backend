@@ -3,10 +3,12 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionProductSummaryDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RetirementPensionResponse;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionEsEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductArea;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.SysType;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.RetirementPensionRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.RetirementPensionEsRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.RetirementPensionJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RetirementPensionService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final RetirementPensionRepository retirementPensionRepository;
+    private final RetirementPensionJpaRepository retirementPensionJpaRepository;
+    private final RetirementPensionEsRepository retirementPensionEsRepository;
 
     private static final String API_URL = "https://www.fss.or.kr/openapi/api/rpGuaranteedProdList.json";
 
@@ -62,23 +65,35 @@ public class RetirementPensionService {
     @Transactional
     public void saveOrUpdate(RetirementPensionProductDto dto, ProductArea productArea, SysType sysType) {
         Optional<RetirementPensionProductEntity> existingEntity =
-                retirementPensionRepository.findByProductNameAndCompany(dto.getProduct(), dto.getCompany());
+                retirementPensionJpaRepository.findByProductNameAndCompany(dto.getProduct(), dto.getCompany());
 
         if (existingEntity.isPresent()) {
             RetirementPensionProductEntity entity = existingEntity.get();
             entity.update(mapToEntity(dto, productArea, sysType));
-            retirementPensionRepository.save(entity);
+            retirementPensionJpaRepository.save(entity);
+            retirementPensionEsRepository.save(mapToEsEntity(entity));
         } else {
-            retirementPensionRepository.save(mapToEntity(dto, productArea, sysType));
+            RetirementPensionProductEntity newEntity = mapToEntity(dto, productArea, sysType);
+            retirementPensionJpaRepository.save(newEntity);
+            retirementPensionEsRepository.save(mapToEsEntity(newEntity));
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<RetirementPensionEsEntity> searchProducts(String keyword, int areaCode, int sysTypeCode) {
+        ProductArea productArea = ProductArea.fromCode(areaCode);
+        SysType sysType = SysType.fromCode(sysTypeCode);
+
+        return retirementPensionEsRepository.findByProductNameContainingAndProductAreaAndSysType(keyword, productArea, sysType);
+    }
+
 
     @Transactional(readOnly = true)
     public List<RetirementPensionProductSummaryDto> getPensionProducts(int areaCode, int sysTypeCode) {
         ProductArea productArea = ProductArea.fromCode(areaCode);
         SysType sysType = SysType.fromCode(sysTypeCode);
 
-        return retirementPensionRepository.findByProductAreaAndSysType(productArea, sysType)
+        return retirementPensionJpaRepository.findByProductAreaAndSysType(productArea, sysType)
                 .stream()
                 .map(product -> new RetirementPensionProductSummaryDto(product.getProductId(), product.getProductName()))
                 .collect(Collectors.toList());
@@ -86,12 +101,12 @@ public class RetirementPensionService {
 
     @Transactional(readOnly = true)
     public Optional<RetirementPensionProductEntity> getPensionProductById(UUID productId) {
-        return retirementPensionRepository.findById(productId);
+        return retirementPensionJpaRepository.findById(productId);
     }
 
     @Transactional(readOnly = true)
     public List<RetirementPensionProductSummaryDto> getAllPensionProducts() {
-        return retirementPensionRepository.findAll()
+        return retirementPensionJpaRepository.findAll()
                 .stream()
                 .map(product -> new RetirementPensionProductSummaryDto(product.getProductId(), product.getProductName()))
                 .collect(Collectors.toList());
@@ -109,4 +124,33 @@ public class RetirementPensionService {
                 .sysType(sysType)
                 .build();
     }
+
+    private RetirementPensionEsEntity mapToEsEntity(RetirementPensionProductEntity entity) {
+        return RetirementPensionEsEntity.builder()
+                .id(entity.getProductId().toString())
+                .productName(entity.getProductName())
+                .company(entity.getCompany())
+                .applyTerm(entity.getApplyTerm())
+                .checkDate(entity.getCheckDate())
+                .contractTerm(entity.getContractTerm())
+                .contractRate(entity.getContractRate())
+                .productArea(ProductArea.valueOf(entity.getProductArea().name()))
+                .sysType(SysType.valueOf(entity.getSysType().name()))
+                .build();
+    }
+
+    private RetirementPensionProductEntity mapToJpaEntity(RetirementPensionEsEntity esEntity) {
+        return RetirementPensionProductEntity.builder()
+                .productId(UUID.fromString(esEntity.getId()))
+                .productName(esEntity.getProductName())
+                .company(esEntity.getCompany())
+                .applyTerm(esEntity.getApplyTerm())
+                .checkDate(esEntity.getCheckDate())
+                .contractTerm(esEntity.getContractTerm())
+                .contractRate(esEntity.getContractRate())
+                .productArea(ProductArea.valueOf(String.valueOf(esEntity.getProductArea())))
+                .sysType(SysType.valueOf(String.valueOf(esEntity.getSysType())))
+                .build();
+    }
 }
+
