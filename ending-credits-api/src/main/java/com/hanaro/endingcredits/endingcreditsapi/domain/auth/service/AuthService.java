@@ -11,7 +11,12 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.hand
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.MemberMapper;
 import com.hanaro.endingcredits.endingcreditsapi.utils.security.JwtProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.util.MultiValueMap;
 import org.springframework.stereotype.Service;
+import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
@@ -23,8 +28,29 @@ import java.util.UUID;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate;
     private final MemberMapper memberMapper;
     private final JwtProvider jwtProvider;
+
+    @Value("${kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectUri;
+
+    @Value("${kakao.token-uri}")
+    private String kakaoTokenUri;
+
+    @Value("${kakao.user-info-uri}")
+    private String kakaoUserInfoUri;
+
+    public String getKakaoClientId() {
+        return kakaoClientId;
+    }
+
+    public String getKakaoRedirectUri() {
+        return kakaoRedirectUri;
+    }
 
     private TokenPairResponseDto generateTokenPair(Map<String, ?> claims) {
         Date now = new Date();
@@ -44,6 +70,18 @@ public class AuthService {
             throw new MemberHandler(ErrorStatus.WRONG_PASSWORD);
         }
         Map<String, Object> memberClaims = Map.of("identifier", loginDto.getIdentifier(),
+                "id", member.getMemberId());
+        return generateTokenPair(memberClaims);
+    }
+
+    public TokenPairResponseDto generateTokenPairWithKaKaoLogin(String email) {
+        MemberEntity member = memberRepository.findByEmail(email).orElse(null);
+
+        if (member == null) {
+            throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
+        }
+
+        Map<String, Object> memberClaims = Map.of("identifier", member.getIdentifier(),
                 "id", member.getMemberId());
         return generateTokenPair(memberClaims);
     }
@@ -107,5 +145,52 @@ public class AuthService {
         member.setSimplePassword(newSimplePassword);
 
         memberRepository.save(member);
+    }
+
+    public TokenPairResponseDto processKakaoLogin(String code) {
+        // 카카오 서버에서 Access Token 요청
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "authorization_code");
+        body.add("client_id", kakaoClientId);
+        body.add("redirect_uri", kakaoRedirectUri);
+        body.add("code", code);
+
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        // 요청 엔티티 생성
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        // 토큰 요청
+        ResponseEntity<Map> tokenResponse = restTemplate.exchange(
+                kakaoTokenUri,
+                HttpMethod.POST,
+                request,
+                Map.class
+        );
+        String accessToken = tokenResponse.getBody().get("access_token").toString();
+
+        // Access Token으로 사용자 정보 조회
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        // 'property_keys' 파라미터 추가
+        MultiValueMap<String, String> userInfoBody = new LinkedMultiValueMap<>();
+        userInfoBody.add("property_keys", "[\"kakao_account.email\"]");
+
+        HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoBody, headers);
+
+        // 사용자 정보 요청 (이메일)
+        ResponseEntity<Map> userInfoResponse = restTemplate.exchange(
+                kakaoUserInfoUri,
+                HttpMethod.GET,
+                userInfoRequest,
+                Map.class
+        );
+
+        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfoResponse.getBody().get("kakao_account");
+        String email = kakaoAccount.get("email").toString();
+
+        return generateTokenPairWithKaKaoLogin(email);
     }
 }

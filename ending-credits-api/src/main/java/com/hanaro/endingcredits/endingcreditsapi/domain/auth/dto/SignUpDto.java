@@ -32,5 +32,8 @@ public class SignUpDto {
     private String name;
 
     @NotBlank
+    private String email;
+
+    @NotBlank
     private String simplePassword;
 }
