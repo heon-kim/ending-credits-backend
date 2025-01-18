@@ -1,7 +1,8 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeEnum;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -9,29 +10,28 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "asset")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DepositEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="deposit_id")
-    private Long depositId; //예금ID
+    private UUID depositId; //예금ID
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "asset_id")
-    private AssetEntity assetId; //자산ID
+    private AssetEntity asset; //자산ID
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "bank_id")
-    private BankEntity bankId;
+    private BankEntity bank;
 
     @Column(nullable = false, columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")//0.00
     @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
@@ -45,5 +45,5 @@ public class DepositEntity {
 
     @Column(nullable = false, name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeEnum currencyCode; //통화코드
+    private CurrencyCodeType currencyCode; //통화코드
 }

@@ -1,11 +1,15 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.member.entities;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.LoanEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.LoginType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "member")
@@ -57,4 +61,14 @@ public class MemberEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean isActive = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isLinked = false;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AssetEntity> assets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LoanEntity> loans = new ArrayList<>();
 }

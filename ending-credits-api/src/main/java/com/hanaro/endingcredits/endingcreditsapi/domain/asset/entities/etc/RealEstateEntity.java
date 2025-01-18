@@ -7,23 +7,24 @@ import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.UUID;
+
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "asset")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RealEstateEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "real_estate_id")
-    private Long realEstateId;
+    private UUID realEstateId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "asset_id")
-    private AssetEntity assetId;
+    private AssetEntity asset;
 
     @Column(nullable = false, name = "purchase_price",columnDefinition = "INTEGER DEFAULT 0")
     @Comment("원화뿐이므로 default: 0")

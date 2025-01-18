@@ -1,6 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums;
 
-public enum AssetEnum {
+public enum AssetType {
     BANK, //은행
     SECURITIES, //증권
     VIRTUAL_ASSET, //가상자산
