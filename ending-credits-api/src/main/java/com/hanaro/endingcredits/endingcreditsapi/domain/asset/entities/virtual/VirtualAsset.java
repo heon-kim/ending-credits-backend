@@ -1,7 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeEnum;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -9,29 +9,28 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "asset")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 public class VirtualAsset {
     @Id
-    @GeneratedValue
-    @Column(name="virtual_asset_code")
-    private String virtualAssetCode; //가상자산 코드
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "virtual_asset_id")
+    private UUID virtualAssetId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "asset_id")
-    private AssetEntity assetId;
+    private AssetEntity asset;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "exchange_id")
-    private ExchangeEntity exchangeId;
+    private ExchangeEntity exchange;
 
     @Column(nullable = false, name = "virtual_asset_name")
     private String virtualAssetName;
@@ -46,5 +45,5 @@ public class VirtualAsset {
 
     @Column(nullable = false, name="currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeEnum currencyCode;
+    private CurrencyCodeType currencyCode;
 }

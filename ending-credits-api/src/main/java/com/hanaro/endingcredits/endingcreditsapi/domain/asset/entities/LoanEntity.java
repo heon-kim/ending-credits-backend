@@ -2,7 +2,7 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.BankEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.DepositEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeEnum;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -22,19 +23,14 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoanEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "loan_id")
-    private Long loanId;
+    private UUID loanId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "member_id")
-    private MemberEntity memberId;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "bank_id")
-    private BankEntity bankId;
+    private MemberEntity member;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -49,7 +45,7 @@ public class LoanEntity {
 
     @Column(nullable = false, name="currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeEnum currencyCode; //통화코드
+    private CurrencyCodeType currencyCode; //통화코드
 
     @Column(nullable = false, name="expiry_date")
     @Comment("년,월,일만(시간x)")

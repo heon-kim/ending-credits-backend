@@ -1,33 +1,32 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeEnum;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "asset")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CashEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID cashId;
+
     @Column(name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeEnum currencyCode; //
+    private CurrencyCodeType currencyCode; //
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "asset_id")
-    private AssetEntity assetId;
+    private AssetEntity asset;
 
     @Column(nullable = false,columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
     @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")

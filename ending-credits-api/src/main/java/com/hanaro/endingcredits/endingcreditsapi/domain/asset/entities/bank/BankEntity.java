@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @ToString
@@ -12,11 +14,10 @@ import org.hibernate.annotations.Comment;
 @NoArgsConstructor
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 public class BankEntity {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="bank_id")
-    private Long bankId; //은행ID, 은행을 분류
+    private UUID bankId; //은행ID, 은행을 분류
 
     @Column(nullable = false, name="bank_name")
     private String bankName; //은행명

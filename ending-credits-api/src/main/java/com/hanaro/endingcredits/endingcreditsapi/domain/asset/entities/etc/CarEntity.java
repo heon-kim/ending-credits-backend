@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,24 +8,24 @@ import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.UUID;
+
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "asset")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CarEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "car_number")
-    @Comment("공백없이, 예: 12가1111, 105허1111")
-    private String carNumber;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "car_id")
+    private UUID carId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "member_id")
-    private MemberEntity memberId;
+    @JoinColumn(name = "asset_id")
+    private AssetEntity asset;
 
     @Column(nullable = false, name = "purchase_price", columnDefinition = "INTEGER DEFAULT 0")
     @Comment("원화 가치이므로 기본값: 0")

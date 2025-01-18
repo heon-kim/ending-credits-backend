@@ -3,6 +3,8 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @ToString
@@ -12,9 +14,9 @@ import lombok.*;
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 public class ExchangeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="exchange_id")
-    private Long exchangeId;
+    private UUID exchangeId;
 
     @Column(nullable = false, name = "exchange_name")
     private String exchangeName;

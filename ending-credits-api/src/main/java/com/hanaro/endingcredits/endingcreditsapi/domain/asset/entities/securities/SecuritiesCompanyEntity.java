@@ -3,6 +3,8 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.securiti
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @ToString
@@ -13,9 +15,9 @@ import lombok.*;
 public class SecuritiesCompanyEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "securities_company_id")
-    private Long securitiesCompanyId; //증권사ID
+    private UUID securitiesCompanyId; //증권사ID
 
     @Column(nullable = false,name = "securities_company_name")
     private String securitiesCompanyName; //증권사명

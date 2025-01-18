@@ -1,7 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.securities;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeEnum;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -9,10 +9,11 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "asset")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -20,19 +21,17 @@ import java.math.BigDecimal;
 public class SecuritiesAccountEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="securities_account_id")
-    private Long securitiesAccountId; //증권계좌ID
+    private UUID securitiesAccountId; //증권계좌ID
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "asset_id")
-    private AssetEntity assetId;
+    private AssetEntity asset;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "securities_company_id")
-    private SecuritiesCompanyEntity securitiesCompanyId; //증권사 ID
+    private SecuritiesCompanyEntity securitiesCompany; //증권사 ID
 
     @Column(nullable = false, name = "account_name")
     private String accountName; //계좌명
@@ -47,5 +46,5 @@ public class SecuritiesAccountEntity {
     
     @Column(nullable = false,name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeEnum currencyCode; //통화코드
+    private CurrencyCodeType currencyCode; //통화코드
 }
