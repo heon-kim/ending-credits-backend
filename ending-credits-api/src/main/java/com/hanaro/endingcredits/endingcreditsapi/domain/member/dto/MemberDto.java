@@ -18,5 +18,6 @@ public class MemberDto {
     private String phoneNumber;
     private String address;
     private String name;
+    private String email;
     private boolean isActive;
 }

@@ -52,6 +52,9 @@ public class MemberEntity {
     private String name;
 
     @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
     @Builder.Default
     private boolean isActive = false;
 }
