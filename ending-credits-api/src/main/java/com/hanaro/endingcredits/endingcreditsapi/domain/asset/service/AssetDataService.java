@@ -65,14 +65,15 @@ public class AssetDataService {
 
         MemberEntity member = memberRepository.save(
                 MemberEntity.builder()
-                        .identifier("testUser")
-                        .password("password")
+                        .identifier("rladlsdud789")
+                        .password("12345")
                         .simplePassword("1234")
+                        .email("rladlsdud789@naver.com")
                         .loginType(LoginType.NORMAL)
-                        .birthDate(LocalDate.of(1990, 1, 1))
-                        .phoneNumber("010-1234-5678")
-                        .address("Test Address")
-                        .name("Test User")
+                        .birthDate(LocalDate.of(1999, 6, 28))
+                        .phoneNumber("010-9057-2190")
+                        .address("서울시 구로구 신도림로 32")
+                        .name("김인영")
                         .isActive(true)
                         .build()
         );
@@ -155,7 +156,7 @@ public class AssetDataService {
 
         // 기타 자산 생성
         for (int i = 0; i < 5; i++) {
-            createCar(member, "12가12" + i,  30000000L + i * 2000000, 15000 + i * 1000);
+            createCar(member, "아이오닉" + i, "33루 867" + i, 30000000L + i * 2000000, 15000 + i * 1000);
             createCash(member, CurrencyCodeType.KRW, BigDecimal.valueOf(500000 + i * 50000));
             createRealEstate(member, "Real Estate " + i, "123 Main St, City " + i, 100000000L + i * 5000000, 120000000L + i * 6000000);
             createPension(member, PensionType.NATIONAL, "Pension Plan " + i, 60 + i, 500000L + i * 50000);
@@ -241,11 +242,12 @@ public class AssetDataService {
         virtualAssetRepository.save(virtualAsset);
     }
 
-    private void createCar(MemberEntity member, String model, Long purchasePrice, Integer mileage) {
+    private void createCar(MemberEntity member, String model, String carNumber, Long purchasePrice, Integer mileage) {
         AssetEntity asset = createAsset(member, AssetType.CAR, purchasePrice);
         CarEntity car = CarEntity.builder()
                 .asset(asset)
                 .model(model)
+                .carNumber(carNumber)
                 .purchasePrice(purchasePrice)
                 .mileage(mileage)
                 .build();
