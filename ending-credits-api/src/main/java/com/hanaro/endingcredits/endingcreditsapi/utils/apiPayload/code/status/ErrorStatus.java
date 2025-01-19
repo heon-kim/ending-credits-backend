@@ -27,7 +27,12 @@ public enum ErrorStatus implements BaseErrorCode {
     // 토근 관련 에러
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 토큰입니다."),
     EMPTY_HEADER(HttpStatus.BAD_REQUEST, "TOKEN4001", "헤더가 비어있습니다."),
-    INVALID_HEADER(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 헤더 형식입니다.");
+    INVALID_HEADER(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 헤더 형식입니다."),
+
+    // 번호 인증 관련 에러
+    VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "VERIFICATION4001", "인증 코드가 만료되었습니다."),
+    VERIFICATION_CODE_SEND_FAILED(HttpStatus.BAD_REQUEST, "VERIFICATION500", "인증 코드 전송에 실패했습니다."),
+    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "VERIFICATION4002", "유효하지 않은 인증 코드입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

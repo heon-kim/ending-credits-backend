@@ -8,8 +8,12 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.Er
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.InvalidJwtException;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.JwtHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.VerificationHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.MemberMapper;
 import com.hanaro.endingcredits.endingcreditsapi.utils.security.JwtProvider;
+import net.nurigo.java_sdk.api.Message;
+import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.json.simple.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.LinkedMultiValueMap;
@@ -20,6 +24,7 @@ import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,6 +48,15 @@ public class AuthService {
 
     @Value("${kakao.user-info-uri}")
     private String kakaoUserInfoUri;
+
+    @Value("${coolsms.api-key}")
+    private String coolsmsApiKey;
+
+    @Value("${coolsms.api-secret}")
+    private String coolsmsApiSecret;
+
+    @Value("${coolsms.from-number}")
+    private String coolsmsFromNumber;
 
     public String getKakaoClientId() {
         return kakaoClientId;
@@ -192,5 +206,23 @@ public class AuthService {
         String email = kakaoAccount.get("email").toString();
 
         return generateTokenPairWithKaKaoLogin(email);
+    }
+
+    public void sendSms(String phoneNumber) {
+        try {
+            Message messageService = new Message(coolsmsApiKey, coolsmsApiSecret);
+            String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000);
+
+            HashMap<String, String> params = new HashMap<>();
+            params.put("to", phoneNumber);
+            params.put("from", coolsmsFromNumber);
+            params.put("type", "SMS");
+            params.put("text", "[엔딩크레딧] 인증번호 : " + certificationCode);
+            params.put("app_version", "EndingCredits API 1.0");
+
+            messageService.send(params);
+        } catch (VerificationHandler | CoolsmsException e) {
+            throw new VerificationHandler(ErrorStatus.VERIFICATION_CODE_SEND_FAILED);
+        }
     }
 }

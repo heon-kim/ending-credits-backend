@@ -5,6 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.auth.service.AuthService
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.JwtHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.VerificationHandler;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -120,6 +121,17 @@ public class AuthController {
             // 인증 성공 응답 반환
             return ApiResponseEntity.onSuccess(tokenPair);
         } catch (MemberHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
+
+    @Operation(summary = "본인인증 SMS 전송")
+    @PostMapping("/send-sms")
+    public ApiResponseEntity sendSms(String phoneNumber) {
+        try {
+            authService.sendSms(phoneNumber);
+            return ApiResponseEntity.onSuccess(null);
+        } catch (VerificationHandler e) {
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
         }
     }
