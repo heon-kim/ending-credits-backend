@@ -27,6 +27,9 @@ public class CarEntity {
     @JoinColumn(name = "asset_id")
     private AssetEntity asset;
 
+    @Column(nullable = false, name = "car_number")
+    private String carNumber;
+
     @Column(nullable = false, name = "purchase_price", columnDefinition = "INTEGER DEFAULT 0")
     @Comment("원화 가치이므로 기본값: 0")
     private Long purchasePrice; //구매가격

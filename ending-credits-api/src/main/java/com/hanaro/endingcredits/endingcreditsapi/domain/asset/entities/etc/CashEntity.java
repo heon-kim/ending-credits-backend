@@ -18,6 +18,7 @@ import java.util.UUID;
 public class CashEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "cash_id")
     private UUID cashId;
 
     @Column(name = "currency_code")

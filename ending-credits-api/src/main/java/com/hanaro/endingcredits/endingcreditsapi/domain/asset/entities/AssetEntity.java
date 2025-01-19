@@ -35,7 +35,6 @@ public class AssetEntity {
     private int assetId; //자산ID
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "member_id", nullable = false) //identifier 참조해야함
     private MemberEntity member; //memberId 있으면 자산연결O, 없으면 연결X
 
