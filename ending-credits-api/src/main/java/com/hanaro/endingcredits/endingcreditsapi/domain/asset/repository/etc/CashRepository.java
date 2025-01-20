@@ -12,5 +12,5 @@ import java.util.UUID;
 
 @Repository
 public interface CashRepository extends JpaRepository<CashEntity, UUID> {
-    List<CashEntity> findByAsset_Member(MemberEntity member);
+    Optional<CashEntity> findByAsset_Member_MemberId(UUID memberId);
 }
