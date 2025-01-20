@@ -31,13 +31,17 @@ public class PensionEntity {
     @Comment("NATIONAL: 국민연금, RETIREMENT: 퇴직연금, PERSONAL: 개인연금")
     private PensionType pensionType; //연금종류
 
-    @Column(nullable = false, name = "pension_name")
-    private String pensionName;
-
     @Column(nullable = false, name = "pension_age")
     @Comment("연금 수령 연령")
     private Integer pensionAge; //연금 수령 연령
 
     @Column(nullable = false,columnDefinition = "INTEGER DEFAULT 0")
     private Long amount;
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }

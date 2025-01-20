@@ -50,4 +50,11 @@ public class FundEntity {
     @Column(nullable = false, name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode; //통화코드
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }

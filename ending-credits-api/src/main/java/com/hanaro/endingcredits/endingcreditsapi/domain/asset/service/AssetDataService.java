@@ -151,7 +151,7 @@ public class AssetDataService {
 
         // 각 증권사에 증권 계좌 연결
         for (int i = 0; i < securitiesCompanies.size(); i++) {
-            createSecuritiesAccount(member, securitiesCompanies.get(i), "Securities Account " + i, BigDecimal.valueOf(1000000 + i * 100000), BigDecimal.valueOf(5000000 + i * 200000));
+            createSecuritiesAccount(member, securitiesCompanies.get(i), "Securities Account " + i, BigDecimal.valueOf(1000000 + i * 100000), BigDecimal.valueOf(5000000 + i * 200000), BigDecimal.valueOf(i + 0.5));
         }
 
         // 기타 자산 생성
@@ -159,11 +159,11 @@ public class AssetDataService {
             createCar(member, "아이오닉" + i, "33루 867" + i, 30000000L + i * 2000000, 15000 + i * 1000);
             createCash(member, CurrencyCodeType.KRW, BigDecimal.valueOf(500000 + i * 50000));
             createRealEstate(member, "Real Estate " + i, "123 Main St, City " + i, 100000000L + i * 5000000, 120000000L + i * 6000000);
-            createPension(member, PensionType.NATIONAL, "Pension Plan " + i, 60 + i, 500000L + i * 50000);
+            createPension(member, PensionType.NATIONAL, 60 + i, 500000L + i * 50000);
         }
     }
 
-    private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String accountName, BigDecimal deposit, BigDecimal principal) {
+    private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String securitiesAccountName, BigDecimal deposit, BigDecimal principal, BigDecimal profitRatio) {
         // 자산 생성
         AssetEntity asset = createAsset(member, AssetType.SECURITIES, principal.longValue());
 
@@ -171,10 +171,11 @@ public class AssetDataService {
         SecuritiesAccountEntity account = SecuritiesAccountEntity.builder()
                 .asset(asset)
                 .securitiesCompany(company)
-                .accountName(accountName)
+                .securitiesAccountName(securitiesAccountName)
                 .deposit(deposit)
                 .principal(principal)
                 .currencyCode(CurrencyCodeType.KRW)
+                .profitRatio(profitRatio)
                 .build();
         securitiesAccountRepository.save(account);
     }
@@ -191,7 +192,7 @@ public class AssetDataService {
     }
 
     private void createTrust(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount) {
-        AssetEntity asset = createAsset(member, AssetType.BANK, amount.longValue());
+        AssetEntity asset = createAsset(member, AssetType.TRUST, amount.longValue());
         TrustEntity trust = TrustEntity.builder()
                 .bank(bank)
                 .asset(asset)
@@ -204,7 +205,7 @@ public class AssetDataService {
     }
 
     private void createFund(MemberEntity member, BankEntity bank, BigDecimal investmentPrincipal) {
-        AssetEntity asset = createAsset(member, AssetType.BANK, investmentPrincipal.longValue());
+        AssetEntity asset = createAsset(member, AssetType.FUND, investmentPrincipal.longValue());
         FundEntity fund = FundEntity.builder()
                 .bank(bank)
                 .asset(asset)
@@ -217,7 +218,7 @@ public class AssetDataService {
     }
 
     private void createDeposit(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount) {
-        AssetEntity asset = createAsset(member, AssetType.BANK, amount.longValue());
+        AssetEntity asset = createAsset(member, AssetType.DEPOSIT, amount.longValue());
         DepositEntity deposit = DepositEntity.builder()
                 .bank(bank)
                 .asset(asset)
@@ -276,12 +277,11 @@ public class AssetDataService {
         realEstateRepository.save(realEstate);
     }
 
-    private void createPension(MemberEntity member, PensionType type, String name, int pensionAge, Long amount) {
+    private void createPension(MemberEntity member, PensionType type, int pensionAge, Long amount) {
         AssetEntity asset = createAsset(member, AssetType.PENSION, amount);
         PensionEntity pension = PensionEntity.builder()
                 .asset(asset)
                 .pensionType(type)
-                .pensionName(name)
                 .pensionAge(pensionAge)
                 .amount(amount)
                 .build();

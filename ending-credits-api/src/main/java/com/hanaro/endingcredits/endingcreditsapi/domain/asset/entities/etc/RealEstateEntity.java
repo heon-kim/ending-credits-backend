@@ -39,4 +39,11 @@ public class RealEstateEntity {
 
     @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }
