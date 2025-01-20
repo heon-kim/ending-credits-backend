@@ -1,11 +1,17 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.config;
 
+//import com.hanaro.endingcredits.endingcreditsapi.domain.product.mapper.PensionSavingsProductMapper;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -13,7 +19,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RetirementPensionDataInitializer {
 
+    private final PensionSavingsService pensionSavingsService;
     private final RetirementPensionService retirementPensionService;
+
+    @Value("${api.key}")
+    private String apiKey;
+
+    private static final String API_URL = "https://www.fss.or.kr/openapi/api/psProdList.json";
+
+    @Bean
+    public ApplicationRunner initPensionSavingsData() {
+        return args -> {
+            List<Integer> areaCodes = List.of(1, 3, 4, 5);
+
+            for (int areaCode : areaCodes) {
+                int year = 2024;
+                int quarter = 3;
+
+                String requestUrl = UriComponentsBuilder.fromHttpUrl(API_URL)
+                        .queryParam("key", apiKey)
+                        .queryParam("year", year)
+                        .queryParam("quarter", quarter)
+                        .queryParam("areaCode", areaCode)
+                        .toUriString();
+
+                pensionSavingsService.fetchAndSavePensionProducts(requestUrl, areaCode);
+            }
+        };
+    }
 
     @Bean
     public ApplicationRunner initRetirementPensionData() {

@@ -4,19 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductArea;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,40 +26,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PensionSavingsService {
 
-    @Value("${api.key}")
-    private String apiKey;
-
     private final RestTemplate restTemplate;
+
     private final PensionSavingsJpaRepository pensionProductRepository;
-
-    private static final String API_URL = "https://www.fss.or.kr/openapi/api/psProdList.json";
-
-    @PostConstruct
-    public void initialize() {
-        requestPensionProductData();
-    }
-
-    public void requestPensionProductData() {
-        try {
-            List<Integer> areaCodes = List.of(1, 3, 4, 5);
-
-            for (int areaCode : areaCodes) {
-                int year = 2024;
-                int quarter = 3;
-
-                String requestUrl = UriComponentsBuilder.fromHttpUrl(API_URL)
-                        .queryParam("key", apiKey)
-                        .queryParam("year", year)
-                        .queryParam("quarter", quarter)
-                        .queryParam("areaCode", areaCode)
-                        .toUriString();
-
-                fetchAndSavePensionProducts(requestUrl, areaCode);
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-    }
+    private final PensionSavingsSearchRepository pensionSavingsSearchRepository;
 
     @Transactional
     public void fetchAndSavePensionProducts(String apiUrl, int areaCode) throws JsonProcessingException {
@@ -95,6 +62,8 @@ public class PensionSavingsService {
                         .productDetail(productDetail)
                         .build();
                 pensionProductRepository.save(entity);
+                PensionSavingsEsEntity document = mapToEsEntity(entity);
+                pensionSavingsSearchRepository.save(document);
             }
         }
     }
@@ -133,7 +102,7 @@ public class PensionSavingsService {
 
         List<Map<String, Object>> productDetail = product.getProductDetail();
         if (productDetail == null || productDetail.isEmpty()) {
-            requestPensionProductData();
+            log.warn("조회할 연금저축 상품이 존재하지 않습니다.");
         }
 
         Map<String, Object> detail = productDetail.get(0);
@@ -163,6 +132,22 @@ public class PensionSavingsService {
                 .previousYearFeeRate((Double) detail.get("feeRate1"))  // 과거 1년 수수료율
                 .twoYearsAgoFeeRate((Double) detail.get("feeRate2"))  // 과거 2년 수수료율
                 .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PensionSavingsEsEntity> searchProducts(String keyword, int areaCode) {
+        String productArea = ProductArea.fromCode(areaCode).getDescription();
+
+        return pensionSavingsSearchRepository.findByProductNameContainingAndProductArea(keyword, productArea);
+    }
+
+    private PensionSavingsEsEntity mapToEsEntity(PensionSavingsProductEntity entity) {
+        return PensionSavingsEsEntity.builder()
+                .productId((entity.getProductId()).toString())
+                .productName(entity.getProductName())
+                .productArea(entity.getProductArea().getDescription())
+                .company(entity.getCompany())
                 .build();
     }
 }

@@ -139,18 +139,18 @@ public class RetirementPensionService {
                 .build();
     }
 
-    private RetirementPensionProductEntity mapToJpaEntity(RetirementPensionEsEntity esEntity) {
-        return RetirementPensionProductEntity.builder()
-                .productId(UUID.fromString(esEntity.getId()))
-                .productName(esEntity.getProductName())
-                .company(esEntity.getCompany())
-                .applyTerm(esEntity.getApplyTerm())
-                .checkDate(esEntity.getCheckDate())
-                .contractTerm(esEntity.getContractTerm())
-                .contractRate(esEntity.getContractRate())
-                .productArea(ProductArea.valueOf(String.valueOf(esEntity.getProductArea())))
-                .sysType(SysType.valueOf(String.valueOf(esEntity.getSysType())))
-                .build();
-    }
+//    private RetirementPensionProductEntity mapToJpaEntity(RetirementPensionEsEntity esEntity) {
+//        return RetirementPensionProductEntity.builder()
+//                .productId(UUID.fromString(esEntity.getId()))
+//                .productName(esEntity.getProductName())
+//                .company(esEntity.getCompany())
+//                .applyTerm(esEntity.getApplyTerm())
+//                .checkDate(esEntity.getCheckDate())
+//                .contractTerm(esEntity.getContractTerm())
+//                .contractRate(esEntity.getContractRate())
+//                .productArea(ProductArea.valueOf(String.valueOf(esEntity.getProductArea())))
+//                .sysType(SysType.valueOf(String.valueOf(esEntity.getSysType())))
+//                .build();
+//    }
 }
 
