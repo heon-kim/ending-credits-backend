@@ -47,4 +47,11 @@ public class TrustEntity {
     @Column(nullable = false, name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode;
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }

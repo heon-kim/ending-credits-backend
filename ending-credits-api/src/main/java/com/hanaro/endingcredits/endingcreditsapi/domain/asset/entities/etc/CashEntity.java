@@ -32,4 +32,11 @@ public class CashEntity {
     @Column(nullable = false,columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
     @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
     private BigDecimal amount; //금액 default: 0.00
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }

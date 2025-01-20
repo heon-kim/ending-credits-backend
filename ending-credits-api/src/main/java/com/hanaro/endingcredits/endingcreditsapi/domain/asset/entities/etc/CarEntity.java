@@ -40,4 +40,11 @@ public class CarEntity {
 
     @Column(nullable = false)
     private String model;
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }

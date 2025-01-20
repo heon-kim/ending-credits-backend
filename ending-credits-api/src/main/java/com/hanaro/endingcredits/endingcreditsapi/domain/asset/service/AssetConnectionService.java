@@ -1,7 +1,30 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.BankEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.DepositEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.FundEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.TrustEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.CarEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.CashEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.PensionEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.RealEstateEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.securities.SecuritiesAccountEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.securities.SecuritiesCompanyEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual.ExchangeEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual.VirtualAsset;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.BankRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.DepositRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.FundRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.TrustRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.CarRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.CashRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.PensionRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.RealEstateRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.securities.SecuritiesAccountRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.securities.SecuritiesCompanyRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.virtual.ExchangeRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.virtual.VirtualAssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,42 +38,135 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AssetConnectionService {
 
+    // 기존의 Repositories 주입
     private final MemberRepository memberRepository;
-    private final AssetRepository assetRepository;
+    private final BankRepository bankRepository;
+    private final DepositRepository depositRepository;
+    private final FundRepository fundRepository;
+    private final TrustRepository trustRepository;
+    private final SecuritiesCompanyRepository securitiesCompanyRepository;
+    private final SecuritiesAccountRepository securitiesAccountRepository;
+    private final ExchangeRepository exchangeRepository;
+    private final VirtualAssetRepository virtualAssetRepository;
+    private final CarRepository carRepository;
+    private final CashRepository cashRepository;
+    private final PensionRepository pensionRepository;
+    private final RealEstateRepository realEstateRepository;
 
-    @Transactional(readOnly = true)
-    public boolean checkMemberAssetConnection(UUID memberId) {
-        MemberEntity member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
-        return member.isLinked();
+    /**
+     * 모든 자산 연결
+     */
+    @Transactional
+    public void connectAllAssets(List<String> bankNames, List<String> securitiesCompanyNames, List<String> exchangeNames, UUID memberId) {
+        MemberEntity member = getMember(memberId);
+
+        // 은행 자산 연결
+        for (String bankName : bankNames) {
+            BankEntity bank = bankRepository.findByBankName(bankName)
+                    .orElseThrow(() -> new IllegalArgumentException("은행을 찾을 수 없습니다: " + bankName));
+            connectDeposits(bank, member);
+            connectFunds(bank, member);
+            connectTrusts(bank, member);
+        }
+
+        // 증권 자산 연결
+        for (String securitiesCompanyName : securitiesCompanyNames) {
+            SecuritiesCompanyEntity company = securitiesCompanyRepository.findBySecuritiesCompanyName(securitiesCompanyName)
+                    .orElseThrow(() -> new IllegalArgumentException("증권회사를 찾을 수 없습니다: " + securitiesCompanyName));
+            connectSecuritiesAccounts(company, member);
+        }
+
+        // 가상자산 연결
+        for (String exchangeName : exchangeNames) {
+            ExchangeEntity exchange = exchangeRepository.findByExchangeName(exchangeName)
+                    .orElseThrow(() -> new IllegalArgumentException("거래소를 찾을 수 없습니다: " + exchangeName));
+            connectVirtualAssets(exchange, member);
+        }
+
+        // 기타 자산 연결
+        connectCars(member);
+        connectCash(member);
+        connectPensions(member);
+        connectRealEstates(member);
     }
 
-    @Transactional
-    public void connectAssets(UUID memberId, List<UUID> assetIdsToConnect) {
-        MemberEntity member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+    // Private Helper Methods (기존 메서드 사용)
 
-        // 선택한 자산 ID들을 자산 테이블에서 조회
-        List<AssetEntity> assets = assetRepository.findAllById(assetIdsToConnect);
-
-        // 회원의 자산 목록에 추가
-        member.getAssets().addAll(assets);
-
-        // 연결 상태를 true로 설정
-        member.setLinked(true);
-        memberRepository.save(member);
+    private void connectDeposits(BankEntity bank, MemberEntity member) {
+        List<DepositEntity> deposits = depositRepository.findByBankAndAsset_Member(bank, member);
+        deposits.forEach(deposit -> {
+            deposit.setConnected(true);
+            depositRepository.save(deposit);
+        });
     }
 
-    @Transactional
-    public void disconnectAssets(UUID memberId) {
-        MemberEntity member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+    private void connectFunds(BankEntity bank, MemberEntity member) {
+        List<FundEntity> funds = fundRepository.findByBankAndAsset_Member(bank, member);
+        funds.forEach(fund -> {
+            fund.setConnected(true);
+            fundRepository.save(fund);
+        });
+    }
 
-        // 모든 자산 연결 해제
-        member.getAssets().clear();
+    private void connectTrusts(BankEntity bank, MemberEntity member) {
+        List<TrustEntity> trusts = trustRepository.findByBankAndAsset_Member(bank, member);
+        trusts.forEach(trust -> {
+            trust.setConnected(true);
+            trustRepository.save(trust);
+        });
+    }
 
-        // 연결 상태를 false로 설정
-        member.setLinked(false);
-        memberRepository.save(member);
+    private void connectSecuritiesAccounts(SecuritiesCompanyEntity company, MemberEntity member) {
+        List<SecuritiesAccountEntity> accounts = securitiesAccountRepository.findBySecuritiesCompanyAndAsset_Member(company, member);
+        accounts.forEach(account -> {
+            account.setConnected(true);
+            securitiesAccountRepository.save(account);
+        });
+    }
+
+    private void connectVirtualAssets(ExchangeEntity exchange, MemberEntity member) {
+        List<VirtualAsset> assets = virtualAssetRepository.findByExchangeAndAsset_Member(exchange, member);
+        assets.forEach(asset -> {
+            asset.setConnected(true);
+            virtualAssetRepository.save(asset);
+        });
+    }
+
+    private void connectCars(MemberEntity member) {
+        List<CarEntity> cars = carRepository.findByAsset_Member(member);
+        cars.forEach(car -> {
+            car.setConnected(true);
+            carRepository.save(car);
+        });
+    }
+
+    private void connectCash(MemberEntity member) {
+        List<CashEntity> cashes = cashRepository.findByAsset_Member(member);
+        cashes.forEach(cash -> {
+            cash.setConnected(true);
+            cashRepository.save(cash);
+        });
+    }
+
+    private void connectPensions(MemberEntity member) {
+        List<PensionEntity> pensions = pensionRepository.findByAsset_Member(member);
+        pensions.forEach(pension -> {
+            pension.setConnected(true);
+            pensionRepository.save(pension);
+        });
+    }
+
+    private void connectRealEstates(MemberEntity member) {
+        List<RealEstateEntity> realEstates = realEstateRepository.findByAsset_Member(member);
+        realEstates.forEach(realEstate -> {
+            realEstate.setConnected(true);
+            realEstateRepository.save(realEstate);
+        });
+    }
+
+    private MemberEntity getMember(UUID memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다. ID: " + memberId));
     }
 }
+

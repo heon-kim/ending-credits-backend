@@ -30,9 +30,9 @@ import java.util.UUID;
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 public class AssetEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "asset_id")
-    private int assetId; //자산ID
+    private UUID assetId; //자산ID
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false) //identifier 참조해야함
@@ -40,7 +40,7 @@ public class AssetEntity {
 
     @Column(nullable=false,name = "asset_type")
     @Enumerated(EnumType.STRING)
-    @Comment("BANK: 은행, SECURITIES: 증권, VIRTUAL_ASSET: 가상자산, CASH: 현금, " +
+    @Comment("DEPOSIT: 예금, FUND: 펀드, TRUST: 신탁, SECURITIES: 증권, VIRTUAL_ASSET: 가상자산, CASH: 현금, " +
             "REAL_ESTATE: 부동산, CAR: 자동차, PENSION: 연금")
     private AssetType assetType;
 

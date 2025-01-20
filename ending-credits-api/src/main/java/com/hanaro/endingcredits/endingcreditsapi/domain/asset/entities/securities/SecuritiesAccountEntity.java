@@ -33,8 +33,8 @@ public class SecuritiesAccountEntity {
     @JoinColumn(name = "securities_company_id")
     private SecuritiesCompanyEntity securitiesCompany; //증권사 ID
 
-    @Column(nullable = false, name = "account_name")
-    private String accountName; //계좌명
+    @Column(nullable = false, name = "securities_account_name")
+    private String securitiesAccountName; //계좌명
     
     @Column(nullable = false, columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
     @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
@@ -47,4 +47,14 @@ public class SecuritiesAccountEntity {
     @Column(nullable = false,name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode; //통화코드
+
+    @Column(nullable = false, name = "isConnected")
+    private boolean isConnected = false;
+
+    @Column(nullable = false, name = "profit_ratio", columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
+    private BigDecimal profitRatio; //수익율, default: 0.00
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
 }
