@@ -13,6 +13,8 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.MemberMapper;
 import com.hanaro.endingcredits.endingcreditsapi.utils.security.JwtProvider;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@EnableScheduling
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -245,5 +248,11 @@ public class AuthService {
         }
 
         cerificationCodes.remove(phoneNumber);
+    }
+
+    @Scheduled(fixedRate = 300000) // 5분마다 만료된 인증코드 삭제 작업 실행
+    public void removeExpiredCodes() {
+        long currentTime = System.currentTimeMillis();
+        cerificationCodes.entrySet().removeIf(entry -> entry.getValue().getExpiryTime() < currentTime);
     }
 }
