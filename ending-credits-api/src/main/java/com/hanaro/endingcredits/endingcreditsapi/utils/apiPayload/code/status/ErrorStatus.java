@@ -32,7 +32,10 @@ public enum ErrorStatus implements BaseErrorCode {
     // 번호 인증 관련 에러
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "VERIFICATION4001", "인증 코드가 만료되었습니다."),
     VERIFICATION_CODE_SEND_FAILED(HttpStatus.BAD_REQUEST, "VERIFICATION500", "인증 코드 전송에 실패했습니다."),
-    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "VERIFICATION4002", "유효하지 않은 인증 코드입니다.");
+    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "VERIFICATION4002", "유효하지 않은 인증 코드입니다."),
+
+    // 자산 관련 에러
+    CASH_NOT_FOUND(HttpStatus.BAD_REQUEST, "CASH4001", "현금 자산이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
