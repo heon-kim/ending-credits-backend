@@ -259,7 +259,6 @@ public class AssetDataService {
         AssetEntity asset = createAsset(member, AssetType.CASH, amount.longValue());
         CashEntity cash = CashEntity.builder()
                 .asset(asset)
-                .currencyCode(currencyCode)
                 .amount(amount)
                 .build();
         cashRepository.save(cash);

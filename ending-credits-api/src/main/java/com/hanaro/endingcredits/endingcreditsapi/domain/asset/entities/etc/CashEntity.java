@@ -21,19 +21,15 @@ public class CashEntity {
     @Column(name = "cash_id")
     private UUID cashId;
 
-    @Column(name = "currency_code")
-    @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeType currencyCode; //
-
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id")
     private AssetEntity asset;
 
-    @Column(nullable = false,columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
-    @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
-    private BigDecimal amount; //금액 default: 0.00
+    @Column(nullable = false, columnDefinition = "DECIMAL(19, 0) DEFAULT 0")
+    @Comment("금액의 기본값을 0으로 설정합니다.")
+    private BigDecimal amount; // 금액 default: 0
 
-    @Column(nullable = false, name = "isConnected")
+    @Column(nullable = false, name = "is_connected")
     private boolean isConnected = false;
 
     public void setConnected(boolean connected) {
