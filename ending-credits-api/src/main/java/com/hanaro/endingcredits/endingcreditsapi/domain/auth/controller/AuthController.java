@@ -5,6 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.auth.service.AuthService
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.JwtHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.VerificationHandler;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -82,12 +83,16 @@ public class AuthController {
         }
     }
 
-//    @Operation(summary = "비밀번호 재설정")
-//    @PatchMapping("/password")
-//    public ApiResponseEntity changePassword(@AuthenticationPrincipal UUID memberId, String password) {
-//        authService.changePassword(memberId, password);
-//        return ApiResponseEntity.onSuccess(null);
-//    }
+    @Operation(summary = "비밀번호 재설정")
+    @PatchMapping("/password")
+    public ApiResponseEntity changePassword(String phoneNumber, String password) {
+        try{
+            authService.changePassword(phoneNumber, password);
+            return ApiResponseEntity.onSuccess(null);
+        } catch(MemberHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
 
     @Operation(summary = "간편 비밀번호 재설정")
     @PatchMapping("/simple-password")
@@ -120,6 +125,28 @@ public class AuthController {
             // 인증 성공 응답 반환
             return ApiResponseEntity.onSuccess(tokenPair);
         } catch (MemberHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
+
+    @Operation(summary = "본인인증 SMS 전송")
+    @PostMapping("/send-sms")
+    public ApiResponseEntity sendSms(String phoneNumber) {
+        try {
+            authService.sendSms(phoneNumber);
+            return ApiResponseEntity.onSuccess(null);
+        } catch (VerificationHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
+
+    @Operation(summary = "본인인증 SMS 코드 인증")
+    @PostMapping("/verify-sms")
+    public ApiResponseEntity sendSms(String phoneNumber, String certificationCode) {
+        try {
+            authService.verifySms(phoneNumber, certificationCode);
+            return ApiResponseEntity.onSuccess(null);
+        } catch (VerificationHandler e) {
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
         }
     }
