@@ -146,8 +146,8 @@ public class AuthService {
         }
     }
 
-    public void changePassword(UUID memberId, String newPassword) {
-        MemberEntity member = memberRepository.findByMemberId(memberId)
+    public void changePassword(String phoneNumber, String newPassword) {
+        MemberEntity member = memberRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         member.setPassword(passwordEncoder.encode(newPassword));

@@ -83,12 +83,16 @@ public class AuthController {
         }
     }
 
-//    @Operation(summary = "비밀번호 재설정")
-//    @PatchMapping("/password")
-//    public ApiResponseEntity changePassword(@AuthenticationPrincipal UUID memberId, String password) {
-//        authService.changePassword(memberId, password);
-//        return ApiResponseEntity.onSuccess(null);
-//    }
+    @Operation(summary = "비밀번호 재설정")
+    @PatchMapping("/password")
+    public ApiResponseEntity changePassword(String phoneNumber, String password) {
+        try{
+            authService.changePassword(phoneNumber, password);
+            return ApiResponseEntity.onSuccess(null);
+        } catch(MemberHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
 
     @Operation(summary = "간편 비밀번호 재설정")
     @PatchMapping("/simple-password")
