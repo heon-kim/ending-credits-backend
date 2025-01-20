@@ -2,10 +2,11 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsEsEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.models.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,5 +39,23 @@ public class PensionSavingsController {
     public ApiResponseEntity<PensionSavingsResponseDto> getPensionProduct(@PathVariable(name = "productId") UUID productId){
         PensionSavingsResponseDto responseDto = pensionSavingsService.getSavingsProduct(productId);
         return ApiResponseEntity.onSuccess(responseDto);
+    }
+
+    @GetMapping("/pension-savings/search")
+    @Operation(summary = "연금저축 상품 검색어로 조회", description = "상품명으로 상품을 조회합니다.")
+    public ApiResponseEntity<List<PensionSavingsEsEntity>> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam int areaCode) {
+        try {
+            List<PensionSavingsEsEntity> responseDto = pensionSavingsService.searchProducts(keyword, areaCode);
+
+            if (responseDto.isEmpty()) {
+                return ApiResponseEntity.onFailure(ErrorStatus.RECOMMEND_NOT_FOUND.getCode(), ErrorStatus.RECOMMEND_NOT_FOUND.getMessage(), null);
+            }
+
+            return ApiResponseEntity.onSuccess(responseDto);
+        } catch (Exception e) {
+            return ApiResponseEntity.onFailure(ErrorStatus.PRODUCT_NOT_FOUND.getCode(), ErrorStatus.PRODUCT_NOT_FOUND.getMessage(), null);
+        }
     }
 }
