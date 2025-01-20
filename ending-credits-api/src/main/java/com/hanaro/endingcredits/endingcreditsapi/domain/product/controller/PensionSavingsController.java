@@ -5,6 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavin
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsEsEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +48,14 @@ public class PensionSavingsController {
             @RequestParam int areaCode) {
         try {
             List<PensionSavingsEsEntity> responseDto = pensionSavingsService.searchProducts(keyword, areaCode);
+
+            if (responseDto.isEmpty()) {
+                return ApiResponseEntity.onFailure(ErrorStatus.RECOMMEND_NOT_FOUND.getCode(), ErrorStatus.RECOMMEND_NOT_FOUND.getMessage(), null);
+            }
+
             return ApiResponseEntity.onSuccess(responseDto);
         } catch (Exception e) {
-            return ApiResponseEntity.onFailure("PRODUCT4001", "상품 목록 조회 중 오류가 발생했습니다.", null);
+            return ApiResponseEntity.onFailure(ErrorStatus.PRODUCT_NOT_FOUND.getCode(), ErrorStatus.PRODUCT_NOT_FOUND.getMessage(), null);
         }
     }
 }
