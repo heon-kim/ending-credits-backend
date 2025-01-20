@@ -21,7 +21,7 @@ public class CashEntity {
     @Column(name = "cash_id")
     private UUID cashId;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id")
     private AssetEntity asset;
 
