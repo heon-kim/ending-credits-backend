@@ -135,5 +135,16 @@ public class AuthController {
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
         }
     }
+
+    @Operation(summary = "본인인증 SMS 코드 인증")
+    @PostMapping("/verify-sms")
+    public ApiResponseEntity sendSms(String phoneNumber, String certificationCode) {
+        try {
+            authService.verifySms(phoneNumber, certificationCode);
+            return ApiResponseEntity.onSuccess(null);
+        } catch (VerificationHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
 }
 

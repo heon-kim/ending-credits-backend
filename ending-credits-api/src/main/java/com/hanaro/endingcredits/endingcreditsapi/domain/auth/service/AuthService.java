@@ -13,7 +13,6 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.MemberMapper;
 import com.hanaro.endingcredits.endingcreditsapi.utils.security.JwtProvider;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
-import org.json.simple.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +65,9 @@ public class AuthService {
     public String getKakaoRedirectUri() {
         return kakaoRedirectUri;
     }
+
+    // 휴대폰 본인인증 코드 넣을 메모리
+    private Map<String, CerificationCodeDto> cerificationCodes = new ConcurrentHashMap<>();
 
     private TokenPairResponseDto generateTokenPair(Map<String, ?> claims) {
         Date now = new Date();
@@ -213,6 +216,12 @@ public class AuthService {
             Message messageService = new Message(coolsmsApiKey, coolsmsApiSecret);
             String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000);
 
+            long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000); // 인증코드 5분 TTL
+            cerificationCodes.put(phoneNumber, CerificationCodeDto.builder()
+                            .code(certificationCode)
+                            .expiryTime(expiryTime)
+                            .build());
+
             HashMap<String, String> params = new HashMap<>();
             params.put("to", phoneNumber);
             params.put("from", coolsmsFromNumber);
@@ -224,5 +233,17 @@ public class AuthService {
         } catch (VerificationHandler | CoolsmsException e) {
             throw new VerificationHandler(ErrorStatus.VERIFICATION_CODE_SEND_FAILED);
         }
+    }
+
+    public void verifySms(String phoneNumber, String certificationCode) {
+        CerificationCodeDto storedCode = cerificationCodes.get(phoneNumber);
+
+        if (storedCode.getCode() == null || !storedCode.getCode().equals(certificationCode)) {
+            throw new VerificationHandler(ErrorStatus.INVALID_VERIFICATION_CODE);
+        } else if (storedCode.isExpired()) {
+            throw new VerificationHandler(ErrorStatus.VERIFICATION_CODE_EXPIRED);
+        }
+
+        cerificationCodes.remove(phoneNumber);
     }
 }
