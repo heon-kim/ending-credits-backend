@@ -3,6 +3,7 @@ package com.hanaro.endingcredits.endingcreditsapi.utils.config;
 //import com.hanaro.endingcredits.endingcreditsapi.domain.product.mapper.PensionSavingsProductMapper;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.AssetDataService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,16 @@ public class RetirementPensionDataInitializer {
 
     private final PensionSavingsService pensionSavingsService;
     private final RetirementPensionService retirementPensionService;
+    private final AssetDataService assetDataService;
+
+    @Bean
+    public ApplicationRunner initAssetData() {
+        return args -> {
+            System.out.println("애플리케이션 실행 시 자산 목 데이터를 생성합니다...");
+            assetDataService.generateMockData(); // 자산 목데이터 생성 호출
+            System.out.println("자산 목 데이터 생성이 완료되었습니다!");
+        };
+    }
 
     @Value("${api.key}")
     private String apiKey;
