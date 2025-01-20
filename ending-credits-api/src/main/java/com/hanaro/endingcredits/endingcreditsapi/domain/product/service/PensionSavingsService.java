@@ -9,6 +9,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elast
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class PensionSavingsService {
 
     private final RestTemplate restTemplate;
+    private final ProductMapper productMapper;
 
     private final PensionSavingsJpaRepository pensionProductRepository;
     private final PensionSavingsSearchRepository pensionSavingsSearchRepository;
@@ -62,7 +64,7 @@ public class PensionSavingsService {
                         .productDetail(productDetail)
                         .build();
                 pensionProductRepository.save(entity);
-                PensionSavingsEsEntity document = mapToEsEntity(entity);
+                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
                 pensionSavingsSearchRepository.save(document);
             }
         }
@@ -140,14 +142,5 @@ public class PensionSavingsService {
         String productArea = ProductArea.fromCode(areaCode).getDescription();
 
         return pensionSavingsSearchRepository.findByProductNameContainingAndProductArea(keyword, productArea);
-    }
-
-    private PensionSavingsEsEntity mapToEsEntity(PensionSavingsProductEntity entity) {
-        return PensionSavingsEsEntity.builder()
-                .productId((entity.getProductId()).toString())
-                .productName(entity.getProductName())
-                .productArea(entity.getProductArea().getDescription())
-                .company(entity.getCompany())
-                .build();
     }
 }
