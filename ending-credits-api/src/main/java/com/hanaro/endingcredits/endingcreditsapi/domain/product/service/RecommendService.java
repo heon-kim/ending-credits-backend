@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -103,6 +104,8 @@ public class RecommendService {
     private PensionSavingsResponseDto buildResponseDto(PensionSavingsProductEntity product) {
         Map<String, Object> detail = product.getProductDetail().get(0);
 
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
         return PensionSavingsResponseDto.builder()
                 .area(product.getProductArea().getDescription())
                 .company((String) detail.get("company"))
@@ -113,14 +116,14 @@ public class RecommendService {
                 .sells("Y".equals(detail.get("sells")) ? "진행" : "중단")
                 .withdraws("Y".equals(detail.get("withdraws")) ? "가능" : "불가능")
                 .guarantees("Y".equals(detail.get("guarantees")) ? "보장" : "비보장")
-                .currentBalance(getIntValue(detail.get("balance")))
-                .previousYearBalance(getIntValue(detail.get("balance1")))
-                .twoYearsAgoBalance(getIntValue(detail.get("balance2")))
-                .threeYearsAgoBalance(getIntValue(detail.get("balance3")))
-                .currentReserve(getIntValue(detail.get("reserve")))
-                .previousYearReserve(getIntValue(detail.get("reserve1")))
-                .twoYearsAgoReserve(getIntValue(detail.get("reserve2")))
-                .threeYearsAgoReserve(getIntValue(detail.get("reserve3")))
+                .currentBalance(formatter.format(getIntValue(detail.get("balance"))))
+                .previousYearBalance(formatter.format(getIntValue(detail.get("balance1"))))
+                .twoYearsAgoBalance(formatter.format(getIntValue(detail.get("balance2"))))
+                .threeYearsAgoBalance(formatter.format(getIntValue(detail.get("balance3"))))
+                .currentReserve(formatter.format(getIntValue(detail.get("reserve"))))
+                .previousYearReserve(formatter.format(getIntValue(detail.get("reserve1"))))
+                .twoYearsAgoReserve(formatter.format(getIntValue(detail.get("reserve2"))))
+                .threeYearsAgoReserve(formatter.format(getIntValue(detail.get("reserve3"))))
                 .currentEarnRate(getDoubleValue(detail.get("earnRate")))
                 .previousYearEarnRate(getDoubleValue(detail.get("earnRate1")))
                 .twoYearsAgoEarnRate(getDoubleValue(detail.get("earnRate2")))
