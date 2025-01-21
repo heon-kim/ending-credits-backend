@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.clovaAdapter;
 
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.STT.ClovaSTTResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -40,8 +42,8 @@ public class ClovaSTTProvider {
 
         // Send the POST request
         String url = invokeUrl + "/recognizer/object-storage";
-        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        ResponseEntity<ClovaSTTResponseDto> response = restTemplate.postForEntity(url, entity, ClovaSTTResponseDto.class);
 
-        return response.getBody();
+        return Objects.requireNonNull(response.getBody()).getText();
     }
 }
