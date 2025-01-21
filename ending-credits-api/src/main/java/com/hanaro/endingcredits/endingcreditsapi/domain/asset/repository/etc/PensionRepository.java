@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface PensionRepository extends JpaRepository<PensionEntity, UUID> {
     List<PensionEntity> findByAsset_Member(MemberEntity member);
+    List<PensionEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }
