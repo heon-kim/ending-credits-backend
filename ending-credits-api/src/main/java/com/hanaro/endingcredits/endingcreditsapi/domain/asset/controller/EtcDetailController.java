@@ -5,6 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.EtcDetailS
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class EtcDetailController {
      */
     @GetMapping("/cars")
     public ResponseEntity<ApiResponseEntity<List<CarDetailDto>>> getConnectedCars(
-            @RequestParam UUID memberId) {
+            @AuthenticationPrincipal UUID memberId) {
         List<CarDetailDto> connectedCars = etcDetailService.getConnectedCars(memberId);
         return ResponseEntity.ok(ApiResponseEntity.onSuccess("자동차 상세 조회 성공", connectedCars));
     }
@@ -31,7 +32,7 @@ public class EtcDetailController {
      */
     @GetMapping("/real-estates")
     public ResponseEntity<ApiResponseEntity<List<RealEstateDetailDto>>> getConnectedRealEstates(
-            @RequestParam UUID memberId) {
+            @AuthenticationPrincipal UUID memberId) {
         List<RealEstateDetailDto> connectedRealEstates = etcDetailService.getConnectedRealEstates(memberId);
         return ResponseEntity.ok(ApiResponseEntity.onSuccess("부동산 상세 조회 성공", connectedRealEstates));
     }
@@ -41,7 +42,7 @@ public class EtcDetailController {
      */
     @GetMapping("/pensions")
     public ResponseEntity<ApiResponseEntity<List<PensionDetailDto>>> getConnectedPensions(
-            @RequestParam UUID memberId) {
+            @AuthenticationPrincipal UUID memberId) {
         List<PensionDetailDto> connectedPensions = etcDetailService.getConnectedPensions(memberId);
         return ResponseEntity.ok(ApiResponseEntity.onSuccess("연금 상세 조회 성공", connectedPensions));
     }
@@ -84,7 +85,7 @@ public class EtcDetailController {
     @PutMapping("/car/{carId}")
     public ResponseEntity<ApiResponseEntity<CarDetailDto>> updateCarPurchasePrice(
             @PathVariable UUID carId,
-            @RequestParam Long newPurchasePrice) {
+            @RequestBody Long newPurchasePrice) {
         CarDetailDto updatedCar = etcDetailService.updateCarPurchasePrice(carId, newPurchasePrice);
         return ResponseEntity.ok(ApiResponseEntity.onSuccess("자동차 자산 수정 성공", updatedCar));
     }
@@ -95,7 +96,7 @@ public class EtcDetailController {
     @PutMapping("/real-estate/{realEstateId}")
     public ResponseEntity<ApiResponseEntity<RealEstateDetailDto>> updateRealEstatePurchasePrice(
             @PathVariable UUID realEstateId,
-            @RequestParam Long newPurchasePrice) {
+            @RequestBody Long newPurchasePrice) {
         RealEstateDetailDto updatedRealEstate = etcDetailService.updateRealEstatePurchasePrice(realEstateId, newPurchasePrice);
         return ResponseEntity.ok(ApiResponseEntity.onSuccess("부동산 자산 수정 성공", updatedRealEstate));
     }
