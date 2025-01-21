@@ -68,7 +68,4 @@ public class MemberEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssetEntity> assets = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LoanEntity> loans = new ArrayList<>();
 }

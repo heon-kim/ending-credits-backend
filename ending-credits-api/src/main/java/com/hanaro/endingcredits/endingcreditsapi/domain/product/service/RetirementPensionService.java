@@ -9,6 +9,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Product
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.SysType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.RetirementPensionEsRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.RetirementPensionJpaRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RetirementPensionService {
+    private final ProductMapper productMapper;
     private final RestTemplate restTemplate = new RestTemplate();
     private final RetirementPensionJpaRepository retirementPensionJpaRepository;
     private final RetirementPensionEsRepository retirementPensionEsRepository;
@@ -69,13 +70,13 @@ public class RetirementPensionService {
 
         if (existingEntity.isPresent()) {
             RetirementPensionProductEntity entity = existingEntity.get();
-            entity.update(mapToEntity(dto, productArea, sysType));
+            entity.update(productMapper.toRetirementPensionProductEntity(dto, productArea, sysType));
             retirementPensionJpaRepository.save(entity);
-            retirementPensionEsRepository.save(mapToEsEntity(entity));
+            retirementPensionEsRepository.save(productMapper.toRetirementPensionEsEntity(entity));
         } else {
-            RetirementPensionProductEntity newEntity = mapToEntity(dto, productArea, sysType);
+            RetirementPensionProductEntity newEntity = productMapper.toRetirementPensionProductEntity(dto, productArea, sysType);
             retirementPensionJpaRepository.save(newEntity);
-            retirementPensionEsRepository.save(mapToEsEntity(newEntity));
+            retirementPensionEsRepository.save(productMapper.toRetirementPensionEsEntity(newEntity));
         }
     }
 
@@ -110,33 +111,6 @@ public class RetirementPensionService {
                 .stream()
                 .map(product -> new RetirementPensionProductSummaryDto(product.getProductId(), product.getProductName()))
                 .collect(Collectors.toList());
-    }
-
-    private RetirementPensionProductEntity mapToEntity(RetirementPensionProductDto dto, ProductArea productArea, SysType sysType) {
-        return RetirementPensionProductEntity.builder()
-                .productName(dto.getProduct())
-                .company(dto.getCompany())
-                .applyTerm(dto.getApplyTerm())
-                .checkDate(dto.getCheckDate())
-                .contractTerm(dto.getContractTerm())
-                .contractRate(dto.getContractRate() != null ? dto.getContractRate() : BigDecimal.ZERO)
-                .productArea(productArea)
-                .sysType(sysType)
-                .build();
-    }
-
-    private RetirementPensionEsEntity mapToEsEntity(RetirementPensionProductEntity entity) {
-        return RetirementPensionEsEntity.builder()
-                .id(entity.getProductId().toString())
-                .productName(entity.getProductName())
-                .company(entity.getCompany())
-                .applyTerm(entity.getApplyTerm())
-                .checkDate(entity.getCheckDate())
-                .contractTerm(entity.getContractTerm())
-                .contractRate(entity.getContractRate())
-                .productArea(ProductArea.valueOf(entity.getProductArea().name()))
-                .sysType(SysType.valueOf(entity.getSysType().name()))
-                .build();
     }
 }
 

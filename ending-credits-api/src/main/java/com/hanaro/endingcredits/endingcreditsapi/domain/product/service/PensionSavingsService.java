@@ -10,6 +10,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elast
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class PensionSavingsService {
-
-    private final RestTemplate restTemplate;
-
+    private final ProductMapper productMapper;
+    private final RestTemplate restTemplate = new RestTemplate();
     private final PensionSavingsJpaRepository pensionProductRepository;
     private final PensionSavingsSearchRepository pensionSavingsSearchRepository;
 
@@ -40,7 +40,7 @@ public class PensionSavingsService {
 
         List<Map<String, Object>> limitedList = response.getList()
                 .stream()
-                .limit(50)  // 리스트에서 처음 50개만 가져옴
+                .limit(50)  // 리스트에서 처음 100개만 가져옴
                 .collect(Collectors.toList());
 
         if (response.getList() != null && !response.getList().isEmpty()) {
@@ -64,7 +64,7 @@ public class PensionSavingsService {
                         .productDetail(productDetail)
                         .build();
                 pensionProductRepository.save(entity);
-                PensionSavingsEsEntity document = mapToEsEntity(entity);
+                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
                 pensionSavingsSearchRepository.save(document);
             }
         }
@@ -144,15 +144,6 @@ public class PensionSavingsService {
         String productArea = ProductArea.fromCode(areaCode).getDescription();
 
         return pensionSavingsSearchRepository.findByProductNameContainingAndProductArea(keyword, productArea);
-    }
-
-    private PensionSavingsEsEntity mapToEsEntity(PensionSavingsProductEntity entity) {
-        return PensionSavingsEsEntity.builder()
-                .productId((entity.getProductId()).toString())
-                .productName(entity.getProductName())
-                .productArea(entity.getProductArea().getDescription())
-                .company(entity.getCompany())
-                .build();
     }
 
     @Transactional(readOnly = true)

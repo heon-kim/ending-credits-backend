@@ -48,7 +48,7 @@ dependencies {
 
     // elasticsearch
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-    
+
     // Jwt Dependency
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
@@ -64,6 +64,8 @@ dependencies {
 
     // coolSMS Dependency
     implementation 'net.nurigo:javaSDK:2.2'
+
+    implementation 'com.google.code.gson:gson:2.11.0'
 }
 
 tasks.named('test') {
