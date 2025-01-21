@@ -5,6 +5,8 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.FinalMessageDto
 import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.InheritanceDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.PurposeDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.will.service.WillService;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,33 +20,38 @@ import org.springframework.web.bind.annotation.RestController;
 public class WillController {
     private final WillService willService;
 
+    @Operation(summary = "step1. 취지")
     @PostMapping("/speech/purpose")
-    public ResponseEntity<PurposeDto> extractWillPurpose(@RequestParam String fileUrl) {
+    public ApiResponseEntity<PurposeDto> extractWillPurpose(@RequestParam String fileUrl) {
         PurposeDto purpose = willService.extractWillPurpose(fileUrl);
-        return ResponseEntity.ok(purpose);
+        return ApiResponseEntity.onSuccess(purpose);
     }
 
+    @Operation(summary = "step2. 상속 재산")
     @PostMapping("/speech/inheritance")
-    public ResponseEntity<InheritanceDto[]> extractWillInheritance(@RequestParam String fileUrl, @RequestParam String type) {
+    public ApiResponseEntity<InheritanceDto[]> extractWillInheritance(@RequestParam String fileUrl, @RequestParam String type) {
         InheritanceDto[] inheritances = willService.extractWillInheritance(fileUrl, type);
-        return ResponseEntity.ok(inheritances);
+        return ApiResponseEntity.onSuccess(inheritances);
     }
 
+    @Operation(summary = "step3. 집행자")
     @PostMapping("/speech/executor")
-    public ResponseEntity<ExecutorDto[]> extractWillExecutor(@RequestParam String fileUrl) {
+    public ApiResponseEntity<ExecutorDto[]> extractWillExecutor(@RequestParam String fileUrl) {
         ExecutorDto[] executors = willService.extractWillExecutor(fileUrl);
-        return ResponseEntity.ok(executors);
+        return ApiResponseEntity.onSuccess(executors);
     }
 
+    @Operation(summary = "step4. 남기고 싶은 말")
     @PostMapping("/speech/final-message")
-    public ResponseEntity<FinalMessageDto[]> extractWillFinalMessage(@RequestParam String fileUrl) {
+    public ApiResponseEntity<FinalMessageDto[]> extractWillFinalMessage(@RequestParam String fileUrl) {
         FinalMessageDto[] finalMessages = willService.extractWillFinalMessage(fileUrl);
-        return ResponseEntity.ok(finalMessages);
+        return ApiResponseEntity.onSuccess(finalMessages);
     }
 
+    @Operation(summary = "step5. 법적 효력")
     @PostMapping("/speech/confirmation")
-    public ResponseEntity<Boolean> extractWillConfirmation(@RequestParam String fileUrl) {
+    public ApiResponseEntity<Boolean> extractWillConfirmation(@RequestParam String fileUrl) {
         Boolean confirmation = willService.extractWillConfirmation(fileUrl);
-        return ResponseEntity.ok(confirmation);
+        return ApiResponseEntity.onSuccess(confirmation);
     }
 }
