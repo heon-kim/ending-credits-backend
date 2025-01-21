@@ -23,11 +23,15 @@ public class CashService {
     private final CashRepository cashRepository;
 
     public BigDecimal getCashBalanceByMemberId(UUID memberId) {
-        MemberEntity memberEntity = memberRepository.findByMemberId(memberId)
-                        .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
         CashEntity cashEntity = cashRepository.findByAsset_Member_MemberId(memberId)
                 .orElseThrow(() -> new AssetHandler(ErrorStatus.CASH_NOT_FOUND));
         return cashEntity.getAmount();
+    }
+
+    public void updateCashAmount(UUID memberId, BigDecimal amount) {
+        CashEntity cashEntity = cashRepository.findByAsset_Member_MemberId(memberId)
+                .orElseThrow(() -> new AssetHandler(ErrorStatus.CASH_NOT_FOUND));
+        cashEntity.updateAmount(amount);
+        cashRepository.save(cashEntity);
     }
 }
