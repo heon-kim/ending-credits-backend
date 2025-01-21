@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.LoanEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.BankEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.DepositEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.FundEntity;
@@ -17,6 +18,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.PensionType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.LoanRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.BankRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.DepositRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.FundRepository;
@@ -40,6 +42,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +53,7 @@ public class AssetDataService {
     private final TrustRepository trustRepository;
     private final FundRepository fundRepository;
     private final DepositRepository depositRepository;
+    private final LoanRepository loanRepository;
     private final CashRepository cashRepository;
     private final RealEstateRepository realEstateRepository;
     private final PensionRepository pensionRepository;
@@ -141,7 +145,7 @@ public class AssetDataService {
         for (int i = 0; i < banks.size(); i++) {
             createTrust(member, banks.get(i), "Trust Account " + i, "123-456-78" + i, BigDecimal.valueOf(1000000 + i * 100000));
             createFund(member, banks.get(i), BigDecimal.valueOf(2000000 + i * 200000));
-            createDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000));
+            createLoan(createDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
         }
 
         // 각 거래소에 가상자산 연결
@@ -217,7 +221,7 @@ public class AssetDataService {
         fundRepository.save(fund);
     }
 
-    private void createDeposit(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount) {
+    private DepositEntity createDeposit(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount) {
         AssetEntity asset = createAsset(member, AssetType.DEPOSIT, amount.longValue());
         DepositEntity deposit = DepositEntity.builder()
                 .bank(bank)
@@ -227,7 +231,36 @@ public class AssetDataService {
                 .amount(amount)
                 .currencyCode(CurrencyCodeType.KRW)
                 .build();
-        depositRepository.save(deposit);
+        return depositRepository.save(deposit);
+    }
+
+    private void createLoan(DepositEntity deposit) {
+        BigDecimal totalAmount = generateRandomAmount(100000, 1000000);              // 100,000 ~ 1,000,000 사이의 금액
+        BigDecimal loanAmount = generateRandomAmount(10000, totalAmount.intValue()); // 10,000 ~ totalAmount 사이의 금액
+        LocalDate expiryDate = generateRandomExpiryDate();                           // 오늘 이후의 랜덤 날짜
+
+        LoanEntity loan = LoanEntity.builder()
+                .depositId(deposit)
+                .totalAmount(totalAmount)
+                .loanAmount(loanAmount)
+                .expiryDate(expiryDate)
+                .build();
+
+        loanRepository.save(loan);
+    }
+
+    private BigDecimal generateRandomAmount(int min, int max) {
+        Random random = new Random();
+
+        int randomValue = random.nextInt(max - min + 1) + min;
+        return BigDecimal.valueOf(randomValue);
+    }
+
+    private LocalDate generateRandomExpiryDate() {
+        Random random = new Random();
+
+        int daysToAdd = random.nextInt(365 * 5) + 1; // 1 ~ 5년 이내의 랜덤 날짜
+        return LocalDate.now().plusDays(daysToAdd);
     }
 
     private void createVirtualAsset(MemberEntity member, ExchangeEntity exchange, String name, BigDecimal quantity, BigDecimal currentPrice) {
@@ -245,14 +278,29 @@ public class AssetDataService {
 
     private void createCar(MemberEntity member, String model, String carNumber, Long purchasePrice, Integer mileage) {
         AssetEntity asset = createAsset(member, AssetType.CAR, purchasePrice);
+
+        long currentMarketPrice = generateRandomMarketPrice(purchasePrice, 0.8, 1.2); // 구매가의 ±20% 범위
+        int manufactureYear = generateRandomManufactureYear(2000, LocalDate.now().getYear() - 1); // 2000년 ~ 현재 이전 연도
+
         CarEntity car = CarEntity.builder()
                 .asset(asset)
                 .model(model)
                 .carNumber(carNumber)
                 .purchasePrice(purchasePrice)
+                .currentMarketPrice(currentMarketPrice)
                 .mileage(mileage)
+                .manufactureYear(manufactureYear)
                 .build();
         carRepository.save(car);
+    }
+
+    private long generateRandomMarketPrice(long purchasePrice, double minRate, double maxRate) {
+        double randomRate = minRate + Math.random() * (maxRate - minRate);
+        return Math.round(purchasePrice * randomRate);
+    }
+
+    private int generateRandomManufactureYear(int startYear, int endYear) {
+        return startYear + (int) (Math.random() * (endYear - startYear + 1));
     }
 
     private void createCash(MemberEntity member, BigDecimal amount) {
@@ -278,13 +326,27 @@ public class AssetDataService {
 
     private void createPension(MemberEntity member, PensionType type, int pensionAge, Long amount) {
         AssetEntity asset = createAsset(member, AssetType.PENSION, amount);
+
+        long monthlyPayment = generateRandomMonthlyAmount(100000, 1000000);   // 10만 원 ~ 100만 원 랜덤 금액
+        int paymentDuration = generateRandomDuration(5, 30);                  // 5년 ~ 30년 랜덤 기간
+
         PensionEntity pension = PensionEntity.builder()
                 .asset(asset)
                 .pensionType(type)
                 .pensionAge(pensionAge)
-                .amount(amount)
+                .monthlyPayment(monthlyPayment)
+                .paymentDuration(paymentDuration)
+                .totalExpectedAmount(monthlyPayment * 12 * paymentDuration) // 총 예상 수령 금액 계산
                 .build();
         pensionRepository.save(pension);
+    }
+
+    private long generateRandomMonthlyAmount(long min, long max) {
+        return min + (long) (Math.random() * (max - min + 1));
+    }
+
+    private int generateRandomDuration(int min, int max) {
+        return min + (int) (Math.random() * (max - min + 1));
     }
 }
 
