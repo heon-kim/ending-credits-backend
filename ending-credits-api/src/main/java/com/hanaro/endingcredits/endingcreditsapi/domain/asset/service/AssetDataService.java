@@ -147,35 +147,105 @@ public class AssetDataService {
         // 각 은행에 자산 연결
         for (int i = 0; i < banks.size(); i++) {
             createDeposit(member, banks.get(i), "Deposit Account " + i, "123-456-78" + i, BigDecimal.valueOf(1_000_000 + i * 100_000));
-            createTrust(member, banks.get(i), "Trust Account " + i, "123-456-78" + i, BigDecimal.valueOf(1_000_000 + i * 100_000));
-            createFund(member, banks.get(i), "Fund Account " + i, "789-123-45" + i, BigDecimal.valueOf(2_000_000 + i * 200_000));
+            // 신탁 : 짝수는 KRW, 홀수는 USD
+            if (i % 2 == 0) {
+                createTrust(
+                        member,
+                        banks.get(i),
+                        "Trust Account " + i,
+                        "123-456-78" + i,
+                        BigDecimal.valueOf(1_000_000 + i * 100_000), // 금액 (KRW)
+                        CurrencyCodeType.KRW
+                );
+            } else {
+                createTrust(
+                        member,
+                        banks.get(i),
+                        "Trust Account " + i,
+                        "123-456-78" + i,
+                        BigDecimal.valueOf(1_000 + i * 100), // 금액 (USD)
+                        CurrencyCodeType.USD
+                );
+            }
+            // 펀드: 짝수는 KRW, 홀수는 USD
+            if (i % 2 == 0) {
+                createFund(
+                        member,
+                        banks.get(i),
+                        "Fund Account " + i,
+                        "789-123-45" + i,
+                        BigDecimal.valueOf(2_000_000 + i * 200_000), // 투자 원금 (KRW)
+                        CurrencyCodeType.KRW
+                );
+            } else {
+                createFund(
+                        member,
+                        banks.get(i),
+                        "Fund Account " + i,
+                        "789-123-45" + i,
+                        BigDecimal.valueOf(2_000 + i * 200), // 투자 원금 (USD)
+                        CurrencyCodeType.USD
+                );
+            }
             createLoan(createDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
         }
 
+
+
         // 각 거래소에 가상자산 연결
-        for (int i = 0; i < exchanges.size(); i++) {
-            createVirtualAsset(
-                    member,
-                    exchanges.get(i),
-                    "Crypto Asset " + i,
-                    BigDecimal.valueOf(1.5 + i * 0.5),
-                    BigDecimal.valueOf(4500000 + i * 500000),
-                    BigDecimal.valueOf(5000000 + i * 500000),
-                    CurrencyCodeType.KRW// 짝수 인덱스는 연결 상태, 홀수 인덱스는 미연결 상태
-            );
+        for(int i = 0 ; i < exchanges.size(); i++){
+            if(i % 2 == 0){
+                //KRW 가상 자산
+                createVirtualAsset(
+                        member,
+                        exchanges.get(i),
+                        "Crypto Asset " + i,
+                        BigDecimal.valueOf(1.5 + i * 0.5),
+                        BigDecimal.valueOf(4500000 + i * 500000), // 구매 가격 (KRW)
+                        BigDecimal.valueOf(5000000 + i * 500000), // 현재 가격 (KRW)
+                        CurrencyCodeType.KRW
+                );
+            } else {
+                // USD 가상 자산
+                createVirtualAsset(
+                        member,
+                        exchanges.get(i),
+                        "Crypto Asset " + i,
+                        BigDecimal.valueOf(1.5 + i * 0.5),
+                        BigDecimal.valueOf(3000 + i * 200), // 구매 가격 (USD)
+                        BigDecimal.valueOf(3500 + i * 300), // 현재 가격 (USD)
+                        CurrencyCodeType.USD
+                );
+            }
         }
 
         // 각 증권사에 증권 계좌 연결
         for (int i = 0; i < securitiesCompanies.size(); i++) {
-            createSecuritiesAccount(
-                    member,
-                    securitiesCompanies.get(i),
-                    "1234-5678-99" + i,
-                    "Securities Account " + i,
-                    BigDecimal.valueOf(1_000_000 + i * 200_000), // 예수금
-                    BigDecimal.valueOf(5_000_000 + i * 300_000), // 원금
-                    BigDecimal.valueOf(i * 2.5)               // 수익률
-            );
+            if (i % 2 == 0) {
+                // KRW로 저장
+                createSecuritiesAccount(
+                        member,
+                        securitiesCompanies.get(i),
+                        "1234-5678-99" + i,
+                        "Securities Account " + i,
+                        BigDecimal.valueOf(1_000_000 + i * 200_000), // 예수금
+                        BigDecimal.valueOf(5_000_000 + i * 300_000), // 원금 (KRW)
+                        BigDecimal.valueOf(i * 2.5), // 수익률
+                        CurrencyCodeType.KRW // 통화 코드
+                );
+            } else {
+                // USD로 저장
+                createSecuritiesAccount(
+                        member,
+                        securitiesCompanies.get(i),
+                        "1234-5678-9912" + i,
+                        "Securities Account " + i,
+                        BigDecimal.valueOf(1_000_000 + i * 200_000), // 예수금 (KRW로 가정)
+                        BigDecimal.valueOf(5_000 + i * 300), // 원금 (USD)
+                        BigDecimal.valueOf(i * 2.5), // 수익률
+                        CurrencyCodeType.USD // 통화 코드
+                );
+            }
         }
 
         // 기타 자산 생성
@@ -187,9 +257,17 @@ public class AssetDataService {
         createCash(member, BigDecimal.valueOf(500000));
     }
 
-    private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String securitiesAccountNumber, String securitiesAccountName, BigDecimal deposit, BigDecimal principal, BigDecimal profitRatio) {
+    private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String securitiesAccountNumber, String securitiesAccountName, BigDecimal deposit, BigDecimal principal, BigDecimal profitRatio, CurrencyCodeType currencyCode) {
+        // 환율 고정 값 (달러 -> 원화 변환)
+        final BigDecimal EXCHANGE_RATE = BigDecimal.valueOf(1450);
+
+        // amount 계산 (환율 적용)
+        BigDecimal adjustedPrincipal = currencyCode == CurrencyCodeType.USD
+                ? principal.multiply(EXCHANGE_RATE) // USD -> KRW 변환
+                : principal;
+
         // 자산 생성
-        AssetEntity asset = createAsset(member, AssetType.SECURITIES, principal.longValue());
+        AssetEntity asset = createAsset(member, AssetType.SECURITIES, adjustedPrincipal.longValue());
 
         // 증권 계좌 생성 및 저장
         SecuritiesAccountEntity account = SecuritiesAccountEntity.builder()
@@ -197,10 +275,10 @@ public class AssetDataService {
                 .securitiesCompany(company)
                 .securitiesAccountNumber(securitiesAccountNumber)
                 .securitiesAccountName(securitiesAccountName)
-                .deposit(deposit)
-                .principal(principal)
-                .currencyCode(CurrencyCodeType.KRW)
-                .profitRatio(profitRatio)
+                .deposit(deposit) // 예수금은 원화로 가정
+                .principal(principal) // 원금은 달러일 수 있으므로 원래 값을 저장
+                .currencyCode(currencyCode) // 통화 코드 저장
+                .profitRatio(profitRatio) // 수익률
                 .build();
         securitiesAccountRepository.save(account);
     }
@@ -216,30 +294,59 @@ public class AssetDataService {
         return assetRepository.save(asset);
     }
 
-    private void createTrust(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount) {
-        AssetEntity asset = createAsset(member, AssetType.TRUST, amount.longValue());
+    private void createTrust(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount, CurrencyCodeType currencyCode) {
+        // 환율 고정 값 (달러 -> 원화 변환)
+        final BigDecimal EXCHANGE_RATE = BigDecimal.valueOf(1450);
+
+        // 신탁 금액에 환율 적용 (USD -> KRW 변환)
+        BigDecimal adjustedAmount = currencyCode == CurrencyCodeType.USD
+                ? amount.multiply(EXCHANGE_RATE)
+                : amount;
+
+        // 자산 생성
+        AssetEntity asset = createAsset(member, AssetType.TRUST, adjustedAmount.longValue());
+
+        // 신탁 생성 및 저장
         TrustEntity trust = TrustEntity.builder()
                 .bank(bank)
                 .asset(asset)
                 .accountName(accountName)
                 .accountNumber(accountNumber)
-                .amount(amount)
-                .currencyCode(CurrencyCodeType.KRW)
+                .amount(amount) // 입력 금액 (USD 또는 KRW)
+                .currencyCode(currencyCode) // 통화 코드 저장
                 .build();
+
         trustRepository.save(trust);
     }
 
-    private void createFund(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal investmentPrincipal) {
-        AssetEntity asset = createAsset(member, AssetType.FUND, investmentPrincipal.longValue());
+    private void createFund(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal investmentPrincipal, CurrencyCodeType currencyCode) {
+        // 환율 고정 값 (달러 -> 원화 변환)
+        final BigDecimal EXCHANGE_RATE = BigDecimal.valueOf(1450);
+
+        // 투자 원금에 환율 적용 (USD -> KRW 변환)
+        BigDecimal adjustedInvestmentPrincipal = currencyCode == CurrencyCodeType.USD
+                ? investmentPrincipal.multiply(EXCHANGE_RATE)
+                : investmentPrincipal;
+
+        // 자산 생성
+        AssetEntity asset = createAsset(member, AssetType.FUND, adjustedInvestmentPrincipal.longValue());
+
+        // 수익률과 펀드 금액 계산
+        BigDecimal profitRatio = BigDecimal.valueOf(10.0);
+        BigDecimal fundAmount = investmentPrincipal.multiply(BigDecimal.valueOf(1.1)); // 투자 원금의 10% 수익 가정
+
+        // 펀드 생성 및 저장
         FundEntity fund = FundEntity.builder()
                 .bank(bank)
                 .asset(asset)
                 .accountName(accountName)
                 .accountNumber(accountNumber)
-                .investmentPrincipal(investmentPrincipal)
-                .fundAmount(investmentPrincipal.multiply(BigDecimal.valueOf(1.1)))
-                .profitRatio(BigDecimal.valueOf(10.0))
-                .currencyCode(CurrencyCodeType.KRW)
+                .investmentPrincipal(investmentPrincipal) // 원금은 입력값 그대로 저장 (USD 또는 KRW)
+                .fundAmount(currencyCode == CurrencyCodeType.USD
+                        ? fundAmount.multiply(EXCHANGE_RATE) // USD -> KRW 변환
+                        : fundAmount) // KRW는 그대로 저장
+                .profitRatio(profitRatio) // 수익률
+                .currencyCode(currencyCode) // 통화 코드 저장
                 .build();
         fundRepository.save(fund);
     }
@@ -293,18 +400,29 @@ public class AssetDataService {
                                     BigDecimal purchasePrice,
                                     BigDecimal currentPrice,
                                     CurrencyCodeType currencyCode) {
-        // 자산 생성
-        AssetEntity asset = createAsset(member, AssetType.VIRTUAL_ASSET, currentPrice.longValue());
+        // 환율 고정 값 (달러 -> 원화 변환)
+        final BigDecimal EXCHANGE_RATE = BigDecimal.valueOf(1450);
+
+        // 현재 가격과 구매 가격에 환율 적용 (USD -> KRW 변환)
+        BigDecimal adjustedPurchasePrice = currencyCode == CurrencyCodeType.USD
+                ? purchasePrice.multiply(EXCHANGE_RATE)
+                : purchasePrice;
+        BigDecimal adjustedCurrentPrice = currencyCode == CurrencyCodeType.USD
+                ? currentPrice.multiply(EXCHANGE_RATE)
+                : currentPrice;
 
         // 총 가치 계산
-        BigDecimal totalValue = quantity.multiply(currentPrice);
+        BigDecimal totalValue = quantity.multiply(adjustedCurrentPrice);
 
         // 수익률 계산
-        BigDecimal profitRatio = (purchasePrice.compareTo(BigDecimal.ZERO) == 0)
+        BigDecimal profitRatio = (adjustedPurchasePrice.compareTo(BigDecimal.ZERO) == 0)
                 ? BigDecimal.ZERO
-                : currentPrice.subtract(purchasePrice)
-                .divide(purchasePrice, 2, BigDecimal.ROUND_HALF_UP)
+                : adjustedCurrentPrice.subtract(adjustedPurchasePrice)
+                .divide(adjustedPurchasePrice, 2, BigDecimal.ROUND_HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
+
+        // 자산 생성
+        AssetEntity asset = createAsset(member, AssetType.VIRTUAL_ASSET, totalValue.longValue());
 
         // 가상 자산 생성 및 저장
         VirtualAsset virtualAsset = VirtualAsset.builder()
@@ -312,11 +430,11 @@ public class AssetDataService {
                 .exchange(exchange)
                 .virtualAssetName(name)
                 .quantity(quantity)
-                .purchasePrice(purchasePrice)
-                .currentPrice(currentPrice)
+                .purchasePrice(adjustedPurchasePrice) // 조정된 구매 가격
+                .currentPrice(adjustedCurrentPrice) // 조정된 현재 가격
                 .profitRatio(profitRatio)
-                .totalValue(totalValue)
-                .currencyCode(currencyCode)
+                .totalValue(totalValue) // 조정된 총 가치
+                .currencyCode(currencyCode) // 통화 코드 저장
                 .build();
 
         virtualAssetRepository.save(virtualAsset);
