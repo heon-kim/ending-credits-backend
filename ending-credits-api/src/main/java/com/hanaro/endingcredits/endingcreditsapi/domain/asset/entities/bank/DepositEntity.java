@@ -47,7 +47,7 @@ public class DepositEntity {
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode; //통화코드
 
-    @Column(nullable = false, name = "isConnected")
+    @Column(nullable = false, name = "is_connected")
     private boolean isConnected = false;
 
     public void setConnected(boolean connected) {

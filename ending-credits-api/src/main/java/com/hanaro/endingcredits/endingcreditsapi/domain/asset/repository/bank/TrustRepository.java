@@ -14,4 +14,5 @@ import java.util.UUID;
 @Repository
 public interface TrustRepository extends JpaRepository<TrustEntity, UUID> {
     List<TrustEntity> findByBankAndAsset_Member(BankEntity bank, MemberEntity member);
+    List<TrustEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }

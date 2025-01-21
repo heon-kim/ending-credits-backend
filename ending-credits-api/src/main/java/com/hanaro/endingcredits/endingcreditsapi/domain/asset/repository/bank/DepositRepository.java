@@ -12,4 +12,5 @@ import java.util.UUID;
 @Repository
 public interface DepositRepository extends JpaRepository<DepositEntity, UUID> {
     List<DepositEntity> findByBankAndAsset_Member(BankEntity bank, MemberEntity member);
+    List<DepositEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }

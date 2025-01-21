@@ -34,7 +34,9 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.virtual
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.LoginType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
+import io.jsonwebtoken.security.Password;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +65,7 @@ public class AssetDataService {
     private final ExchangeRepository exchangeRepository;
     private final SecuritiesCompanyRepository securitiesCompanyRepository;
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void generateMockData() {
@@ -70,7 +73,7 @@ public class AssetDataService {
         MemberEntity member = memberRepository.save(
                 MemberEntity.builder()
                         .identifier("rladlsdud789")
-                        .password("12345")
+                        .password(passwordEncoder.encode("12345"))
                         .simplePassword("1234")
                         .email("rladlsdud789@naver.com")
                         .loginType(LoginType.NORMAL)
@@ -143,19 +146,36 @@ public class AssetDataService {
     private void createMockAssets(MemberEntity member, List<BankEntity> banks, List<BankEntity> savingsBanks, List<ExchangeEntity> exchanges, List<SecuritiesCompanyEntity> securitiesCompanies) {
         // 각 은행에 자산 연결
         for (int i = 0; i < banks.size(); i++) {
-            createTrust(member, banks.get(i), "Trust Account " + i, "123-456-78" + i, BigDecimal.valueOf(1000000 + i * 100000));
-            createFund(member, banks.get(i), BigDecimal.valueOf(2000000 + i * 200000));
+            createDeposit(member, banks.get(i), "Deposit Account " + i, "123-456-78" + i, BigDecimal.valueOf(1_000_000 + i * 100_000));
+            createTrust(member, banks.get(i), "Trust Account " + i, "123-456-78" + i, BigDecimal.valueOf(1_000_000 + i * 100_000));
+            createFund(member, banks.get(i), "Fund Account " + i, "789-123-45" + i, BigDecimal.valueOf(2_000_000 + i * 200_000));
             createLoan(createDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
         }
 
         // 각 거래소에 가상자산 연결
         for (int i = 0; i < exchanges.size(); i++) {
-            createVirtualAsset(member, exchanges.get(i), "Crypto Asset " + i, BigDecimal.valueOf(1.5 + i * 0.5), BigDecimal.valueOf(5000000 + i * 500000));
+            createVirtualAsset(
+                    member,
+                    exchanges.get(i),
+                    "Crypto Asset " + i,
+                    BigDecimal.valueOf(1.5 + i * 0.5),
+                    BigDecimal.valueOf(4500000 + i * 500000),
+                    BigDecimal.valueOf(5000000 + i * 500000),
+                    CurrencyCodeType.KRW// 짝수 인덱스는 연결 상태, 홀수 인덱스는 미연결 상태
+            );
         }
 
         // 각 증권사에 증권 계좌 연결
         for (int i = 0; i < securitiesCompanies.size(); i++) {
-            createSecuritiesAccount(member, securitiesCompanies.get(i), "Securities Account " + i, BigDecimal.valueOf(1000000 + i * 100000), BigDecimal.valueOf(5000000 + i * 200000), BigDecimal.valueOf(i + 0.5));
+            createSecuritiesAccount(
+                    member,
+                    securitiesCompanies.get(i),
+                    "1234-5678-99" + i,
+                    "Securities Account " + i,
+                    BigDecimal.valueOf(1_000_000 + i * 200_000), // 예수금
+                    BigDecimal.valueOf(5_000_000 + i * 300_000), // 원금
+                    BigDecimal.valueOf(i * 2.5)               // 수익률
+            );
         }
 
         // 기타 자산 생성
@@ -164,10 +184,10 @@ public class AssetDataService {
             createRealEstate(member, "Real Estate " + i, "123 Main St, City " + i, 100000000L + i * 5000000, 120000000L + i * 6000000);
             createPension(member, PensionType.NATIONAL, 60 + i, 500000L + i * 50000);
         }
-        createCash(member, BigDecimal.valueOf(500000 * 50000));
+        createCash(member, BigDecimal.valueOf(500000));
     }
 
-    private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String securitiesAccountName, BigDecimal deposit, BigDecimal principal, BigDecimal profitRatio) {
+    private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String securitiesAccountNumber, String securitiesAccountName, BigDecimal deposit, BigDecimal principal, BigDecimal profitRatio) {
         // 자산 생성
         AssetEntity asset = createAsset(member, AssetType.SECURITIES, principal.longValue());
 
@@ -175,6 +195,7 @@ public class AssetDataService {
         SecuritiesAccountEntity account = SecuritiesAccountEntity.builder()
                 .asset(asset)
                 .securitiesCompany(company)
+                .securitiesAccountNumber(securitiesAccountNumber)
                 .securitiesAccountName(securitiesAccountName)
                 .deposit(deposit)
                 .principal(principal)
@@ -208,11 +229,13 @@ public class AssetDataService {
         trustRepository.save(trust);
     }
 
-    private void createFund(MemberEntity member, BankEntity bank, BigDecimal investmentPrincipal) {
+    private void createFund(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal investmentPrincipal) {
         AssetEntity asset = createAsset(member, AssetType.FUND, investmentPrincipal.longValue());
         FundEntity fund = FundEntity.builder()
                 .bank(bank)
                 .asset(asset)
+                .accountName(accountName)
+                .accountNumber(accountNumber)
                 .investmentPrincipal(investmentPrincipal)
                 .fundAmount(investmentPrincipal.multiply(BigDecimal.valueOf(1.1)))
                 .profitRatio(BigDecimal.valueOf(10.0))
@@ -263,18 +286,42 @@ public class AssetDataService {
         return LocalDate.now().plusDays(daysToAdd);
     }
 
-    private void createVirtualAsset(MemberEntity member, ExchangeEntity exchange, String name, BigDecimal quantity, BigDecimal currentPrice) {
+    private void createVirtualAsset(MemberEntity member,
+                                    ExchangeEntity exchange,
+                                    String name,
+                                    BigDecimal quantity,
+                                    BigDecimal purchasePrice,
+                                    BigDecimal currentPrice,
+                                    CurrencyCodeType currencyCode) {
+        // 자산 생성
         AssetEntity asset = createAsset(member, AssetType.VIRTUAL_ASSET, currentPrice.longValue());
+
+        // 총 가치 계산
+        BigDecimal totalValue = quantity.multiply(currentPrice);
+
+        // 수익률 계산
+        BigDecimal profitRatio = (purchasePrice.compareTo(BigDecimal.ZERO) == 0)
+                ? BigDecimal.ZERO
+                : currentPrice.subtract(purchasePrice)
+                .divide(purchasePrice, 2, BigDecimal.ROUND_HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        // 가상 자산 생성 및 저장
         VirtualAsset virtualAsset = VirtualAsset.builder()
                 .asset(asset)
                 .exchange(exchange)
                 .virtualAssetName(name)
                 .quantity(quantity)
+                .purchasePrice(purchasePrice)
                 .currentPrice(currentPrice)
-                .currencyCode(CurrencyCodeType.KRW)
+                .profitRatio(profitRatio)
+                .totalValue(totalValue)
+                .currencyCode(currencyCode)
                 .build();
+
         virtualAssetRepository.save(virtualAsset);
     }
+
 
     private void createCar(MemberEntity member, String model, String carNumber, Long purchasePrice, Integer mileage) {
         AssetEntity asset = createAsset(member, AssetType.CAR, purchasePrice);

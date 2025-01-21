@@ -47,11 +47,17 @@ public class FundEntity {
     @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
     private BigDecimal profitRatio; //수익율, default: 0.00
 
+    @Column(nullable = false,name = "account_number")
+    private String accountNumber; //계좌번호
+
+    @Column(nullable = false, name = "account_name")
+    private String accountName;
+
     @Column(nullable = false, name = "currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode; //통화코드
 
-    @Column(nullable = false, name = "isConnected")
+    @Column(nullable = false, name = "is_connected")
     private boolean isConnected = false;
 
     public void setConnected(boolean connected) {

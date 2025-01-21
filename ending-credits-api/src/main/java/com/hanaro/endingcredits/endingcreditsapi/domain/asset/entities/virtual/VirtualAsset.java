@@ -39,18 +39,29 @@ public class VirtualAsset {
     @Comment("코인 수량은 소수점 아래 4번째 자리까지 가능. default: 0.0000")
     private BigDecimal quantity; //default: 0.0000 -> 코인은 소숫점 아래 4자리 까지 보유 가능
 
+    @Column(nullable = false, name = "purchase_price", columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
+    @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
+    private BigDecimal purchasePrice;
+
     @Column(nullable = false, name = "current_price", columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
     @Comment("USD일 경우를 고려해서 default를 0.00으로 설정했습니다.")
     private BigDecimal currentPrice;
+
+    @Column(nullable = false, name = "profit_ratio", columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
+    private BigDecimal profitRatio;
+
+    @Column(nullable = false, name = "total_value")
+    private BigDecimal totalValue;
 
     @Column(nullable = false, name="currency_code")
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode;
 
-    @Column(nullable = false, name = "isConnected")
+    @Column(nullable = false, name = "is_connected")
     private boolean isConnected = false;
 
     public void setConnected(boolean connected) {
         isConnected = connected;
     }
+
 }
