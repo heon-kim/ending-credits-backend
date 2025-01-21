@@ -27,11 +27,14 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.virtual
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.virtual.VirtualAssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.AssetHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -141,11 +144,10 @@ public class AssetConnectionService {
     }
 
     private void connectCash(MemberEntity member) {
-        List<CashEntity> cashes = cashRepository.findByAsset_Member(member);
-        cashes.forEach(cash -> {
-            cash.setConnected(true);
-            cashRepository.save(cash);
-        });
+        CashEntity cash = cashRepository.findByAsset_Member_MemberId(member.getMemberId())
+                .orElseThrow(() -> new AssetHandler(ErrorStatus.CASH_NOT_FOUND));
+        cash.setConnected(true);
+        cashRepository.save(cash);
     }
 
     private void connectPensions(MemberEntity member) {
