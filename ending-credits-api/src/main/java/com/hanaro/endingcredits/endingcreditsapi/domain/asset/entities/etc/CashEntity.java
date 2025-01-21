@@ -2,6 +2,8 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.AssetHandler;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -34,5 +36,12 @@ public class CashEntity {
 
     public void setConnected(boolean connected) {
         isConnected = connected;
+    }
+
+    public void updateAmount(BigDecimal newAmount) {
+        if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new AssetHandler(ErrorStatus.NEGATIVE_AMOUNT_NOT_ALLOWED);
+        }
+        this.amount = newAmount;
     }
 }
