@@ -36,7 +36,7 @@ public class MemberEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column
     private String simplePassword;
 
     @Column(nullable = false)
