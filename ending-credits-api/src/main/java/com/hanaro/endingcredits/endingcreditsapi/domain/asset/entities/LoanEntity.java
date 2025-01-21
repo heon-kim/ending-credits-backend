@@ -29,11 +29,6 @@ public class LoanEntity {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "member_id")
-    private MemberEntity member;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "deposit_id")
     private DepositEntity depositId;
 
@@ -41,13 +36,9 @@ public class LoanEntity {
     private BigDecimal totalAmount; //대출금액
 
     @Column(nullable = false, name = "loan_amount")
-    private BigDecimal loanAmount; //대출잔액
-
-    @Column(nullable = false, name="currency_code")
-    @Comment("KRW: 원화, USD: 미국달러")
-    private CurrencyCodeType currencyCode; //통화코드
+    private BigDecimal loanAmount;  //대출잔액
 
     @Column(nullable = false, name="expiry_date")
     @Comment("년,월,일만(시간x)")
-    private LocalDate expiryDate; //만기일
+    private LocalDate expiryDate;   //만기일
 }
