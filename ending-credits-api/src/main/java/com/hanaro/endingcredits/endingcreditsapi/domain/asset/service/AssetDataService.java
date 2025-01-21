@@ -157,10 +157,10 @@ public class AssetDataService {
         // 기타 자산 생성
         for (int i = 0; i < 5; i++) {
             createCar(member, "아이오닉" + i, "33루 867" + i, 30000000L + i * 2000000, 15000 + i * 1000);
-            createCash(member, CurrencyCodeType.KRW, BigDecimal.valueOf(500000 + i * 50000));
             createRealEstate(member, "Real Estate " + i, "123 Main St, City " + i, 100000000L + i * 5000000, 120000000L + i * 6000000);
             createPension(member, PensionType.NATIONAL, 60 + i, 500000L + i * 50000);
         }
+        createCash(member, BigDecimal.valueOf(500000 * 50000));
     }
 
     private void createSecuritiesAccount(MemberEntity member, SecuritiesCompanyEntity company, String securitiesAccountName, BigDecimal deposit, BigDecimal principal, BigDecimal profitRatio) {
@@ -255,11 +255,10 @@ public class AssetDataService {
         carRepository.save(car);
     }
 
-    private void createCash(MemberEntity member, CurrencyCodeType currencyCode, BigDecimal amount) {
+    private void createCash(MemberEntity member, BigDecimal amount) {
         AssetEntity asset = createAsset(member, AssetType.CASH, amount.longValue());
         CashEntity cash = CashEntity.builder()
                 .asset(asset)
-                .currencyCode(currencyCode)
                 .amount(amount)
                 .build();
         cashRepository.save(cash);

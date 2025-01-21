@@ -60,8 +60,8 @@ public class AssetEntity {
     @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PensionEntity> pensions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CashEntity> cashes = new ArrayList<>();
+    @OneToOne(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CashEntity cashEntity;
 
     @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TrustEntity> trusts = new ArrayList<>();
