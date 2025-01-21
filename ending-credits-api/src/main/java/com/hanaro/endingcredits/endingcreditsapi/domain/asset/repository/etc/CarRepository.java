@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface CarRepository extends JpaRepository<CarEntity, UUID> {
     List<CarEntity> findByAsset_Member(MemberEntity member);
+    List<CarEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }

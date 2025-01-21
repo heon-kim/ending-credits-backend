@@ -34,14 +34,23 @@ public class CarEntity {
     @Comment("원화 가치이므로 기본값: 0")
     private Long purchasePrice; //구매가격
 
+    //Todo : 현재 시장가치 AssetDataService 컬럼에 추가하기
+    @Column(nullable = false, name = "current_market_price", columnDefinition = "INTEGER DEFAULT 0")
+    @Comment("현재 시장가치 기본값: 0")
+    private Long currentMarketPrice; // 현재 시장가치
+
     @Column(nullable = false,columnDefinition = "INTEGER DEFAULT 0")
     @Comment("주행거리 기본값: 0")
     private Integer mileage;
 
     @Column(nullable = false)
     private String model;
+    //Todo : 제조연도 AssetDataService 컬럼에 추가하기
+    @Column(nullable = false, name = "manufacture_year")
+    @Comment("제조 연도")
+    private Integer manufactureYear;
 
-    @Column(nullable = false, name = "isConnected")
+    @Column(nullable = false, name = "is_connected")
     private boolean isConnected = false;
 
     public void setConnected(boolean connected) {

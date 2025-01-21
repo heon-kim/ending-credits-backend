@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface RealEstateRepository extends JpaRepository<RealEstateEntity, UUID> {
     List<RealEstateEntity> findByAsset_Member(MemberEntity member);
+    List<RealEstateEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }
