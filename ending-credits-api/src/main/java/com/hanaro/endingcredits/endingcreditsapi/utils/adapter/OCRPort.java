@@ -1,4 +1,4 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.adapter;
 
-public class ClovaProvider {
+public interface OCRPort {
 }
