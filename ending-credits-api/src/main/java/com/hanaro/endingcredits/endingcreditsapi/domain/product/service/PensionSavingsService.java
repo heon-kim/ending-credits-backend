@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +109,8 @@ public class PensionSavingsService {
 
         Map<String, Object> detail = productDetail.get(0);
 
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
         return PensionSavingsResponseDto.builder()
                 .area(product.getProductArea().getDescription())  // 권역
                 .company((String) detail.get("company"))  // 은행명
@@ -118,14 +121,14 @@ public class PensionSavingsService {
                 .sells(((String) detail.get("sells")).equals("Y") ? "진행" : "중단")  // 판매 여부
                 .withdraws(((String) detail.get("withdraws")).equals("Y") ? "가능" : "불가능")  // 중도 해지
                 .guarantees(((String) detail.get("guarantees")).equals("Y") ? "보장" : "비보장")  // 원금 보장
-                .currentBalance((int) detail.get("balance"))  // 현재 납입원금
-                .previousYearBalance((int) detail.get("balance1"))  // 과거 1년 납입원금
-                .twoYearsAgoBalance((int) detail.get("balance2"))  // 과거 2년 납입원금
-                .threeYearsAgoBalance((int) detail.get("balance3"))  // 과거 3년 납입원금
-                .currentReserve((int) detail.get("reserve"))  // 현재 적립금
-                .previousYearReserve((int) detail.get("reserve1"))  // 과거 1년 적립금
-                .twoYearsAgoReserve((int) detail.get("reserve2"))  // 과거 2년 적립금
-                .threeYearsAgoReserve((int) detail.get("reserve3"))  // 과거 3년 적립금
+                .currentBalance(formatter.format(detail.get("balance")))  // 현재 납입원금
+                .previousYearBalance(formatter.format(detail.get("balance1")))  // 과거 1년 납입원금
+                .twoYearsAgoBalance(formatter.format(detail.get("balance2")))  // 과거 2년 납입원금
+                .threeYearsAgoBalance(formatter.format(detail.get("balance3")))  // 과거 3년 납입원금
+                .currentReserve(formatter.format(detail.get("reserve")))  // 현재 적립금
+                .previousYearReserve(formatter.format(detail.get("reserve1")))  // 과거 1년 적립금
+                .twoYearsAgoReserve(formatter.format(detail.get("reserve2")))  // 과거 2년 적립금
+                .threeYearsAgoReserve(formatter.format(detail.get("reserve3")))  // 과거 3년 적립금
                 .currentEarnRate((Double) detail.get("earnRate"))  // 현재 수익률
                 .previousYearEarnRate((Double) detail.get("earnRate1"))  // 과거 1년 수익률
                 .twoYearsAgoEarnRate((Double) detail.get("earnRate2"))  // 과거 2년 수익률
