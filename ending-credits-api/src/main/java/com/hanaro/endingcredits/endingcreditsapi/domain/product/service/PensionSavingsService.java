@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
@@ -38,7 +39,7 @@ public class PensionSavingsService {
 
         List<Map<String, Object>> limitedList = response.getList()
                 .stream()
-                .limit(100)  // 리스트에서 처음 100개만 가져옴
+                .limit(50)  // 리스트에서 처음 50개만 가져옴
                 .collect(Collectors.toList());
 
         if (response.getList() != null && !response.getList().isEmpty()) {
@@ -148,6 +149,34 @@ public class PensionSavingsService {
                 .productName(entity.getProductName())
                 .productArea(entity.getProductArea().getDescription())
                 .company(entity.getCompany())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public PensionSavingsDetailResponseDto getSavingsProductDetail(UUID productId) {
+        PensionSavingsProductEntity product = pensionProductRepository.findById(productId)
+                .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+
+        List<Map<String, Object>> productDetail = product.getProductDetail();
+        if (productDetail == null || productDetail.isEmpty()) {
+            log.warn("조회할 연금저축 상품이 존재하지 않습니다.");
+        }
+
+        Map<String, Object> detail = productDetail.get(0);
+
+        return PensionSavingsDetailResponseDto.builder()
+                .productArea(product.getProductArea().getDescription())  // 권역
+                .company((String) detail.get("company"))  // 기업명
+                .productName(product.getProductName())  // 상품명
+                .productType((String) detail.get("productType"))  // 상품 유형
+                .withdraws(((String) detail.get("withdraws")).equals("Y") ? "가능" : "불가능")  // 중도 해지
+                .currentEarnRate((Double) detail.get("earnRate"))  // 현재 수익률
+                .previousYearEarnRate((Double) detail.get("earnRate1"))  // 과거 1년 수익률
+                .twoYearsAgoEarnRate((Double) detail.get("earnRate2"))  // 과거 2년 수익률
+                .threeYearsAgoEarnRate((Double) detail.get("earnRate3"))  // 과거 3년 수익률
+                .previousYearFeeRate((Double) detail.get("feeRate1"))  // 과거 1년 수수료율
+                .twoYearsAgoFeeRate((Double) detail.get("feeRate2"))  // 과거 2년 수수료율
+                .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
                 .build();
     }
 }

@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PensionSavingsDetailResponseDto {
-    String productName; // 상품명
     String productArea; // 권역
-    String campany; // 기업명
+    String company; // 기업명
+    String productName; // 상품명
     String productType; // 상품 유형
     String withdraws; // 중도 해지 (가능/불가능)
 
