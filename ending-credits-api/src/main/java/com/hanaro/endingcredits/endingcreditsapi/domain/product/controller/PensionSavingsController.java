@@ -60,7 +60,7 @@ public class PensionSavingsController {
         }
     }
 
-    @GetMapping("/pension-savings/detail/search")
+    @GetMapping("/pension-savings/detail/{productId}")
     @Operation(summary = "연금저축 상품 상세 조회", description = "연금저축 상품을 상세 조회합니다.")
     public ApiResponseEntity<PensionSavingsDetailResponseDto> getSavingsProductDetail(@PathVariable(name = "productId") UUID productId) {
         PensionSavingsDetailResponseDto responseDto = pensionSavingsService.getSavingsProductDetail(productId);
