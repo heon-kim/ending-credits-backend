@@ -10,6 +10,8 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -38,5 +40,23 @@ public class MemberService {
         }
 
         memberRepository.save(member);
+    }
+
+    public void setWishFund(UUID memberId, Long wishFund) {
+        MemberEntity member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        member.setWishFund(wishFund);
+        memberRepository.save(member);
+    }
+
+    public String getWishFund(UUID memberId) {
+        MemberEntity member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.KOREA);
+        String wishFund = formatter.format(member.getWishFund());
+
+        return wishFund;
     }
 }

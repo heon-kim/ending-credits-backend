@@ -65,6 +65,10 @@ public class MemberEntity {
     @Builder.Default
     private boolean isLinked = false;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Long wishFund = 0L;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssetEntity> assets = new ArrayList<>();
 }
