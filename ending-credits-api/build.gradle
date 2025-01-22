@@ -65,7 +65,12 @@ dependencies {
     // coolSMS Dependency
     implementation 'net.nurigo:javaSDK:2.2'
 
+    // Gson Dependency
     implementation 'com.google.code.gson:gson:2.11.0'
+
+    // NCP Storage Dependency
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.780'
 }
 
 tasks.named('test') {
