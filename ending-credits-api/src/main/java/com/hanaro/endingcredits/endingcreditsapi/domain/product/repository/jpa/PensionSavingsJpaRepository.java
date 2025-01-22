@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface PensionSavingsJpaRepository extends JpaRepository<PensionSavingsProductEntity, UUID> {
     List<PensionSavingsProductEntity> findByProductArea(ProductArea productArea);
+    List<PensionSavingsProductEntity> findByCompany(String company);
 }

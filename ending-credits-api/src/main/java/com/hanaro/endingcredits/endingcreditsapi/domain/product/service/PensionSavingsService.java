@@ -172,4 +172,17 @@ public class PensionSavingsService {
                 .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public List<PensionSavingsListResponseDto> getHanaSavingsProductList(String company) {
+
+        return pensionProductRepository.findByCompany(company)
+                .stream()
+                .map(product -> PensionSavingsListResponseDto.builder()
+                        .productId(product.getProductId())
+                        .productName(product.getProductName())
+                        .company(product.getCompany())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

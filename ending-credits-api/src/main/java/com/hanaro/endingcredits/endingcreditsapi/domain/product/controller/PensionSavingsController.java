@@ -66,4 +66,11 @@ public class PensionSavingsController {
         PensionSavingsDetailResponseDto responseDto = pensionSavingsService.getSavingsProductDetail(productId);
         return ApiResponseEntity.onSuccess(responseDto);
     }
+
+    @GetMapping("/pension-savings/detail/hana")
+    @Operation(summary = "연금저축 하나은행 상품 조회", description = "하나은행 연금저축 상품들을 조회합니다.")
+    public ApiResponseEntity<List<PensionSavingsListResponseDto>> getHanaPensionProductDetail() {
+        List<PensionSavingsListResponseDto> responseDto = pensionSavingsService.getHanaSavingsProductList("하나은행");
+        return ApiResponseEntity.onSuccess(responseDto);
+    }
 }
