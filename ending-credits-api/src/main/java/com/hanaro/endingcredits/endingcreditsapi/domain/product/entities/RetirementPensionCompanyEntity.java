@@ -11,16 +11,16 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter(AccessLevel.PROTECTED)
-@Table(name = "retirement_pension_yield")
+@Table(name = "retirement_pension_company")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RetirementPensionYieldEntity {
+public class RetirementPensionCompanyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name="company_yield_id")
-    private UUID companyYieldId;
+    @Column(name="company_id")
+    private UUID companyId;
 
     @Column(name="company", nullable = false, length = 50)
     private String company;
