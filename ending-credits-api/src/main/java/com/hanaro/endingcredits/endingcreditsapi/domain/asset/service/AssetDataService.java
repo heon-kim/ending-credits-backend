@@ -174,9 +174,9 @@ public class AssetDataService {
         createCash(member, BigDecimal.valueOf(500000));
 
         // 각 은행에 자산 연결
-        for (int i = 0; i < banks.size(); i++) {
-            createLoan(createSingleDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
-        }
+//        for (int i = 0; i < banks.size(); i++) {
+//            createLoan(createSingleDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
+//        }
     }
 
     private AssetEntity createAsset(MemberEntity member, AssetType type, Long amount) {

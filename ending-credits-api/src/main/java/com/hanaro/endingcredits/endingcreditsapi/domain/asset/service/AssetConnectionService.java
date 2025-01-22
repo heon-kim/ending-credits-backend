@@ -13,6 +13,9 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.securitie
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.securities.SecuritiesCompanyEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual.ExchangeEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual.VirtualAsset;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.BankRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.DepositRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.FundRepository;
@@ -34,8 +37,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -56,6 +59,10 @@ public class AssetConnectionService {
     private final CashRepository cashRepository;
     private final PensionRepository pensionRepository;
     private final RealEstateRepository realEstateRepository;
+    private final AssetRepository assetRepository;
+
+    private static final BigDecimal EXCHANGE_RATE = BigDecimal.valueOf(1450); // USD -> KRW 환율
+
 
     /**
      * 모든 자산 연결
@@ -73,6 +80,15 @@ public class AssetConnectionService {
             connectTrusts(bank, member);
         }
 
+        BigDecimal totalDeposits = calculateTotalDepositsForBanks(member, bankNames);
+        updateAssetEntity(member, AssetType.DEPOSIT, totalDeposits);
+
+        BigDecimal totalFunds = calculateTotalFundsForBanks(member, bankNames);
+        updateAssetEntity(member, AssetType.FUND, totalFunds);
+
+        BigDecimal totalTrusts = calculateTotalTrustsForBanks(member, bankNames);
+        updateAssetEntity(member, AssetType.TRUST, totalTrusts);
+
         // 증권 자산 연결
         for (String securitiesCompanyName : securitiesCompanyNames) {
             SecuritiesCompanyEntity company = securitiesCompanyRepository.findBySecuritiesCompanyName(securitiesCompanyName)
@@ -80,12 +96,18 @@ public class AssetConnectionService {
             connectSecuritiesAccounts(company, member);
         }
 
+        BigDecimal totalSecurities = calculateTotalSecuritiesForCompanies(member, securitiesCompanyNames);
+        updateAssetEntity(member, AssetType.SECURITIES, totalSecurities);
+
         // 가상자산 연결
         for (String exchangeName : exchangeNames) {
             ExchangeEntity exchange = exchangeRepository.findByExchangeName(exchangeName)
                     .orElseThrow(() -> new IllegalArgumentException("거래소를 찾을 수 없습니다: " + exchangeName));
             connectVirtualAssets(exchange, member);
         }
+
+        BigDecimal totalVirtualAssets = calculateTotalVirtualAssetsForExchanges(member, exchangeNames);
+        updateAssetEntity(member, AssetType.VIRTUAL_ASSET, totalVirtualAssets);
 
         // 기타 자산 연결
         connectCars(member);
@@ -95,6 +117,149 @@ public class AssetConnectionService {
     }
 
     // Private Helper Methods (기존 메서드 사용)
+
+    private BigDecimal calculateTotalVirtualAssetsForExchanges(MemberEntity member, List<String> exchangeNames) {
+        BigDecimal totalVirtualAssets = BigDecimal.ZERO;
+
+        for (String exchangeName : exchangeNames) {
+            // 거래소 엔티티 조회
+            ExchangeEntity exchange = exchangeRepository.findByExchangeName(exchangeName)
+                    .orElseThrow(() -> new IllegalArgumentException("거래소를 찾을 수 없습니다: " + exchangeName));
+
+            // 해당 거래소의 가상자산 총액 계산
+            BigDecimal virtualAssets = virtualAssetRepository.findByExchangeAndAsset_Member(exchange, member)
+                    .stream()
+                    .map(asset -> calculateVirtualAssetTotal(asset)) // 각 자산의 총액 계산
+                    .reduce(BigDecimal.ZERO, BigDecimal::add); // 합산
+
+            // 전체 가상자산 총액에 추가
+            totalVirtualAssets = totalVirtualAssets.add(virtualAssets);
+        }
+
+        return totalVirtualAssets;
+    }
+
+    // 개별 가상자산의 총액 계산
+    private BigDecimal calculateVirtualAssetTotal(VirtualAsset asset) {
+        // 보유량 × 현재 가격 (통화 코드를 기준으로 적절한 환율 적용)
+        BigDecimal totalValue = asset.getCurrentPrice().multiply(asset.getQuantity());
+
+        if (asset.getCurrencyCode() == CurrencyCodeType.USD) {
+            // USD -> KRW 변환
+            totalValue = totalValue.multiply(EXCHANGE_RATE);
+        }
+
+        return totalValue;
+    }
+
+
+    private BigDecimal calculateTotalSecuritiesForCompanies(MemberEntity member, List<String> securitiesCompanyNames) {
+        BigDecimal totalSecurities = BigDecimal.ZERO;
+
+        for (String companyName : securitiesCompanyNames) {
+            // 증권회사 엔티티 조회
+            SecuritiesCompanyEntity company = securitiesCompanyRepository.findBySecuritiesCompanyName(companyName)
+                    .orElseThrow(() -> new IllegalArgumentException("증권회사를 찾을 수 없습니다: " + companyName));
+
+            // 해당 증권회사의 증권 계좌에서 총액 계산
+            BigDecimal securities = securitiesAccountRepository.findBySecuritiesCompanyAndAsset_Member(company, member)
+                    .stream()
+                    .map(account -> calculateAccountTotal(account)) // 각 계좌의 총액 계산
+                    .reduce(BigDecimal.ZERO, BigDecimal::add); // 합산
+
+            // 전체 증권 총액에 추가
+            totalSecurities = totalSecurities.add(securities);
+        }
+
+        return totalSecurities;
+    }
+
+    // 개별 계좌의 총액 계산
+    private BigDecimal calculateAccountTotal(SecuritiesAccountEntity account) {
+        // 예수금 + 원금 (통화 코드를 기준으로 적절한 환율 적용)
+        BigDecimal deposit = account.getDeposit();
+        BigDecimal principal = account.getPrincipal();
+
+        if (account.getCurrencyCode() == CurrencyCodeType.USD) {
+            // USD -> KRW 변환
+            deposit = deposit.multiply(EXCHANGE_RATE);
+            principal = principal.multiply(EXCHANGE_RATE);
+        }
+
+        return deposit.add(principal); // 총액 반환
+    }
+
+
+    private BigDecimal calculateTotalTrustsForBanks(MemberEntity member, List<String> bankNames) {
+        BigDecimal totalTrusts = BigDecimal.ZERO;
+
+        for (String bankName : bankNames) {
+            BankEntity bank = bankRepository.findByBankName(bankName)
+                    .orElseThrow(() -> new IllegalArgumentException("은행을 찾을 수 없습니다: " + bankName));
+
+            // 해당 은행의 신탁 총액 계산
+            BigDecimal trusts = trustRepository.findByBankAndAsset_Member(bank, member)
+                    .stream()
+                    .map(TrustEntity::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            totalTrusts = totalTrusts.add(trusts);
+        }
+
+        return totalTrusts;
+    }
+
+    private BigDecimal calculateTotalDepositsForBanks(MemberEntity member, List<String> bankNames) {
+        BigDecimal totalDeposits = BigDecimal.ZERO;
+
+        for (String bankName : bankNames) {
+            BankEntity bank = bankRepository.findByBankName(bankName)
+                    .orElseThrow(() -> new IllegalArgumentException("은행을 찾을 수 없습니다: " + bankName));
+
+            // 해당 은행의 예금 총액 계산
+            BigDecimal deposits = depositRepository.findByBankAndAsset_Member(bank, member)
+                    .stream()
+                    .map(DepositEntity::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            totalDeposits = totalDeposits.add(deposits);
+        }
+
+        return totalDeposits;
+    }
+
+    private BigDecimal calculateTotalFundsForBanks(MemberEntity member, List<String> bankNames) {
+        BigDecimal totalFunds = BigDecimal.ZERO;
+
+        for (String bankName : bankNames) {
+            BankEntity bank = bankRepository.findByBankName(bankName)
+                    .orElseThrow(() -> new IllegalArgumentException("은행을 찾을 수 없습니다: " + bankName));
+
+            // 해당 은행의 펀드 총액 계산
+            BigDecimal funds = fundRepository.findByBankAndAsset_Member(bank, member)
+                    .stream()
+                    .map(FundEntity::getFundAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            totalFunds = totalFunds.add(funds);
+        }
+
+        return totalFunds;
+    }
+
+    private void updateAssetEntity(MemberEntity member, AssetType assetType, BigDecimal totalAmount) {
+        // AssetEntity 조회 또는 생성
+        AssetEntity assetEntity = assetRepository.findByMemberAndAssetType(member, assetType)
+                .orElseGet(() -> AssetEntity.builder()
+                        .member(member)
+                        .assetType(assetType)
+                        .amount(0L)
+                        .build());
+
+        // 총액 업데이트
+        assetEntity.setAmount(totalAmount.longValue());
+        assetRepository.save(assetEntity);
+    }
 
     private void connectDeposits(BankEntity bank, MemberEntity member) {
         List<DepositEntity> deposits = depositRepository.findByBankAndAsset_Member(bank, member);
