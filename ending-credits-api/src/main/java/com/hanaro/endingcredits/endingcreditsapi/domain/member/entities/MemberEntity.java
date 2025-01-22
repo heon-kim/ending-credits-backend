@@ -1,7 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.member.entities;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.LoanEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.LoginType;
 import jakarta.persistence.*;
 import lombok.*;

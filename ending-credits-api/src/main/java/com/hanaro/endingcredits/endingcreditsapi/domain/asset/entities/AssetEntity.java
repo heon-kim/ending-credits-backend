@@ -14,8 +14,6 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEn
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@ToString(exclude = {"virtualAssets", "securitiesAccounts", "realEstates", "pensions", "cashes", "trusts", "cars", "funds", "deposits"})
+@ToString(exclude = {"member", "virtualAssets", "securitiesAccounts", "realEstates", "pensions", "cashes", "trusts", "cars", "funds", "deposits"})
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor

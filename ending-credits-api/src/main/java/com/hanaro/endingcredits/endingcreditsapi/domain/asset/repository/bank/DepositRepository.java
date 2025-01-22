@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.BankEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.DepositEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
@@ -13,4 +14,5 @@ import java.util.UUID;
 public interface DepositRepository extends JpaRepository<DepositEntity, UUID> {
     List<DepositEntity> findByBankAndAsset_Member(BankEntity bank, MemberEntity member);
     List<DepositEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
+    List<DepositEntity> findByAsset(AssetEntity asset);
 }

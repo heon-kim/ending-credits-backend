@@ -1,9 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.BankEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank.DepositEntity;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
-import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -16,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "deposit")
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -30,7 +27,7 @@ public class LoanEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "deposit_id")
-    private DepositEntity depositId;
+    private DepositEntity deposit;
 
     @Column(nullable = false, name = "total_amount")
     private BigDecimal totalAmount; //대출금액

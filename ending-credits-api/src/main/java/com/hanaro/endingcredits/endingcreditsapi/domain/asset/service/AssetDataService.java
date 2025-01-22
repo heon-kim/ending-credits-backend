@@ -497,6 +497,8 @@ public class AssetDataService {
                     .build();
             DepositEntity deposit = depositRepository.save(depositUSD);
 
+            createLoan(deposit);
+
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
             totalAmount = totalAmount.add(amountKRW);
             totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
@@ -531,18 +533,20 @@ public class AssetDataService {
 
 
     private void createLoan(DepositEntity deposit) {
-        BigDecimal totalAmount = generateRandomAmount(100000, 1000000);              // 100,000 ~ 1,000,000 사이의 금액
-        BigDecimal loanAmount = generateRandomAmount(10000, totalAmount.intValue()); // 10,000 ~ totalAmount 사이의 금액
-        LocalDate expiryDate = generateRandomExpiryDate();                           // 오늘 이후의 랜덤 날짜
+        for(int i = 0; i < 5; i++) {
+            BigDecimal totalAmount = generateRandomAmount(100000, 1000000);              // 100,000 ~ 1,000,000 사이의 금액
+            BigDecimal loanAmount = generateRandomAmount(10000, totalAmount.intValue()); // 10,000 ~ totalAmount 사이의 금액
+            LocalDate expiryDate = generateRandomExpiryDate();                           // 오늘 이후의 랜덤 날짜
 
-        LoanEntity loan = LoanEntity.builder()
-                .depositId(deposit)
-                .totalAmount(totalAmount)
-                .loanAmount(loanAmount)
-                .expiryDate(expiryDate)
-                .build();
+            LoanEntity loan = LoanEntity.builder()
+                    .deposit(deposit)
+                    .totalAmount(totalAmount)
+                    .loanAmount(loanAmount)
+                    .expiryDate(expiryDate)
+                    .build();
 
-        loanRepository.save(loan);
+            loanRepository.save(loan);
+        }
     }
 
     private BigDecimal calculateProfitRatio(BigDecimal purchasePrice, BigDecimal currentPrice) {

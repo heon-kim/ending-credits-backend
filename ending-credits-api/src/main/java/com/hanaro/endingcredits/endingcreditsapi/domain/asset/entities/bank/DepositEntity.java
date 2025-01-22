@@ -1,15 +1,15 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.bank;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.LoanEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
-import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -54,4 +54,6 @@ public class DepositEntity {
         isConnected = connected;
     }
 
+    @OneToMany(mappedBy = "deposit", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<LoanEntity> loans = new ArrayList<>();
 }
