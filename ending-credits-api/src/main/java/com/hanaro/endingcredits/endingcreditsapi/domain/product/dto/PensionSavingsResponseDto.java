@@ -21,16 +21,16 @@ public class PensionSavingsResponseDto {
     String guarantees; // 원금 보장 (보장/비보장)
 
     // 납입원금
-    int currentBalance; // 현재
-    int previousYearBalance; // 과거 1년
-    int twoYearsAgoBalance; // 과거 2년
-    int threeYearsAgoBalance; // 과거 3년
+    String currentBalance; // 현재
+    String previousYearBalance; // 과거 1년
+    String twoYearsAgoBalance; // 과거 2년
+    String threeYearsAgoBalance; // 과거 3년
 
     // 적립금
-    int currentReserve; // 현재
-    int previousYearReserve; // 과거 1년
-    int twoYearsAgoReserve; // 과거 2년
-    int threeYearsAgoReserve; // 과거 3년
+    String currentReserve; // 현재
+    String previousYearReserve; // 과거 1년
+    String twoYearsAgoReserve; // 과거 2년
+    String threeYearsAgoReserve; // 과거 3년
 
     // 수익률
     double currentEarnRate; // 현재
