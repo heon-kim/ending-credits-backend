@@ -148,10 +148,10 @@ public class AssetDataService {
     private void createMockAssets(MemberEntity member, List<BankEntity> banks, List<BankEntity> savingsBanks, List<ExchangeEntity> exchanges, List<SecuritiesCompanyEntity> securitiesCompanies) {
 
         AssetEntity depositAsset = createAsset(member, AssetType.DEPOSIT, 10L);
-        createMultipleDepositsForAsset(depositAsset, banks); // 첫 3개 은행과 연결
+        createMultipleDepositsForAsset(depositAsset, banks);
 
         AssetEntity trustAsset = createAsset(member, AssetType.TRUST, 10L);
-        createMultipleTrustsForAsset(trustAsset, banks);
+        createMultipleTrustsForAsset(trustAsset, savingsBanks);
 
         AssetEntity fundAsset = createAsset(member, AssetType.FUND, 10L);
         createMultipleFundsForAsset(fundAsset, banks);
@@ -171,11 +171,12 @@ public class AssetDataService {
         AssetEntity pensionAsset = createAsset(member, AssetType.PENSION, 20L);
         createMultiplePensionsForAsset(pensionAsset);
 
+        createCash(member, BigDecimal.valueOf(500000));
+
         // 각 은행에 자산 연결
         for (int i = 0; i < banks.size(); i++) {
             createLoan(createSingleDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
         }
-        createCash(member, BigDecimal.valueOf(500000));
     }
 
     private AssetEntity createAsset(MemberEntity member, AssetType type, Long amount) {
@@ -494,7 +495,7 @@ public class AssetDataService {
                     .amount(amountUSD)
                     .currencyCode(CurrencyCodeType.USD)
                     .build();
-            depositRepository.save(depositUSD);
+            DepositEntity deposit = depositRepository.save(depositUSD);
 
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
             totalAmount = totalAmount.add(amountKRW);
