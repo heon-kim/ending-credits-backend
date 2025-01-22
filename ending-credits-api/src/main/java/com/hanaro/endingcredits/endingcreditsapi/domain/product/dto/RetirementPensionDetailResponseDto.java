@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class RetirementPensionDetailResponseDto {
     String company; // 기업명
     String area; // 권역
+    String division; // 원리금 보장 여부 (보장/비보장)
 
     // 수익률 추이
     double dbEarnRate; // DB 장기수익률 해당 분기

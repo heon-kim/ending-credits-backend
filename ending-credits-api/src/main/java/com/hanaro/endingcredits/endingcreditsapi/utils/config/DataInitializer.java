@@ -72,7 +72,7 @@ public class DataInitializer {
                         .queryParam("sysType", sysType)
                         .toUriString();
 
-                retirementPensionService.fetchAndSaveAnnuityProducts(requestUrl, sysType);
+                retirementPensionService.fetchAndSaveAnnuityProducts(requestUrl);
             }
         };
     }

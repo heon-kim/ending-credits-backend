@@ -25,7 +25,7 @@ public class RetirementPensionService {
     private final RetirementPensionEsRepository retirementPensionEsRepository;
 
     @Transactional
-    public void fetchAndSaveAnnuityProducts(String apiUrl, int sysType) {
+    public void fetchAndSaveAnnuityProducts(String apiUrl) {
         RetirementPensionResponse response = restTemplate.getForObject(apiUrl, RetirementPensionResponse.class);
         if (response == null) return;
 
@@ -41,13 +41,11 @@ public class RetirementPensionService {
                 }
 
                 ProductArea yieldArea = ProductArea.fromDescription(area);
-                SysType convertedSysType = SysType.fromCode(sysType);
 
                 RetirementPensionYieldEntity entity = RetirementPensionYieldEntity.builder()
                         .company(company)
                         .area(yieldArea)
                         .yieldDetail(yieldDetail)
-                        .sysType(convertedSysType)
                         .build();
                 retirementPensionJpaRepository.save(entity);
 //                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
@@ -103,6 +101,7 @@ public class RetirementPensionService {
         return RetirementPensionDetailResponseDto.builder()
                 .company(yieldEntity.getCompany())
                 .area(yieldEntity.getArea().getDescription())
+                .division((String) yieldDetail.get("division"))
                 .dbEarnRate(getDoubleValue(yieldDetail, "dbEarnRate", 0.0))
                 .dbEarnRate3(getDoubleValue(yieldDetail, "dbEarnRate3", 0.0))
                 .dbEarnRate5(getDoubleValue(yieldDetail, "dbEarnRate5", 0.0))
@@ -120,7 +119,6 @@ public class RetirementPensionService {
                 .irpEarnRate10(getDoubleValue(yieldDetail, "irpEarnRate10", 0.0))
                 .build();
     }
-
 
     private double getDoubleValue(Map<String, Object> map, String key, double defaultValue) {
         return Optional.ofNullable(map.get(key))

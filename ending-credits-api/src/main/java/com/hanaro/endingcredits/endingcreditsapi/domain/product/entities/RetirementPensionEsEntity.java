@@ -30,16 +30,4 @@ public class RetirementPensionEsEntity {
 
     @Field(type = FieldType.Text)
     private String company;
-
-    @Field(type = FieldType.Text)
-    private String applyTerm;
-
-    @Field(type = FieldType.Text)
-    private String checkDate;
-
-    @Field(type = FieldType.Integer)
-    private int contractTerm;
-
-    @Field(type = FieldType.Double)
-    private BigDecimal contractRate;
 }

@@ -29,10 +29,6 @@ public class RetirementPensionYieldEntity {
     @Column(name="area", nullable = false)
     private ProductArea area;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name="sys_type", nullable = false)
-    private SysType sysType;
-
     @Column(name="yield_detail", length = 10000)
     @Convert(converter = JsonListConverter.class)
     private List<Map<String, Object>> yieldDetail;
