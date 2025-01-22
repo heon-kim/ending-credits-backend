@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class RetirementPensionResponse {
-    private final String code;
-    private final String message;
-    private final int count;
-    private final List<CompanyDto> list;
+public class CompanyDto {
+    private final String company;
+    private final String area;
+    private final List<Map<String, Object>> list;
 }
