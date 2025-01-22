@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PensionSavingsListResponseDto {
-    UUID productId;
-    String company;
-    String productName;
+    private UUID productId;
+    private String company;
+    private String productName;
 }

@@ -1,16 +1,17 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Builder
 @Getter
-public class RetirementPensionProductSummaryDto {
-    private final UUID productId;
-    private final String productName;
-
-    public RetirementPensionProductSummaryDto(UUID productId, String productName) {
-        this.productId = productId;
-        this.productName = productName;
-    }
+@NoArgsConstructor
+@AllArgsConstructor
+public class RetirementPensionCompanySummaryDto {
+    private UUID companyId;
+    private String company;
 }

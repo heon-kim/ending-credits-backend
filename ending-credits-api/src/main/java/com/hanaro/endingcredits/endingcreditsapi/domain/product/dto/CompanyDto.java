@@ -3,15 +3,17 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
 
-@Getter
 @Builder
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class CompanyDto {
-    private final String company;
-    private final String area;
-    private final List<Map<String, Object>> list;
+    private String company;
+    private String area;
+    private List<Map<String, Object>> list;
 }

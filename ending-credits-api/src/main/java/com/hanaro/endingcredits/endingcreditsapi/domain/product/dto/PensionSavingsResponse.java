@@ -13,8 +13,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PensionSavingsResponse {
-    String code;
-    String message;
-    int count;
-    List<Map<String, Object>> list;
+    private String code;
+    private String message;
+    private int count;
+    private List<Map<String, Object>> list;
 }
