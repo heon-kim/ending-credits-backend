@@ -12,4 +12,5 @@ import java.util.UUID;
 @Repository
 public interface VirtualAssetRepository extends JpaRepository<VirtualAsset, UUID> {
     List<VirtualAsset> findByExchangeAndAsset_Member(ExchangeEntity exchange, MemberEntity member);
+    List<VirtualAsset> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }

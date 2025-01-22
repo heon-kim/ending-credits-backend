@@ -13,4 +13,5 @@ import java.util.UUID;
 @Repository
 public interface FundRepository extends JpaRepository<FundEntity, UUID> {
     List<FundEntity> findByBankAndAsset_Member(BankEntity bank, MemberEntity member);
+    List<FundEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
 }

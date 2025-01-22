@@ -33,6 +33,9 @@ public class SecuritiesAccountEntity {
     @JoinColumn(name = "securities_company_id")
     private SecuritiesCompanyEntity securitiesCompany; //증권사 ID
 
+    @Column(nullable = false, name = "securities_account_number")
+    private String securitiesAccountNumber;
+
     @Column(nullable = false, name = "securities_account_name")
     private String securitiesAccountName; //계좌명
     
@@ -48,7 +51,7 @@ public class SecuritiesAccountEntity {
     @Comment("KRW: 원화, USD: 미국달러")
     private CurrencyCodeType currencyCode; //통화코드
 
-    @Column(nullable = false, name = "isConnected")
+    @Column(nullable = false, name = "is_connected")
     private boolean isConnected = false;
 
     @Column(nullable = false, name = "profit_ratio", columnDefinition = "DECIMAL(19, 2) DEFAULT 0.00")
