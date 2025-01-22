@@ -12,9 +12,8 @@ import java.util.Map;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PensionSavingsResponse {
-    private String code;
-    private String message;
-    private int count;
-    private List<Map<String, Object>> list;
+public class RetirementPensionDetailResponseDto {
+    private String company; // 기업명
+    private String area; // 권역
+    private Map<String, YieldDetailDto> earnRates; // 원리금 보장 여부별 수익률
 }

@@ -3,8 +3,8 @@ package com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.han
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.BaseErrorCode;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.GeneralException;
 
-public class ProductHandler extends GeneralException {
-    public ProductHandler(BaseErrorCode errorCode) {
+public class FinanceHandler extends GeneralException {
+    public FinanceHandler(BaseErrorCode errorCode) {
         super(errorCode);
     }
 }

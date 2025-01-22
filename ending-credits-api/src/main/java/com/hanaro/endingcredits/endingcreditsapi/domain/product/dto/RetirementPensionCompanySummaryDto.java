@@ -11,8 +11,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PensionSavingsListResponseDto {
-    private UUID productId;
+public class RetirementPensionCompanySummaryDto {
+    private UUID companyId;
     private String company;
-    private String productName;
 }
