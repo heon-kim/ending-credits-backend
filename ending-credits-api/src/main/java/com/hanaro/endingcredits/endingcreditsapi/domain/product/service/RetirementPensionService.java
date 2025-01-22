@@ -27,7 +27,7 @@ public class RetirementPensionService {
     private final RetirementPensionEsRepository retirementPensionEsRepository;
 
     @Transactional
-    public void fetchAndSaveAnnuityProducts(String apiUrl) {
+    public void fetchAndSaveAnnuityYields(String apiUrl) {
         RetirementPensionResponse response = restTemplate.getForObject(apiUrl, RetirementPensionResponse.class);
         if (response == null) return;
 
@@ -38,15 +38,15 @@ public class RetirementPensionService {
                 if (existingEntity.isPresent()) {
                     // 기존 엔티티 업데이트
                     RetirementPensionCompanyEntity entity = existingEntity.get();
-                    List<Map<String, Object>> yieldDetail = entity.getYieldDetail();
-                    yieldDetail.add((companyList.getList()).get(0));
+                    List<Map<String, Object>> yieldDetails = entity.getYieldDetails();
+                    yieldDetails.add((companyList.getList()).get(0));
                     retirementPensionJpaRepository.save(entity);
                 } else {
                         String company = companyList.getCompany();
                         String area = companyList.getArea();
-                        List<Map<String, Object>> yieldDetail = companyList.getList();
+                        List<Map<String, Object>> yieldDetails = companyList.getList();
 
-                        if (company == null || area == null || yieldDetail == null || yieldDetail.isEmpty()) {
+                        if (company == null || area == null || yieldDetails == null || yieldDetails.isEmpty()) {
                             log.warn("company 또는 area 또는 yieldDetail가 존재하지 않습니다.");
                             continue;
                         }
@@ -56,7 +56,7 @@ public class RetirementPensionService {
                         RetirementPensionCompanyEntity entity = RetirementPensionCompanyEntity.builder()
                                 .company(company)
                                 .area(yieldArea)
-                                .yieldDetail(yieldDetail)
+                                .yieldDetails(yieldDetails)
                                 .build();
                         retirementPensionJpaRepository.save(entity);
 //                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
@@ -66,6 +66,33 @@ public class RetirementPensionService {
         }
     }
 
+    @Transactional
+    public void fetchAndSaveAnnuityFees(String apiUrl) {
+        RetirementPensionFeeResponse response = restTemplate.getForObject(apiUrl, RetirementPensionFeeResponse.class);
+        if (response == null) return;
+
+        if (response.getList() != null && !response.getList().isEmpty()) {
+            List<Map<String, Object>> list = response.getList();
+
+            for (Map<String, Object> feeDetails : list) {
+                Optional<RetirementPensionCompanyEntity> existingEntity = retirementPensionJpaRepository.findByCompany((String) feeDetails.get("company"));
+
+                if (existingEntity.isPresent()) {
+                    RetirementPensionCompanyEntity companyEntity = existingEntity.get();
+                    List<Map<String, Object>> feeDetail = companyEntity.getFeeDetails();
+                    if (feeDetail == null) {
+                        feeDetail = new ArrayList<>();
+                    }
+
+                    if (!feeDetails.containsKey("area") && !feeDetails.containsKey("company")) {
+                        feeDetail.add(feeDetails);
+                    }
+                    companyEntity.setFeeDetails(feeDetail);
+                    retirementPensionJpaRepository.save(companyEntity);
+                }
+            }
+        }
+    }
 
 //    @Transactional
 //    public void saveOrUpdate(RetirementPensionProductDto dto, ProductArea productArea, SysType sysType) {
@@ -108,47 +135,42 @@ public class RetirementPensionService {
         RetirementPensionCompanyEntity yieldEntity = retirementPensionJpaRepository.findById(companyId)
                 .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
-        List<Map<String, Object>> yieldDetail = yieldEntity.getYieldDetail();
-
-
-        for (Map<String, Object> yield : yieldDetail) {
-
-        }
+        List<Map<String, Object>> yieldDetails = yieldEntity.getYieldDetails();
 
         YieldDetailDto guaranteedYieldDetails = YieldDetailDto.builder()
-                .dbEarnRate(getDoubleValue(yieldDetail.get(0), "dbEarnRate", 0.0))
-                .dbEarnRate3(getDoubleValue(yieldDetail.get(0), "dbEarnRate3", 0.0))
-                .dbEarnRate5(getDoubleValue(yieldDetail.get(0), "dbEarnRate5", 0.0))
-                .dbEarnRate7(getDoubleValue(yieldDetail.get(0), "dbEarnRate7", 0.0))
-                .dbEarnRate10(getDoubleValue(yieldDetail.get(0), "dbEarnRate10", 0.0))
-                .dcEarnRate(getDoubleValue(yieldDetail.get(0), "dcEarnRate", 0.0))
-                .dcEarnRate3(getDoubleValue(yieldDetail.get(0), "dcEarnRate3", 0.0))
-                .dcEarnRate5(getDoubleValue(yieldDetail.get(0), "dcEarnRate5", 0.0))
-                .dcEarnRate7(getDoubleValue(yieldDetail.get(0), "dcEarnRate7", 0.0))
-                .dcEarnRate10(getDoubleValue(yieldDetail.get(0), "dcEarnRate10", 0.0))
-                .irpEarnRate(getDoubleValue(yieldDetail.get(0), "irpEarnRate", 0.0))
-                .irpEarnRate3(getDoubleValue(yieldDetail.get(0), "irpEarnRate3", 0.0))
-                .irpEarnRate5(getDoubleValue(yieldDetail.get(0), "irpEarnRate5", 0.0))
-                .irpEarnRate7(getDoubleValue(yieldDetail.get(0), "irpEarnRate7", 0.0))
-                .irpEarnRate10(getDoubleValue(yieldDetail.get(0), "irpEarnRate10", 0.0))
+                .dbEarnRate(getDoubleValue(yieldDetails.get(0), "dbEarnRate", 0.0))
+                .dbEarnRate3(getDoubleValue(yieldDetails.get(0), "dbEarnRate3", 0.0))
+                .dbEarnRate5(getDoubleValue(yieldDetails.get(0), "dbEarnRate5", 0.0))
+                .dbEarnRate7(getDoubleValue(yieldDetails.get(0), "dbEarnRate7", 0.0))
+                .dbEarnRate10(getDoubleValue(yieldDetails.get(0), "dbEarnRate10", 0.0))
+                .dcEarnRate(getDoubleValue(yieldDetails.get(0), "dcEarnRate", 0.0))
+                .dcEarnRate3(getDoubleValue(yieldDetails.get(0), "dcEarnRate3", 0.0))
+                .dcEarnRate5(getDoubleValue(yieldDetails.get(0), "dcEarnRate5", 0.0))
+                .dcEarnRate7(getDoubleValue(yieldDetails.get(0), "dcEarnRate7", 0.0))
+                .dcEarnRate10(getDoubleValue(yieldDetails.get(0), "dcEarnRate10", 0.0))
+                .irpEarnRate(getDoubleValue(yieldDetails.get(0), "irpEarnRate", 0.0))
+                .irpEarnRate3(getDoubleValue(yieldDetails.get(0), "irpEarnRate3", 0.0))
+                .irpEarnRate5(getDoubleValue(yieldDetails.get(0), "irpEarnRate5", 0.0))
+                .irpEarnRate7(getDoubleValue(yieldDetails.get(0), "irpEarnRate7", 0.0))
+                .irpEarnRate10(getDoubleValue(yieldDetails.get(0), "irpEarnRate10", 0.0))
                 .build();
 
         YieldDetailDto nonGuaranteedYieldDetails = YieldDetailDto.builder()
-                .dbEarnRate(getDoubleValue(yieldDetail.get(1), "dbEarnRate", 0.0))
-                .dbEarnRate3(getDoubleValue(yieldDetail.get(1), "dbEarnRate3", 0.0))
-                .dbEarnRate5(getDoubleValue(yieldDetail.get(1), "dbEarnRate5", 0.0))
-                .dbEarnRate7(getDoubleValue(yieldDetail.get(1), "dbEarnRate7", 0.0))
-                .dbEarnRate10(getDoubleValue(yieldDetail.get(1), "dbEarnRate10", 0.0))
-                .dcEarnRate(getDoubleValue(yieldDetail.get(1), "dcEarnRate", 0.0))
-                .dcEarnRate3(getDoubleValue(yieldDetail.get(1), "dcEarnRate3", 0.0))
-                .dcEarnRate5(getDoubleValue(yieldDetail.get(1), "dcEarnRate5", 0.0))
-                .dcEarnRate7(getDoubleValue(yieldDetail.get(1), "dcEarnRate7", 0.0))
-                .dcEarnRate10(getDoubleValue(yieldDetail.get(1), "dcEarnRate10", 0.0))
-                .irpEarnRate(getDoubleValue(yieldDetail.get(1), "irpEarnRate", 0.0))
-                .irpEarnRate3(getDoubleValue(yieldDetail.get(1), "irpEarnRate3", 0.0))
-                .irpEarnRate5(getDoubleValue(yieldDetail.get(1), "irpEarnRate5", 0.0))
-                .irpEarnRate7(getDoubleValue(yieldDetail.get(1), "irpEarnRate7", 0.0))
-                .irpEarnRate10(getDoubleValue(yieldDetail.get(1), "irpEarnRate10", 0.0))
+                .dbEarnRate(getDoubleValue(yieldDetails.get(1), "dbEarnRate", 0.0))
+                .dbEarnRate3(getDoubleValue(yieldDetails.get(1), "dbEarnRate3", 0.0))
+                .dbEarnRate5(getDoubleValue(yieldDetails.get(1), "dbEarnRate5", 0.0))
+                .dbEarnRate7(getDoubleValue(yieldDetails.get(1), "dbEarnRate7", 0.0))
+                .dbEarnRate10(getDoubleValue(yieldDetails.get(1), "dbEarnRate10", 0.0))
+                .dcEarnRate(getDoubleValue(yieldDetails.get(1), "dcEarnRate", 0.0))
+                .dcEarnRate3(getDoubleValue(yieldDetails.get(1), "dcEarnRate3", 0.0))
+                .dcEarnRate5(getDoubleValue(yieldDetails.get(1), "dcEarnRate5", 0.0))
+                .dcEarnRate7(getDoubleValue(yieldDetails.get(1), "dcEarnRate7", 0.0))
+                .dcEarnRate10(getDoubleValue(yieldDetails.get(1), "dcEarnRate10", 0.0))
+                .irpEarnRate(getDoubleValue(yieldDetails.get(1), "irpEarnRate", 0.0))
+                .irpEarnRate3(getDoubleValue(yieldDetails.get(1), "irpEarnRate3", 0.0))
+                .irpEarnRate5(getDoubleValue(yieldDetails.get(1), "irpEarnRate5", 0.0))
+                .irpEarnRate7(getDoubleValue(yieldDetails.get(1), "irpEarnRate7", 0.0))
+                .irpEarnRate10(getDoubleValue(yieldDetails.get(1), "irpEarnRate10", 0.0))
                 .build();
 
 

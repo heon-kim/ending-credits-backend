@@ -34,7 +34,8 @@ public class DataInitializer {
     private String apiKey;
 
     private static final String PENSION_SAVINGS_API_URL = "https://www.fss.or.kr/openapi/api/psProdList.json";
-    private static final String RETIREMENT_PENSION_PRODUCT_API_URL = "https://www.fss.or.kr/openapi/api/rpCorpResultList.json";
+    private static final String RETIREMENT_PENSION_API_URL = "https://www.fss.or.kr/openapi/api/rpCorpResultList.json";
+    private static final String RETIREMENT_PENSION_FEE_API_URL = "https://www.fss.or.kr/openapi/api/rpCorpBurdenRatioList.json";
 
     @Bean
     public ApplicationRunner initPensionSavingsData() {
@@ -62,18 +63,27 @@ public class DataInitializer {
         return args -> {
             int year = 2024;
             int quarter = 3;
+            int feeYear = 2023;
+
             List<Integer> sysTypes = List.of(1, 2);
 
             for (int sysType : sysTypes) {
-                String requestUrl = UriComponentsBuilder.fromHttpUrl(RETIREMENT_PENSION_PRODUCT_API_URL)
+                String requestUrl = UriComponentsBuilder.fromHttpUrl(RETIREMENT_PENSION_API_URL)
                         .queryParam("key", apiKey)
                         .queryParam("year", year)
                         .queryParam("quarter", quarter)
                         .queryParam("sysType", sysType)
                         .toUriString();
 
-                retirementPensionService.fetchAndSaveAnnuityProducts(requestUrl);
+                retirementPensionService.fetchAndSaveAnnuityYields(requestUrl);
             }
+
+            String requestUrl = UriComponentsBuilder.fromHttpUrl(RETIREMENT_PENSION_FEE_API_URL)
+                    .queryParam("key", apiKey)
+                    .queryParam("year", feeYear)
+                    .toUriString();
+
+            retirementPensionService.fetchAndSaveAnnuityFees(requestUrl);
         };
     }
 }
