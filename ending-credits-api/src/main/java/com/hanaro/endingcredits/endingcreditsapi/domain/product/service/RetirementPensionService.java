@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,26 +32,36 @@ public class RetirementPensionService {
         if (response == null) return;
 
         if (response.getList() != null && !response.getList().isEmpty()) {
-            for (CompanyDto companyList : response.getList()) {
-                String company = companyList.getCompany();
-                String area = companyList.getArea();
-                List<Map<String, Object>> yieldDetail = companyList.getList();
+            for (CompanyDto companyList: response.getList()) {
+                Optional<RetirementPensionCompanyEntity> existingEntity = retirementPensionJpaRepository.findByCompany(companyList.getCompany());
 
-                if (company == null || area == null || yieldDetail == null || yieldDetail.isEmpty()) {
-                    log.warn("company 또는 area 또는 yieldDetail가 존재하지 않습니다.");
-                    continue;
-                }
+                if (existingEntity.isPresent()) {
+                    // 기존 엔티티 업데이트
+                    RetirementPensionCompanyEntity entity = existingEntity.get();
+                    List<Map<String, Object>> yieldDetail = entity.getYieldDetail();
+                    yieldDetail.add((companyList.getList()).get(0));
+                    retirementPensionJpaRepository.save(entity);
+                } else {
+                        String company = companyList.getCompany();
+                        String area = companyList.getArea();
+                        List<Map<String, Object>> yieldDetail = companyList.getList();
 
-                ProductArea yieldArea = ProductArea.fromDescription(area);
+                        if (company == null || area == null || yieldDetail == null || yieldDetail.isEmpty()) {
+                            log.warn("company 또는 area 또는 yieldDetail가 존재하지 않습니다.");
+                            continue;
+                        }
 
-                RetirementPensionYieldEntity entity = RetirementPensionYieldEntity.builder()
-                        .company(company)
-                        .area(yieldArea)
-                        .yieldDetail(yieldDetail)
-                        .build();
-                retirementPensionJpaRepository.save(entity);
+                        ProductArea yieldArea = ProductArea.fromDescription(area);
+
+                        RetirementPensionCompanyEntity entity = RetirementPensionCompanyEntity.builder()
+                                .company(company)
+                                .area(yieldArea)
+                                .yieldDetail(yieldDetail)
+                                .build();
+                        retirementPensionJpaRepository.save(entity);
 //                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
 //                retirementPensionEsRepository.save(document);
+                }
             }
         }
     }
@@ -72,13 +84,13 @@ public class RetirementPensionService {
 //        }
 //    }
 
-    @Transactional(readOnly = true)
-    public List<RetirementPensionEsEntity> searchProducts(String keyword, int areaCode, int sysTypeCode) {
-        ProductArea productArea = ProductArea.fromCode(areaCode);
-        SysType sysType = SysType.fromCode(sysTypeCode);
-
-        return retirementPensionEsRepository.findByProductNameContainingAndProductAreaAndSysType(keyword, productArea, sysType);
-    }
+//    @Transactional(readOnly = true)
+//    public List<RetirementPensionEsEntity> searchProducts(String keyword, int areaCode, int sysTypeCode) {
+//        ProductArea productArea = ProductArea.fromCode(areaCode);
+//        SysType sysType = SysType.fromCode(sysTypeCode);
+//
+//        return retirementPensionEsRepository.findByProductNameContainingAndProductAreaAndSysType(keyword, productArea, sysType);
+//    }
 
 //    @Transactional(readOnly = true)
 //    public List<RetirementPensionProductSummaryDto> getPensionProducts(int areaCode, int sysTypeCode) {
@@ -92,31 +104,63 @@ public class RetirementPensionService {
 //    }
 
     @Transactional(readOnly = true)
-    public RetirementPensionDetailResponseDto getPensionProductDetailById(UUID companyYieldId) {
-        RetirementPensionYieldEntity yieldEntity = retirementPensionJpaRepository.findById(companyYieldId)
+    public RetirementPensionDetailResponseDto getPensionProductDetailById(UUID companyId) {
+        RetirementPensionCompanyEntity yieldEntity = retirementPensionJpaRepository.findById(companyId)
                 .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
-        Map<String, Object> yieldDetail = yieldEntity.getYieldDetail().get(0);
+        List<Map<String, Object>> yieldDetail = yieldEntity.getYieldDetail();
+
+
+        for (Map<String, Object> yield : yieldDetail) {
+
+        }
+
+        YieldDetailDto guaranteedYieldDetails = YieldDetailDto.builder()
+                .dbEarnRate(getDoubleValue(yieldDetail.get(0), "dbEarnRate", 0.0))
+                .dbEarnRate3(getDoubleValue(yieldDetail.get(0), "dbEarnRate3", 0.0))
+                .dbEarnRate5(getDoubleValue(yieldDetail.get(0), "dbEarnRate5", 0.0))
+                .dbEarnRate7(getDoubleValue(yieldDetail.get(0), "dbEarnRate7", 0.0))
+                .dbEarnRate10(getDoubleValue(yieldDetail.get(0), "dbEarnRate10", 0.0))
+                .dcEarnRate(getDoubleValue(yieldDetail.get(0), "dcEarnRate", 0.0))
+                .dcEarnRate3(getDoubleValue(yieldDetail.get(0), "dcEarnRate3", 0.0))
+                .dcEarnRate5(getDoubleValue(yieldDetail.get(0), "dcEarnRate5", 0.0))
+                .dcEarnRate7(getDoubleValue(yieldDetail.get(0), "dcEarnRate7", 0.0))
+                .dcEarnRate10(getDoubleValue(yieldDetail.get(0), "dcEarnRate10", 0.0))
+                .irpEarnRate(getDoubleValue(yieldDetail.get(0), "irpEarnRate", 0.0))
+                .irpEarnRate3(getDoubleValue(yieldDetail.get(0), "irpEarnRate3", 0.0))
+                .irpEarnRate5(getDoubleValue(yieldDetail.get(0), "irpEarnRate5", 0.0))
+                .irpEarnRate7(getDoubleValue(yieldDetail.get(0), "irpEarnRate7", 0.0))
+                .irpEarnRate10(getDoubleValue(yieldDetail.get(0), "irpEarnRate10", 0.0))
+                .build();
+
+        YieldDetailDto nonGuaranteedYieldDetails = YieldDetailDto.builder()
+                .dbEarnRate(getDoubleValue(yieldDetail.get(1), "dbEarnRate", 0.0))
+                .dbEarnRate3(getDoubleValue(yieldDetail.get(1), "dbEarnRate3", 0.0))
+                .dbEarnRate5(getDoubleValue(yieldDetail.get(1), "dbEarnRate5", 0.0))
+                .dbEarnRate7(getDoubleValue(yieldDetail.get(1), "dbEarnRate7", 0.0))
+                .dbEarnRate10(getDoubleValue(yieldDetail.get(1), "dbEarnRate10", 0.0))
+                .dcEarnRate(getDoubleValue(yieldDetail.get(1), "dcEarnRate", 0.0))
+                .dcEarnRate3(getDoubleValue(yieldDetail.get(1), "dcEarnRate3", 0.0))
+                .dcEarnRate5(getDoubleValue(yieldDetail.get(1), "dcEarnRate5", 0.0))
+                .dcEarnRate7(getDoubleValue(yieldDetail.get(1), "dcEarnRate7", 0.0))
+                .dcEarnRate10(getDoubleValue(yieldDetail.get(1), "dcEarnRate10", 0.0))
+                .irpEarnRate(getDoubleValue(yieldDetail.get(1), "irpEarnRate", 0.0))
+                .irpEarnRate3(getDoubleValue(yieldDetail.get(1), "irpEarnRate3", 0.0))
+                .irpEarnRate5(getDoubleValue(yieldDetail.get(1), "irpEarnRate5", 0.0))
+                .irpEarnRate7(getDoubleValue(yieldDetail.get(1), "irpEarnRate7", 0.0))
+                .irpEarnRate10(getDoubleValue(yieldDetail.get(1), "irpEarnRate10", 0.0))
+                .build();
+
+
+        Map<String, YieldDetailDto> earnRates = Map.of(
+                "원리금 보장", guaranteedYieldDetails,
+                "원리금 비보장", nonGuaranteedYieldDetails
+        );
 
         return RetirementPensionDetailResponseDto.builder()
                 .company(yieldEntity.getCompany())
                 .area(yieldEntity.getArea().getDescription())
-                .division((String) yieldDetail.get("division"))
-                .dbEarnRate(getDoubleValue(yieldDetail, "dbEarnRate", 0.0))
-                .dbEarnRate3(getDoubleValue(yieldDetail, "dbEarnRate3", 0.0))
-                .dbEarnRate5(getDoubleValue(yieldDetail, "dbEarnRate5", 0.0))
-                .dbEarnRate7(getDoubleValue(yieldDetail, "dbEarnRate7", 0.0))
-                .dbEarnRate10(getDoubleValue(yieldDetail, "dbEarnRate10", 0.0))
-                .dcEarnRate(getDoubleValue(yieldDetail, "dcEarnRate", 0.0))
-                .dcEarnRate3(getDoubleValue(yieldDetail, "dcEarnRate3", 0.0))
-                .dcEarnRate5(getDoubleValue(yieldDetail, "dcEarnRate5", 0.0))
-                .dcEarnRate7(getDoubleValue(yieldDetail, "dcEarnRate7", 0.0))
-                .dcEarnRate10(getDoubleValue(yieldDetail, "dcEarnRate10", 0.0))
-                .irpEarnRate(getDoubleValue(yieldDetail, "irpEarnRate", 0.0))
-                .irpEarnRate3(getDoubleValue(yieldDetail, "irpEarnRate3", 0.0))
-                .irpEarnRate5(getDoubleValue(yieldDetail, "irpEarnRate5", 0.0))
-                .irpEarnRate7(getDoubleValue(yieldDetail, "irpEarnRate7", 0.0))
-                .irpEarnRate10(getDoubleValue(yieldDetail, "irpEarnRate10", 0.0))
+                .earnRates(earnRates)
                 .build();
     }
 
@@ -128,12 +172,23 @@ public class RetirementPensionService {
     }
 
 
-//    @Transactional(readOnly = true)
-//    public List<RetirementPensionProductSummaryDto> getAllCompany() {
-//        return retirementPensionJpaRepository.findAll()
-//                .stream()
-//                .map(product -> new RetirementPensionProductSummaryDto(product.getProductId(), product.getProductName()))
-//                .collect(Collectors.toList());
-//    }
+    @Transactional(readOnly = true)
+    public List<RetirementPensionCompanySummaryDto> getAllCompany() {
+        return retirementPensionJpaRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(
+                        companyYield -> companyYield.getCompany(),
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .stream()
+                .map(companyYield -> RetirementPensionCompanySummaryDto.builder()
+                        .companyId(companyYield.getCompanyId())
+                        .company(companyYield.getCompany())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
 }
 

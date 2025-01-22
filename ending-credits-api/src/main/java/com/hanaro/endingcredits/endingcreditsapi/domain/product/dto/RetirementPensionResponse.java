@@ -3,15 +3,17 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
 @Builder
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class RetirementPensionResponse {
-    private final String code;
-    private final String message;
-    private final int count;
-    private final List<CompanyDto> list;
+    private String code;
+    private String message;
+    private int count;
+    private List<CompanyDto> list;
 }
