@@ -5,7 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Pension
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Strategy;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
-import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class RecommendService {
 
         PensionSavingsProductEntity bestProduct = products.stream()
                 .max((p1, p2) -> Double.compare(calculateScore(p1, strategy), calculateScore(p2, strategy)))
-                .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
         return buildResponseDto(bestProduct);
     }

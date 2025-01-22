@@ -5,7 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.RetirementPensionEsRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.RetirementPensionJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
-import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +106,7 @@ public class RetirementPensionService {
     @Transactional(readOnly = true)
     public RetirementPensionDetailResponseDto getPensionProductDetailById(UUID companyId) {
         RetirementPensionCompanyEntity yieldEntity = retirementPensionJpaRepository.findById(companyId)
-                .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
         List<Map<String, Object>> yieldDetail = yieldEntity.getYieldDetail();
 

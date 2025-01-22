@@ -1,6 +1,5 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
@@ -9,7 +8,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
-import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.ProductHandler;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +99,7 @@ public class PensionSavingsService {
     @Transactional(readOnly = true)
     public PensionSavingsResponseDto getSavingsProduct(UUID productId) {
         PensionSavingsProductEntity product = pensionProductRepository.findById(productId)
-                .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
         List<Map<String, Object>> productDetail = product.getProductDetail();
         if (productDetail == null || productDetail.isEmpty()) {
@@ -149,7 +148,7 @@ public class PensionSavingsService {
     @Transactional(readOnly = true)
     public PensionSavingsDetailResponseDto getSavingsProductDetail(UUID productId) {
         PensionSavingsProductEntity product = pensionProductRepository.findById(productId)
-                .orElseThrow(() -> new ProductHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
         List<Map<String, Object>> productDetail = product.getProductDetail();
         if (productDetail == null || productDetail.isEmpty()) {

@@ -20,9 +20,11 @@ public enum ErrorStatus implements BaseErrorCode {
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "MEMBER4001", "비밀번호가 맞지 않습니다."),
     DUPLICATED_IDENTIFIER(HttpStatus.BAD_REQUEST, "MEMBER4001", "중복된 아이디 입니다."),
 
-    // 금융 상품 관련 에러
-    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "PRODUCT4001", "존재하지 않는 상품입니다."),
-    RECOMMEND_NOT_FOUND(HttpStatus.BAD_REQUEST, "PRODUCT4002", "추천상품 결과가 없습니다."),
+    // 금융 관련 에러
+    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4001", "존재하지 않는 상품입니다."),
+    RECOMMEND_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4002", "추천상품 결과가 없습니다."),
+    COMPANY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4003", "존재하지 않는 기업입니다."),
+    YIELD_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4004", "수익률 결과 요청 중 오류가 발생했습니다."),
 
     // 토근 관련 에러
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 토큰입니다."),
