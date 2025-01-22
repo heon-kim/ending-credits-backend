@@ -1,6 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Strategy;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
@@ -22,7 +22,7 @@ public class RecommendService {
 
     // 가장 높은 점수를 가진 상품을 반환
     @Transactional
-    public PensionSavingsResponseDto recommendProduct(Strategy strategy) {
+    public PensionSavingsResponseComparisonDto recommendProduct(Strategy strategy) {
         List<PensionSavingsProductEntity> products = pensionSavingsJpaRepository.findAll();
 
         PensionSavingsProductEntity bestProduct = products.stream()
@@ -101,12 +101,12 @@ public class RecommendService {
     }
 
     // 상품 상세 정보를 Dto로 변환
-    private PensionSavingsResponseDto buildResponseDto(PensionSavingsProductEntity product) {
+    private PensionSavingsResponseComparisonDto buildResponseDto(PensionSavingsProductEntity product) {
         Map<String, Object> detail = product.getProductDetail().get(0);
 
         DecimalFormat formatter = new DecimalFormat("#,###");
 
-        return PensionSavingsResponseDto.builder()
+        return PensionSavingsResponseComparisonDto.builder()
                 .area(product.getProductArea().getDescription())
                 .company((String) detail.get("company"))
                 .product(product.getProductName())

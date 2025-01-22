@@ -2,7 +2,7 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
@@ -97,7 +97,7 @@ public class PensionSavingsService {
     }
 
     @Transactional(readOnly = true)
-    public PensionSavingsResponseDto getSavingsProduct(UUID productId) {
+    public PensionSavingsResponseComparisonDto getSavingsProduct(UUID productId) {
         PensionSavingsProductEntity product = pensionProductRepository.findById(productId)
                 .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
@@ -110,7 +110,8 @@ public class PensionSavingsService {
 
         DecimalFormat formatter = new DecimalFormat("#,###");
 
-        return PensionSavingsResponseDto.builder()
+        return PensionSavingsResponseComparisonDto.builder()
+                .productId(productId) // 상품 ID
                 .area(product.getProductArea().getDescription())  // 권역
                 .company((String) detail.get("company"))  // 은행명
                 .product(product.getProductName())  // 상품명

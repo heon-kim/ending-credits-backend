@@ -2,7 +2,7 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsEsEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
@@ -37,8 +37,8 @@ public class PensionSavingsController {
 
     @GetMapping("/pension-savings/comparision/{productId}")
     @Operation(summary = "연금저축 상품 비교 상세 조회", description = "연금저축 상품을 비교하기 위한 상세를 상품 ID로 조회합니다.")
-    public ApiResponseEntity<PensionSavingsResponseDto> getPensionProduct(@PathVariable(name = "productId") UUID productId){
-        PensionSavingsResponseDto responseDto = pensionSavingsService.getSavingsProduct(productId);
+    public ApiResponseEntity<PensionSavingsResponseComparisonDto> getPensionProduct(@PathVariable(name = "productId") UUID productId){
+        PensionSavingsResponseComparisonDto responseDto = pensionSavingsService.getSavingsProduct(productId);
         return ApiResponseEntity.onSuccess(responseDto);
     }
 

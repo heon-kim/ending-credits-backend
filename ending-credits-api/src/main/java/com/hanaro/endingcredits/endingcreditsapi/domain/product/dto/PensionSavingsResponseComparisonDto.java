@@ -5,11 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PensionSavingsResponseDto {
+public class PensionSavingsResponseComparisonDto {
+    private UUID productId; // 상품 ID
     private String area; // 권역
     private String company; // 은행명
     private String product; // 상품명
