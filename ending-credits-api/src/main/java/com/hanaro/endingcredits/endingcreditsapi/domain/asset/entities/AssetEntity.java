@@ -74,4 +74,8 @@ public class AssetEntity {
 
     @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DepositEntity> deposits = new ArrayList<>();
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
+    }
 }
