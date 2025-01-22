@@ -33,6 +33,7 @@ public class VirtualAssetService {
                         .purchasePrice(asset.getPurchasePrice())
                         .currentPrice(asset.getCurrentPrice())
                         .profitRatio(asset.getProfitRatio()) // 수익률
+                        .totalValue(asset.getTotalValue())
                         .build())
                 .collect(Collectors.toList());
     }
