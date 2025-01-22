@@ -34,13 +34,13 @@ public class PensionSavingsService {
     private final PensionSavingsSearchRepository pensionSavingsSearchRepository;
 
     @Transactional
-    public void fetchAndSavePensionProducts(String apiUrl, int areaCode) throws JsonProcessingException {
+    public void fetchAndSavePensionProducts(String apiUrl, int areaCode) {
         PensionSavingsResponse response = restTemplate.getForObject(apiUrl, PensionSavingsResponse.class);
         if (response == null) return;
 
         List<Map<String, Object>> limitedList = response.getList()
                 .stream()
-                .limit(100)  // 리스트에서 처음 100개만 가져옴
+                .limit(50)  // 리스트에서 50개만 가져옴
                 .collect(Collectors.toList());
 
         if (response.getList() != null && !response.getList().isEmpty()) {
