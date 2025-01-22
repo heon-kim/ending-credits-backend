@@ -7,16 +7,20 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEnti
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.CarEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.RealEstateEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.CarRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.PensionRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.RealEstateRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.AssetHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,6 +32,7 @@ public class EtcDetailService {
     private final RealEstateRepository realEstateRepository;
     private final PensionRepository pensionRepository;
     private final MemberRepository memberRepository;
+    private final AssetRepository assetRepository;
 
     @Transactional(readOnly = true)
     public List<CarDetailDto> getConnectedCars(UUID memberId) {
@@ -60,11 +65,9 @@ public class EtcDetailService {
     public CarDetailDto addCar(UUID memberId, String model, String carNumber, Long purchasePrice, Long currentPrice, Integer milage, Integer manufactureYear) {
         MemberEntity member = getMember(memberId);
 
-        AssetEntity asset = AssetEntity.builder()
-                .member(member)
-                .assetType(AssetType.CAR)
-                .amount(purchasePrice)
-                .build();
+        AssetEntity asset = assetRepository.findByMemberAndAssetType(member, AssetType.CAR)
+                .orElseThrow(() -> new AssetHandler(ErrorStatus.CAR_NOT_FOUND));
+
 
         CarEntity car = CarEntity.builder()
                 .asset(asset)
@@ -85,11 +88,8 @@ public class EtcDetailService {
     public RealEstateDetailDto addRealEstate(UUID memberId, String name, String address, Long purchasePrice, Long currentPrice){
         MemberEntity member = getMember(memberId);
 
-        AssetEntity asset = AssetEntity.builder()
-                .member(member)
-                .assetType(AssetType.REAL_ESTATE)
-                .amount(currentPrice)
-                .build();
+        AssetEntity asset = assetRepository.findByMemberAndAssetType(member, AssetType.REAL_ESTATE)
+                .orElseThrow(() -> new AssetHandler(ErrorStatus.REALESTATE_NOT_FOUND));
 
         RealEstateEntity realEstate = RealEstateEntity.builder()
                 .asset(asset)
@@ -135,8 +135,8 @@ public class EtcDetailService {
                 .asset(realEstate.getAsset())
                 .realEstateName(realEstate.getRealEstateName())
                 .address(realEstate.getAddress())
-                .purchasePrice(newPurchasePrice) // 새로운 구매 가격 설정
-                .currentPrice(realEstate.getCurrentPrice())
+                .purchasePrice(realEstate.getPurchasePrice()) // 새로운 구매 가격 설정
+                .currentPrice(newPurchasePrice)
                 .isConnected(realEstate.isConnected())
                 .build();
 

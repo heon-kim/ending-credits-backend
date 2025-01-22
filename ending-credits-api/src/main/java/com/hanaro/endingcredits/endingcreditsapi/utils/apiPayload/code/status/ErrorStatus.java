@@ -36,7 +36,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 자산 관련 에러
     CASH_NOT_FOUND(HttpStatus.BAD_REQUEST, "CASH4001", "현금 자산이 존재하지 않습니다."),
-    NEGATIVE_AMOUNT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CASH4002", "금액은 음수일 수 없습니다.");
+    NEGATIVE_AMOUNT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CASH4002", "금액은 음수일 수 없습니다."),
+
+    CAR_NOT_FOUND(HttpStatus.BAD_REQUEST, "CAR4001" , "차 자산이 존재하지 않습니다."),
+    REALESTATE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REAL_ESTATES4001", "부동산이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

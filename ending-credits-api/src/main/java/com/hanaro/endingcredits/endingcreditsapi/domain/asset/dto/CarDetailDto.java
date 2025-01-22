@@ -21,7 +21,7 @@ public class CarDetailDto {
         dto.setModel(car.getModel());
         dto.setCarNumber(car.getCarNumber());
         dto.setPurchasePrice(car.getPurchasePrice());
-        dto.setCurrentPurchasePrice(car.getPurchasePrice());
+        dto.setCurrentPurchasePrice(car.getCurrentMarketPrice());
         dto.setMileage(car.getMileage());
         dto.setYear(car.getManufactureYear());
         return dto;
