@@ -6,6 +6,8 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEnt
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.JwtHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.VerificationHandler;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -117,17 +119,28 @@ public class AuthController {
 
     @Operation(summary = "카카오 로그인 콜백")
     @GetMapping("/kakao")
-    public ResponseEntity<ApiResponseEntity<TokenPairResponseDto>>  kakaoLoginCallback(@RequestParam String code) {
+    public ResponseEntity<ApiResponseEntity<TokenPairResponseDto>>  kakaoLoginCallback(@RequestParam String code, HttpServletResponse response) {
         try {
             TokenPairResponseDto tokenPair = authService.processKakaoLogin(code);
 
-            String accessTokenCookie = String.format("accessToken=%s; Path=/; HttpOnly; Secure;", tokenPair.getAccessToken());
-            String refreshTokenCookie = String.format("refreshToken=%s; Path=/; HttpOnly; Secure;", tokenPair.getRefreshToken());
+            // Access Token Cookie 설정
+            Cookie accessTokenCookie = new Cookie("accessToken", tokenPair.getAccessToken());
+            accessTokenCookie.setHttpOnly(false); // 필요에 따라 HttpOnly 설정
+            accessTokenCookie.setSecure(false);   // 개발 환경에서는 Secure=false
+            accessTokenCookie.setPath("/");       // 모든 경로에서 접근 가능
 
-            return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
-                    .header("Set-Cookie", accessTokenCookie)
-                    .header("Set-Cookie", refreshTokenCookie)
-                    .header(HttpHeaders.LOCATION, "http://localhost:5173/")
+            // Refresh Token Cookie 설정
+            Cookie refreshTokenCookie = new Cookie("refreshToken", tokenPair.getRefreshToken());
+            refreshTokenCookie.setHttpOnly(false);
+            refreshTokenCookie.setSecure(false);
+            refreshTokenCookie.setPath("/");
+
+            response.addCookie(accessTokenCookie);
+            response.addCookie(refreshTokenCookie);
+
+            // 리다이렉트 처리
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .header(HttpHeaders.LOCATION, "http://localhost:5173/") // 프론트엔드 URL
                     .build();
         } catch (MemberHandler e) {
             return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
