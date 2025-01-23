@@ -101,9 +101,9 @@ public class AuthController {
         return ApiResponseEntity.onSuccess(null);
     }
 
-    @Operation(summary = "카카오 로그인 백엔드에서 test 시 사용")
+    @Operation(summary = "카카오 로그인")
     @GetMapping("/klogin")
-    public ResponseEntity<Object> kakaoLogin() {  // Front 연동 후 삭제 예정
+    public ResponseEntity<Object> kakaoLogin() {
         String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
                 "?client_id=" + authService.getKakaoClientId() +
                 "&redirect_uri=" + authService.getKakaoRedirectUri() +
@@ -115,17 +115,24 @@ public class AuthController {
                 .build();
     }
 
-    @Operation(summary = "카카오 로그인")
+    @Operation(summary = "카카오 로그인 콜백")
     @GetMapping("/kakao")
-    public ApiResponseEntity kakaoLoginCallback(@RequestParam String code) {
+    public ResponseEntity<ApiResponseEntity<TokenPairResponseDto>>  kakaoLoginCallback(@RequestParam String code) {
         try {
-            // 카카오 로그인 프로세스 수행 (AccessToken 및 사용자 정보 처리)
             TokenPairResponseDto tokenPair = authService.processKakaoLogin(code);
 
-            // 인증 성공 응답 반환
-            return ApiResponseEntity.onSuccess(tokenPair);
+            String accessTokenCookie = String.format("accessToken=%s; Path=/; HttpOnly; Secure;", tokenPair.getAccessToken());
+            String refreshTokenCookie = String.format("refreshToken=%s; Path=/; HttpOnly; Secure;", tokenPair.getRefreshToken());
+
+            return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
+                    .header("Set-Cookie", accessTokenCookie)
+                    .header("Set-Cookie", refreshTokenCookie)
+                    .header(HttpHeaders.LOCATION, "http://localhost:5173/")
+                    .build();
         } catch (MemberHandler e) {
-            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+            return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
+                    .header(HttpHeaders.LOCATION, "http://localhost:5173/signup")
+                    .body(ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null));
         }
     }
 
