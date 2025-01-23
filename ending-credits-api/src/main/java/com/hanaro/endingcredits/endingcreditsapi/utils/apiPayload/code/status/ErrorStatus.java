@@ -39,6 +39,8 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "VERIFICATION4002", "유효하지 않은 인증 코드입니다."),
 
     // 자산 관련 에러
+    ASSET_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "ASSET4001", "존재하지 않는 자산 유형입니다."),
+
     CASH_NOT_FOUND(HttpStatus.BAD_REQUEST, "CASH4001", "현금 자산이 존재하지 않습니다."),
     NEGATIVE_AMOUNT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CASH4002", "금액은 음수일 수 없습니다."),
 
