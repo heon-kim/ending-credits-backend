@@ -35,8 +35,8 @@ services:
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=endingcredits
     ports:
-      - 9200:9200
-      - 9300:9300
+      - "9200:9200"
+      - "9300:9300"
     networks:
       - api-net
 
