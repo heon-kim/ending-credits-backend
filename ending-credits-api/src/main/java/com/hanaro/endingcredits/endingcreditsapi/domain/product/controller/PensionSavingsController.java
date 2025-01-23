@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsEstimateDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsSearchItems;
@@ -71,6 +72,13 @@ public class PensionSavingsController {
     @Operation(summary = "연금저축 하나은행 상품 조회", description = "하나은행 연금저축 상품들을 조회합니다.")
     public ApiResponseEntity<List<PensionSavingsListResponseDto>> getHanaPensionProductDetail() {
         List<PensionSavingsListResponseDto> responseDto = pensionSavingsService.getHanaSavingsProductList("하나은행");
+        return ApiResponseEntity.onSuccess(responseDto);
+    }
+
+    @GetMapping("/calculate/{productId}")
+    @Operation(summary = "수익률 계산", description = "투자 금액, 기간에 따른 수익 데이터를 계산해서 조회합니다.")
+    public ApiResponseEntity<PensionSavingsEstimateDto> calculateProfit(@PathVariable UUID productId) {
+        PensionSavingsEstimateDto responseDto = pensionSavingsService.calculateProfit(productId);
         return ApiResponseEntity.onSuccess(responseDto);
     }
 }

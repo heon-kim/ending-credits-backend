@@ -1,9 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponse;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
@@ -185,5 +182,35 @@ public class PensionSavingsService {
                         .company(product.getCompany())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+
+    @Transactional(readOnly = true)
+    public PensionSavingsEstimateDto calculateProfit(UUID productId) {
+        PensionSavingsProductEntity product = pensionProductRepository.findById(productId)
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+
+        double currentEarnRate = (double) product.getProductDetail().get(0).get("earnRate") / 100.0;
+
+        int initialAmount = 20000000;  // 초기 금액 2천만 원
+
+        double totalAmountAfter3Years = initialAmount * Math.pow(1 + currentEarnRate, 3);
+
+        // 예상 수익액 = 3년 후 총 금액 - 초기 금액
+        int estimatedProfit = (int) Math.round(totalAmountAfter3Years - initialAmount);
+
+        // 연간 추가 사용 금액 = 예상 수익액의 10%으로 설정
+        int annualUsagePercentage = 10;
+        int annualAdditionalUsage = (int) Math.round(estimatedProfit * annualUsagePercentage / 100.0);
+
+        // 월간 추가 사용 금액
+        int monthlyAdditionalUsage = annualAdditionalUsage / 12;
+
+        return PensionSavingsEstimateDto.builder()
+                .expectedProfit(estimatedProfit)
+                .annualAdditionalUsage(annualAdditionalUsage)
+                .monthlyAdditionalUsage(monthlyAdditionalUsage)
+                .expectedEarnRate(currentEarnRate * 100)
+                .build();
     }
 }
