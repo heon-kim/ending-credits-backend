@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class BankAssetDto {
     private String bankName;
+    private String assetType;
     private String accountName;
     private String accountNumber;
     private BigDecimal amount;
