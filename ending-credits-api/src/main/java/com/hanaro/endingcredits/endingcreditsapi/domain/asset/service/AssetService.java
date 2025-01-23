@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetsDetailDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetsLoanDetailDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.LoanDetailDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
@@ -28,13 +29,12 @@ public class AssetService {
     private final LoanRepository loanRepository;
 
     /**
-     * 연결된 자산 모두 조회 (개인 자산 상세 페이지)
+     * 연결된 자산 모두 조회 (대출 상세 제외)
      */
-    public AssetsDetailDto getAssetsDetail(UUID memberId) {
+    public AssetsDetailDto getAssetTotalDetail(UUID memberId) {
         MemberEntity member = getMember(memberId);
 
         List<AssetEntity> assetsList = assetRepository.findAssetTypeAndAmountByMember(member);
-        List<AssetEntity> depositAssetList = assetRepository.findAssetByMember(member);
 
         Map<AssetType, Long> totalAmounts = new EnumMap<>(AssetType.class);
         Long assetTotalAmount = 0L;
@@ -48,6 +48,29 @@ public class AssetService {
                     totalAmounts.get(asset.getAssetType()) + asset.getAmount());
             assetTotalAmount += asset.getAmount();
         }
+
+        return AssetsDetailDto.builder()
+                .bank(formatAmount(
+                        totalAmounts.get(AssetType.DEPOSIT) +
+                                totalAmounts.get(AssetType.FUND) +
+                                totalAmounts.get(AssetType.TRUST)))
+                .securityCompany(formatAmount(totalAmounts.get(AssetType.SECURITIES)))
+                .virtual(formatAmount(totalAmounts.get(AssetType.VIRTUAL_ASSET)))
+                .realEstate(formatAmount(totalAmounts.get(AssetType.REAL_ESTATE)))
+                .car(formatAmount(totalAmounts.get(AssetType.CAR)))
+                .pension(formatAmount(totalAmounts.get(AssetType.PENSION)))
+                .cash(formatAmount(totalAmounts.get(AssetType.CASH)))
+                .assetTotal(formatAmount(assetTotalAmount)).build();
+    }
+
+    /**
+     * 연결된 자산 모두 조회 (개인 자산 상세 페이지)
+     */
+    public AssetsLoanDetailDto getAssetsLoanDetail(UUID memberId) {
+        MemberEntity member = getMember(memberId);
+
+        AssetsDetailDto assetsDetail = getAssetTotalDetail(memberId);
+        List<AssetEntity> depositAssetList = assetRepository.findAssetByMember(member);
 
         AtomicLong loanTotalAmount = new AtomicLong(0L);
 
@@ -66,18 +89,8 @@ public class AssetService {
             )
             .toList();
 
-        return AssetsDetailDto.builder()
-                .bank(formatAmount(
-                        totalAmounts.get(AssetType.DEPOSIT) +
-                        totalAmounts.get(AssetType.FUND) +
-                        totalAmounts.get(AssetType.TRUST)))
-                .securityCompany(formatAmount(totalAmounts.get(AssetType.SECURITIES)))
-                .virtual(formatAmount(totalAmounts.get(AssetType.VIRTUAL_ASSET)))
-                .realEstate(formatAmount(totalAmounts.get(AssetType.REAL_ESTATE)))
-                .car(formatAmount(totalAmounts.get(AssetType.CAR)))
-                .pension(formatAmount(totalAmounts.get(AssetType.PENSION)))
-                .cash(formatAmount(totalAmounts.get(AssetType.CASH)))
-                .assetTotal(formatAmount(assetTotalAmount))
+        return AssetsLoanDetailDto.builder()
+                .assetsDetail(assetsDetail)
                 .loan(loanDetailList)
                 .loanTotal(formatAmount(Long.valueOf(loanTotalAmount.get())))
                 .build();

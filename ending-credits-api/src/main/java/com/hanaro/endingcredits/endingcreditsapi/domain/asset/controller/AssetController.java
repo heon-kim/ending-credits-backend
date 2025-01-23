@@ -4,7 +4,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetConnectio
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.BankAssetDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.SecuritiesAssetDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.VirtualAssetDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetsDetailDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetsLoanDetailDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.AssetConnectionService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.BankAssetService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.SecuritiesAssetService;
@@ -79,9 +79,9 @@ public class AssetController {
 
     @GetMapping("/detail")
     @Operation(summary= "개인 자산 조회", description = "보유하고 있는 자산들을 조회합니다.")
-    public ApiResponseEntity<AssetsDetailDto> getAssetsDetail(@AuthenticationPrincipal UUID memberId) {
+    public ApiResponseEntity<AssetsLoanDetailDto> getAssetsDetail(@AuthenticationPrincipal UUID memberId) {
         try {
-            AssetsDetailDto assetDetails = assetService.getAssetsDetail(memberId);
+            AssetsLoanDetailDto assetDetails = assetService.getAssetsLoanDetail(memberId);
             return ApiResponseEntity.onSuccess(assetDetails);
         } catch (MemberHandler e){
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);

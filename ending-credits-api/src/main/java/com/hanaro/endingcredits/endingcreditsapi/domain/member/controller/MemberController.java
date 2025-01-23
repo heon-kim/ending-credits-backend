@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.member.controller;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetsWishDetailDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.MemberInfoDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.MemberUpdateInfoDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.service.MemberService;
@@ -55,11 +56,21 @@ public class MemberController {
     }
 
     @GetMapping("/wish")
-    @Operation(summary = "희망 노후 자금 조회", description = "사용자의 희망 노후 자금 조회")
-    public ApiResponseEntity<String> getWishFund(@AuthenticationPrincipal UUID memberId) {
+    @Operation(summary = "희망 노후 자금, 보유 자금 조회", description = "사용자의 희망 노후 자금 조회")
+    public ApiResponseEntity<AssetsWishDetailDto> getAssetsWishDetail(@AuthenticationPrincipal UUID memberId) {
         try {
-            return ApiResponseEntity.onSuccess(memberService.getWishFund(memberId));
+            return ApiResponseEntity.onSuccess(memberService.getAssetsWishDetail(memberId));
         } catch (MemberHandler e) {
+            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+        }
+    }
+
+    @GetMapping("/connected")
+    @Operation(summary = "개인 자산 연결 여부 확인")
+    public ApiResponseEntity<Boolean> isAssetsConnected(@AuthenticationPrincipal UUID memberId) {
+        try {
+            return ApiResponseEntity.onSuccess(memberService.isAssetsConnected(memberId));
+        } catch (MemberHandler e){
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
         }
     }
