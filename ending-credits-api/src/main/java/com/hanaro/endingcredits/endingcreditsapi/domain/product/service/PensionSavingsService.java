@@ -63,7 +63,7 @@ public class PensionSavingsService {
                         .productDetail(productDetail)
                         .build();
                 pensionProductRepository.save(entity);
-                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
+                PensionSavingsSearchItems document = productMapper.toPensionSavingsSearchItems(entity);
                 pensionSavingsSearchRepository.save(document);
             }
         }
@@ -140,7 +140,7 @@ public class PensionSavingsService {
     }
 
     @Transactional(readOnly = true)
-    public List<PensionSavingsEsEntity> searchProducts(String keyword, int areaCode) {
+    public List<PensionSavingsSearchItems> searchProducts(String keyword, int areaCode) {
         String productArea = ProductArea.fromCode(areaCode).getDescription();
 
         return pensionSavingsSearchRepository.findByProductNameContainingAndProductArea(keyword, productArea);

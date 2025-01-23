@@ -2,7 +2,7 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.RetirementPensionEsRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.RetirementPensionSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.RetirementPensionJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
@@ -24,7 +24,7 @@ public class RetirementPensionService {
     private final ProductMapper productMapper;
     private final RestTemplate restTemplate;
     private final RetirementPensionJpaRepository retirementPensionJpaRepository;
-    private final RetirementPensionEsRepository retirementPensionEsRepository;
+    private final RetirementPensionSearchRepository retirementPensionSearchRepository;
 
     @Transactional
     public void fetchAndSaveAnnuityYields(String apiUrl) {
@@ -42,25 +42,26 @@ public class RetirementPensionService {
                     yieldDetails.add((companyList.getList()).get(0));
                     retirementPensionJpaRepository.save(entity);
                 } else {
-                        String company = companyList.getCompany();
-                        String area = companyList.getArea();
-                        List<Map<String, Object>> yieldDetails = companyList.getList();
+                    String company = companyList.getCompany();
+                    String area = companyList.getArea();
+                    List<Map<String, Object>> yieldDetails = companyList.getList();
 
-                        if (company == null || area == null || yieldDetails == null || yieldDetails.isEmpty()) {
-                            log.warn("company 또는 area 또는 yieldDetail가 존재하지 않습니다.");
-                            continue;
-                        }
+                    if (company == null || area == null || yieldDetails == null || yieldDetails.isEmpty()) {
+                        log.warn("company 또는 area 또는 yieldDetail가 존재하지 않습니다.");
+                        continue;
+                    }
 
-                        ProductArea yieldArea = ProductArea.fromDescription(area);
+                    ProductArea yieldArea = ProductArea.fromDescription(area);
 
-                        RetirementPensionCompanyEntity entity = RetirementPensionCompanyEntity.builder()
-                                .company(company)
-                                .area(yieldArea)
-                                .yieldDetails(yieldDetails)
-                                .build();
-                        retirementPensionJpaRepository.save(entity);
-//                PensionSavingsEsEntity document = productMapper.toPensionSavingsEsEntity(entity);
-//                retirementPensionEsRepository.save(document);
+                    RetirementPensionCompanyEntity entity = RetirementPensionCompanyEntity.builder()
+                            .company(company)
+                            .area(yieldArea)
+                            .yieldDetails(yieldDetails)
+                            .build();
+                    retirementPensionJpaRepository.save(entity);
+
+                    RetirementPensionSearchItems items = productMapper.toRetirementPensionSearchItems(entity);
+                    retirementPensionSearchRepository.save(items);
                 }
             }
         }
@@ -97,31 +98,6 @@ public class RetirementPensionService {
             }
         }
     }
-
-//    @Transactional
-//    public void saveOrUpdate(RetirementPensionProductDto dto, ProductArea productArea, SysType sysType) {
-//        Optional<RetirementPensionYieldEntity> existingEntity =
-//                retirementPensionJpaRepository.findByProductNameAndCompany(dto.getProduct(), dto.getCompany());
-//
-//        if (existingEntity.isPresent()) {
-//            RetirementPensionYieldEntity entity = existingEntity.get();
-//            entity.update(productMapper.toRetirementPensionProductEntity(dto, productArea, sysType));
-//            retirementPensionJpaRepository.save(entity);
-//            retirementPensionEsRepository.save(productMapper.toRetirementPensionEsEntity(entity));
-//        } else {
-//            RetirementPensionYieldEntity newEntity = productMapper.toRetirementPensionProductEntity(dto, productArea, sysType);
-//            retirementPensionJpaRepository.save(newEntity);
-//            retirementPensionEsRepository.save(productMapper.toRetirementPensionEsEntity(newEntity));
-//        }
-//    }
-
-//    @Transactional(readOnly = true)
-//    public List<RetirementPensionEsEntity> searchProducts(String keyword, int areaCode, int sysTypeCode) {
-//        ProductArea productArea = ProductArea.fromCode(areaCode);
-//        SysType sysType = SysType.fromCode(sysTypeCode);
-//
-//        return retirementPensionEsRepository.findByProductNameContainingAndProductAreaAndSysType(keyword, productArea, sysType);
-//    }
 
     @Transactional(readOnly = true)
     public RetirementPensionFeeComparisonDto getPensionComparisonDetail(UUID companyId) {
@@ -238,6 +214,11 @@ public class RetirementPensionService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<RetirementPensionSearchItems> searchCompany(String keyword) {
+        return retirementPensionSearchRepository.findByCompanyContaining(keyword);
     }
 }
 
