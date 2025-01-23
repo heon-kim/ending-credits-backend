@@ -8,20 +8,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
       - es
-    networks:
-      - api-net
-
-  db:
-    image: postgres:16
-    container_name: postgres-db
-    restart: always
-    environment:
-      - POSTGRES_USER=endingcredits
-      - POSTGRES_PASSWORD=endingcredits
-    ports:
-      - "5432:5432"
     networks:
       - api-net
 
