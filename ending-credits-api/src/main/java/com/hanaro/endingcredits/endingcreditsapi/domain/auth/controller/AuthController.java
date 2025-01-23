@@ -101,9 +101,9 @@ public class AuthController {
         return ApiResponseEntity.onSuccess(null);
     }
 
-    @Operation(summary = "카카오 로그인 백엔드에서 test 시 사용")
+    @Operation(summary = "카카오 로그인")
     @GetMapping("/klogin")
-    public ResponseEntity<Object> kakaoLogin() {  // Front 연동 후 삭제 예정
+    public ResponseEntity<Object> kakaoLogin() {
         String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
                 "?client_id=" + authService.getKakaoClientId() +
                 "&redirect_uri=" + authService.getKakaoRedirectUri() +
@@ -115,7 +115,7 @@ public class AuthController {
                 .build();
     }
 
-    @Operation(summary = "카카오 로그인")
+    @Operation(summary = "카카오 로그인 콜백")
     @GetMapping("/kakao")
     public ResponseEntity<ApiResponseEntity<TokenPairResponseDto>>  kakaoLoginCallback(@RequestParam String code) {
         try {
