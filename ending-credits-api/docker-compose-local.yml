@@ -17,7 +17,7 @@ services:
     container_name: es
     environment:
       - node.name=single-node
-      - cluster.name=backtony
+      - cluster.name=ending-credits
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=endingcredits
