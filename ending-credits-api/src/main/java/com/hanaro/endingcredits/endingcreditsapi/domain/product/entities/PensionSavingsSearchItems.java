@@ -6,27 +6,21 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.math.BigDecimal;
-
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@Document(indexName = "retirement_pension")
-public class RetirementPensionEsEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Document(indexName = "pension_savings_search_items")
+public class PensionSavingsSearchItems {
 
     @Id
-    private String id;
+    private String productId;
 
     @Field(type = FieldType.Text)
     private String productName;
 
-    @Field(type = FieldType.Keyword)
-    private ProductArea productArea;
-
-    @Field(type = FieldType.Keyword)
-    private SysType sysType;
+    @Field(type = FieldType.Text)
+    private String productArea;
 
     @Field(type = FieldType.Text)
     private String company;
