@@ -3,7 +3,7 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsEsEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsSearchItems;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
@@ -44,11 +44,11 @@ public class PensionSavingsController {
 
     @GetMapping("/search")
     @Operation(summary = "연금저축 상품 검색어로 조회", description = "상품명으로 상품을 조회합니다.")
-    public ApiResponseEntity<List<PensionSavingsEsEntity>> searchProducts(
+    public ApiResponseEntity<List<PensionSavingsSearchItems>> searchProducts(
             @RequestParam String keyword,
             @RequestParam int areaCode) {
         try {
-            List<PensionSavingsEsEntity> responseDto = pensionSavingsService.searchProducts(keyword, areaCode);
+            List<PensionSavingsSearchItems> responseDto = pensionSavingsService.searchProducts(keyword, areaCode);
 
             if (responseDto.isEmpty()) {
                 return ApiResponseEntity.onFailure(ErrorStatus.RECOMMEND_NOT_FOUND.getCode(), ErrorStatus.RECOMMEND_NOT_FOUND.getMessage(), null);

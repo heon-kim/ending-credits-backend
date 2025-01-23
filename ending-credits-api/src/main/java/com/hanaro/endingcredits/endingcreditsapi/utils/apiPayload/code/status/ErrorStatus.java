@@ -24,6 +24,7 @@ public enum ErrorStatus implements BaseErrorCode {
     PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4001", "존재하지 않는 상품입니다."),
     RECOMMEND_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4002", "추천상품 결과가 없습니다."),
     COMPANY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4003", "존재하지 않는 기업입니다."),
+    SEARCH_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4003", "검색 중 오류가 발생했습니다."),
     YIELD_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4004", "수익률 결과 요청 중 오류가 발생했습니다."),
     FEE_DETAILS_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4005", "수수료율 상세 정보가 존재하지 않습니다."),
 
