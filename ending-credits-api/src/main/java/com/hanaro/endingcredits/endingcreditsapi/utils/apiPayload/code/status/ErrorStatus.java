@@ -25,6 +25,7 @@ public enum ErrorStatus implements BaseErrorCode {
     RECOMMEND_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4002", "추천상품 결과가 없습니다."),
     COMPANY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4003", "존재하지 않는 기업입니다."),
     YIELD_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4004", "수익률 결과 요청 중 오류가 발생했습니다."),
+    FEE_DETAILS_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4005", "수수료율 상세 정보가 존재하지 않습니다."),
 
     // 토근 관련 에러
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 토큰입니다."),

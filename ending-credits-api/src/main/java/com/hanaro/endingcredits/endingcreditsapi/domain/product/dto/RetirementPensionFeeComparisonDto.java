@@ -1,7 +1,18 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.dto;
 
-public class RetirementPensionFeeDto {
-    private String companyId; // 기업 ID
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class RetirementPensionFeeComparisonDto {
+    private UUID companyId; // 기업 ID
     private String area; // 권역
     private String company; // 기업명
     private double dbTotalCostRate; // DB 총비용부담률
