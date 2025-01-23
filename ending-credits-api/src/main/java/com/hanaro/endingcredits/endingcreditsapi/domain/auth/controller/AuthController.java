@@ -117,15 +117,22 @@ public class AuthController {
 
     @Operation(summary = "카카오 로그인")
     @GetMapping("/kakao")
-    public ApiResponseEntity kakaoLoginCallback(@RequestParam String code) {
+    public ResponseEntity<ApiResponseEntity<TokenPairResponseDto>>  kakaoLoginCallback(@RequestParam String code) {
         try {
-            // 카카오 로그인 프로세스 수행 (AccessToken 및 사용자 정보 처리)
             TokenPairResponseDto tokenPair = authService.processKakaoLogin(code);
 
-            // 인증 성공 응답 반환
-            return ApiResponseEntity.onSuccess(tokenPair);
+            String accessTokenCookie = String.format("accessToken=%s; Path=/; HttpOnly; Secure;", tokenPair.getAccessToken());
+            String refreshTokenCookie = String.format("refreshToken=%s; Path=/; HttpOnly; Secure;", tokenPair.getRefreshToken());
+
+            return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
+                    .header("Set-Cookie", accessTokenCookie)
+                    .header("Set-Cookie", refreshTokenCookie)
+                    .header(HttpHeaders.LOCATION, "http://localhost:5173/")
+                    .build();
         } catch (MemberHandler e) {
-            return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
+            return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
+                    .header(HttpHeaders.LOCATION, "http://localhost:5173/signup")
+                    .body(ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null));
         }
     }
 
