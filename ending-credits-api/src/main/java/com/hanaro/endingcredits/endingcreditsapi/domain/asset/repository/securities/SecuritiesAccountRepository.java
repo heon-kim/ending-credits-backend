@@ -13,4 +13,5 @@ import java.util.UUID;
 public interface SecuritiesAccountRepository extends JpaRepository<SecuritiesAccountEntity, UUID> {
     List<SecuritiesAccountEntity> findBySecuritiesCompanyAndAsset_Member(SecuritiesCompanyEntity company, MemberEntity member);
     List<SecuritiesAccountEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
+    List<SecuritiesAccountEntity> findByAsset_Member(MemberEntity member);
 }

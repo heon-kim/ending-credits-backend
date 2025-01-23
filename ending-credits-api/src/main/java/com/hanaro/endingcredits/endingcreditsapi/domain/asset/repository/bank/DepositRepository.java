@@ -15,4 +15,5 @@ public interface DepositRepository extends JpaRepository<DepositEntity, UUID> {
     List<DepositEntity> findByBankAndAsset_Member(BankEntity bank, MemberEntity member);
     List<DepositEntity> findByAsset_MemberAndIsConnectedTrue(MemberEntity member);
     List<DepositEntity> findByAsset(AssetEntity asset);
+    List<DepositEntity> findByAsset_Member(MemberEntity member);
 }
