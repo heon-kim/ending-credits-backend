@@ -10,6 +10,6 @@ import java.util.UUID;
 import java.util.List;
 
 @Repository
-public interface RetirementPensionEsRepository extends ElasticsearchRepository<RetirementPensionSearchItems, UUID> {
-    List<RetirementPensionSearchItems> findByProductNameContainingAndProductAreaAndSysType(String productName, ProductArea productArea, SysType sysType);
+public interface RetirementPensionSearchRepository extends ElasticsearchRepository<RetirementPensionSearchItems, UUID> {
+    List<RetirementPensionSearchItems> findByCompanyContaining(String company);
 }
