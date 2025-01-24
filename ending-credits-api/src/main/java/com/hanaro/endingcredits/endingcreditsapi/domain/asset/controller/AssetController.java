@@ -5,11 +5,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.BankAssetDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.SecuritiesAssetDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.VirtualAssetDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.AssetsLoanDetailDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.AssetConnectionService;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.BankAssetService;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.SecuritiesAssetService;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.VirtualAssetService;
-import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.AssetService;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.*;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
@@ -29,6 +25,7 @@ public class AssetController {
     private final BankAssetService bankAssetService;
     private final SecuritiesAssetService securitiesAssetService;
     private final VirtualAssetService virtualAssetService;
+    private final AssetAllConnectionService assetAllConnectionService;
 
     /**
      * 은행 자산 조회 API
@@ -61,11 +58,11 @@ public class AssetController {
     }
 
     /**
-     * 모든 자산 연결 API
+     * 선택된 자산 연결 API
      */
-    @PostMapping("/connect/all")
-    @Operation(summary= "개인 자산 연결", description = "개인 자산을 연결합니다.")
-    public ApiResponseEntity<String> connectAllAssets(
+    @PostMapping("/connect/selected")
+    @Operation(summary= "선택된 개인 자산 연결", description = "선택된 개인 자산을 연결합니다.")
+    public ApiResponseEntity<String> connectSelectedAssets(
             @AuthenticationPrincipal UUID memberId,
             @RequestBody AssetConnectionRequest request) {
         assetConnectionService.connectAllAssets(
@@ -74,7 +71,19 @@ public class AssetController {
                 request.getExchangeNames(),
                 memberId
         );
-        return ApiResponseEntity.onSuccess("모든 자산 연결 완료", null);
+        return ApiResponseEntity.onSuccess("선택된 모든 자산 연결 완료", null);
+    }
+
+    /**
+     * 모든 자산 연결 API
+     */
+    @PostMapping("/connect/all")
+    @Operation(summary = "모든 개인 자산 연결", description = "모든 개인 자산을 연결합니다.")
+    public ApiResponseEntity<String> connectAllAssets(
+            @AuthenticationPrincipal UUID memberId
+    ){
+        assetAllConnectionService.connectAllAssets(memberId);
+        return ApiResponseEntity.onSuccess("회원 전체 자산 연결 완료", null);
     }
 
     @GetMapping("/detail")
@@ -88,3 +97,4 @@ public class AssetController {
         }
     }
 }
+

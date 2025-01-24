@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -96,7 +98,8 @@ public class EtcDetailController {
     @Operation(summary= "자동차 자산 가격 수정", description = "자동차 자산의 현재시세 가격을 수정합니다.")
     public ApiResponseEntity<CarDetailDto> updateCarPurchasePrice(
             @PathVariable UUID carId,
-            @RequestBody Long newPurchasePrice) {
+            @RequestBody Map<String, Long> body) {
+        Long newPurchasePrice = body.get("newPurchasePrice");
         CarDetailDto updatedCar = etcDetailService.updateCarPurchasePrice(carId, newPurchasePrice);
         return ApiResponseEntity.onSuccess("자동차 자산 수정 성공", updatedCar);
     }
@@ -108,7 +111,8 @@ public class EtcDetailController {
     @Operation(summary= "부동산 자산 가격 수정", description = "부동산 자산의 현재시세 가격을 수정합니다.")
     public ApiResponseEntity<RealEstateDetailDto> updateRealEstatePurchasePrice(
             @PathVariable UUID realEstateId,
-            @RequestBody Long newPurchasePrice) {
+            @RequestBody Map<String, Long> body) {
+        Long newPurchasePrice = body.get("newPurchasePrice");
         RealEstateDetailDto updatedRealEstate = etcDetailService.updateRealEstatePurchasePrice(realEstateId, newPurchasePrice);
         return ApiResponseEntity.onSuccess("부동산 자산 수정 성공", updatedRealEstate);
     }

@@ -7,21 +7,19 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Getter
-@Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "pension_savings")
-public class PensionSavingsEsEntity {
+@Builder
+@Document(indexName = "retirement_pension_search_items")
+public class RetirementPensionSearchItems {
 
     @Id
-    private String productId;
-
-    @Field(type = FieldType.Text)
-    private String productName;
-
-    @Field(type = FieldType.Text)
-    private String productArea;
+    private String companyId;
 
     @Field(type = FieldType.Text)
     private String company;
+
+    @Field(type = FieldType.Keyword)
+    private String area;
 }

@@ -189,11 +189,6 @@ public class AssetDataService {
         createMultiplePensionsForAsset(pensionAsset);
 
         createCash(member, BigDecimal.valueOf(500000));
-
-        // 각 은행에 자산 연결
-//        for (int i = 0; i < banks.size(); i++) {
-//            createLoan(createSingleDeposit(member, banks.get(i), "Savings Account " + i, "890-123-45" + i, BigDecimal.valueOf(3000000 + i * 300000)));
-//        }
     }
 
     private AssetEntity createAsset(MemberEntity member, AssetType type, Long amount) {
@@ -211,7 +206,7 @@ public class AssetDataService {
         // 연금 타입 배열
         PensionType[] pensionTypes = PensionType.values();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             // 월 지급액 및 지급 기간 생성
             long monthlyPayment = 500_000L + (i * 50_000L); // 월 지급액
             int paymentDuration = 20 + i; // 지급 기간 (연 단위)
@@ -223,7 +218,7 @@ public class AssetDataService {
             // 연금 데이터 생성
             PensionEntity pension = PensionEntity.builder()
                     .asset(asset)
-                    .pensionType(pensionTypes[i % pensionTypes.length]) // 순환하여 연금 타입 설정
+                    .pensionType(pensionTypes[i]) // 순환하여 연금 타입 설정
                     .pensionAge(60 + i) // 연금 수령 시작 나이
                     .monthlyPayment(monthlyPayment) // 월 지급액
                     .paymentDuration(paymentDuration) // 지급 기간 (연 단위)
@@ -487,6 +482,7 @@ public class AssetDataService {
 
     private void createMultipleDepositsForAsset(AssetEntity asset, List<BankEntity> banks) {
         BigDecimal totalAmount = BigDecimal.ZERO;
+        DepositEntity deposit = null;
 
         for (int i = 0; i < banks.size(); i++) {
             BigDecimal amountKRW = BigDecimal.valueOf(2_000_000 + i * 200_000); // 예금 금액 (KRW)
@@ -512,15 +508,14 @@ public class AssetDataService {
                     .amount(amountUSD)
                     .currencyCode(CurrencyCodeType.USD)
                     .build();
-            DepositEntity deposit = depositRepository.save(depositUSD);
 
-            createLoan(deposit);
-
+            deposit = depositRepository.save(depositUSD);
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
             totalAmount = totalAmount.add(amountKRW);
             totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
         }
 
+        createLoan(deposit);
         // AssetEntity의 총 자산 업데이트
         asset.setAmount(totalAmount.longValue());
         assetRepository.save(asset);
@@ -550,17 +545,17 @@ public class AssetDataService {
 
 
     private void createLoan(DepositEntity deposit) {
-        for(int i = 0; i < 5; i++) {
+        for(int i = 0; i < 3; i++) {
             BigDecimal totalAmount = generateRandomAmount(100000, 1000000);              // 100,000 ~ 1,000,000 사이의 금액
             BigDecimal loanAmount = generateRandomAmount(10000, totalAmount.intValue()); // 10,000 ~ totalAmount 사이의 금액
             LocalDate expiryDate = generateRandomExpiryDate();                           // 오늘 이후의 랜덤 날짜
 
-            LoanEntity loan = LoanEntity.builder()
-                    .deposit(deposit)
-                    .totalAmount(totalAmount)
-                    .loanAmount(loanAmount)
-                    .expiryDate(expiryDate)
-                    .build();
+        LoanEntity loan = LoanEntity.builder()
+                .deposit(deposit)
+                .totalAmount(totalAmount)
+                .loanAmount(loanAmount)
+                .expiryDate(expiryDate)
+                .build();
 
             loanRepository.save(loan);
         }

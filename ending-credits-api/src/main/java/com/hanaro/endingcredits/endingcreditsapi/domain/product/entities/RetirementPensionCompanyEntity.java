@@ -29,11 +29,15 @@ public class RetirementPensionCompanyEntity {
     @Column(name="area", nullable = false)
     private ProductArea area;
 
-    @Column(name="yield_detail", length = 10000)
+    @Column(name="yield_details", length = 10000)
     @Convert(converter = JsonListConverter.class)
-    private List<Map<String, Object>> yieldDetail;
+    private List<Map<String, Object>> yieldDetails;
 
-    public List<Map<String, Object>> getYieldDetail() {
-        return this.yieldDetail;
+    @Column(name="fee_details", length = 10000)
+    @Convert(converter = JsonListConverter.class)
+    private List<Map<String, Object>> feeDetails;
+
+    public void setFeeDetails(List<Map<String, Object>> feeDetails) {
+        this.feeDetails = feeDetails;
     }
 }

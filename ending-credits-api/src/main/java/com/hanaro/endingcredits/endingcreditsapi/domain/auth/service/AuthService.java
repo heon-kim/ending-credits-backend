@@ -128,7 +128,7 @@ public class AuthService {
     }
 
     public void unsubscribe(UUID memberId) {
-        memberRepository.findByMemberId(memberId).ifPresentOrElse(member -> {
+        memberRepository.findById(memberId).ifPresentOrElse(member -> {
             MemberDto memberDto = memberMapper.toMemberDto(member);
             memberDto.setActive(false);
             memberRepository.save(memberMapper.toMemberEntity(memberDto, memberId));

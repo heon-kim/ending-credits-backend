@@ -1,11 +1,14 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.BankAssetDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.DepositRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.FundRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.TrustRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,7 @@ public class BankAssetService {
                 .stream()
                 .map(deposit -> BankAssetDto.builder()
                         .bankName(deposit.getBank().getBankName())
+                        .assetType(AssetType.DEPOSIT.getDescription())
                         .accountName(deposit.getAccountName())
                         .accountNumber(deposit.getAccountNumber())
                         .amount(deposit.getAmount())
@@ -48,6 +52,7 @@ public class BankAssetService {
                 .stream()
                 .map(trust -> BankAssetDto.builder()
                         .bankName(trust.getBank().getBankName())
+                        .assetType(AssetType.TRUST.getDescription())
                         .accountName(trust.getAccountName())
                         .accountNumber(trust.getAccountNumber())
                         .amount(trust.getAmount())
@@ -61,6 +66,7 @@ public class BankAssetService {
                 .stream()
                 .map(fund -> BankAssetDto.builder()
                         .bankName(fund.getBank().getBankName())
+                        .assetType(AssetType.FUND.getDescription())
                         .accountName(fund.getAccountName())
                         .accountNumber(fund.getAccountNumber())
                         .amount(fund.getFundAmount()) // 펀드 평가 금액
@@ -74,7 +80,7 @@ public class BankAssetService {
 
     private MemberEntity getMember(UUID memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다. ID: " + memberId));
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 }
 

@@ -25,7 +25,7 @@ public class MemberService {
     private final MemberMapper memberMapper;
 
     public MemberEntity getMember(UUID memberId) {
-        MemberEntity member = memberRepository.findByMemberId(memberId)
+        MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         return member;
     }
