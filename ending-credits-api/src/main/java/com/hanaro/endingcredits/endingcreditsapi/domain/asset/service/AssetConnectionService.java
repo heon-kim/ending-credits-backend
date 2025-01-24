@@ -120,6 +120,10 @@ public class AssetConnectionService {
         connectCash(member);
         connectPensions(member);
         connectRealEstates(member);
+
+        // 자산 연결 처리
+        member.setLinked(true);
+        memberRepository.save(member);
     }
 
     // Private Helper Methods (기존 메서드 사용)

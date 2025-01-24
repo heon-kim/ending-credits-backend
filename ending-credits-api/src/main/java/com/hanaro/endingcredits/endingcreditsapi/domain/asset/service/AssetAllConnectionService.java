@@ -77,10 +77,15 @@ public class AssetAllConnectionService {
         updateAssetEntity(member, AssetType.SECURITIES, totalSecurities);
         updateAssetEntity(member, AssetType.VIRTUAL_ASSET, totalVirtualAssets);
 
+        // 기타 자산 연결
         connectCars(member);
         connectCash(member);
         connectPensions(member);
         connectRealEstates(member);
+
+        // 자산 연결 처리
+        member.setLinked(true);
+        memberRepository.save(member);
     }
 
     private BigDecimal connectAndCalculateDeposits(MemberEntity member) {
