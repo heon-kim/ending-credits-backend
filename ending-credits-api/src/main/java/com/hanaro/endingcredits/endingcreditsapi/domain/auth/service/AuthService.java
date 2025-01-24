@@ -4,6 +4,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.auth.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.dto.MemberDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.OCRPort;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.InvalidJwtException;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.JwtHandler;
@@ -23,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.stereotype.Service;
 import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Date;
@@ -39,6 +41,7 @@ public class AuthService {
     private final RestTemplate restTemplate;
     private final MemberMapper memberMapper;
     private final JwtProvider jwtProvider;
+    private final OCRPort ocrPort;
 
     @Value("${kakao.client-id}")
     private String kakaoClientId;
@@ -254,5 +257,11 @@ public class AuthService {
     public void removeExpiredCodes() {
         long currentTime = System.currentTimeMillis();
         cerificationCodes.entrySet().removeIf(entry -> entry.getValue().getExpiryTime() < currentTime);
+    }
+
+    public IdCardDto recognizeIdCard(MultipartFile file) {
+        System.out.println("AuthService.recognizeIdCard");
+        return ocrPort.recognizeIdCard(file);
+
     }
 }

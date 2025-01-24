@@ -14,6 +14,7 @@ import org.apache.http.HttpHeaders;
 
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -127,6 +128,14 @@ public class AuthController {
         } catch (MemberHandler e) {
             return ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null);
         }
+    }
+
+    @Operation(summary = "신분증 OCR")
+    @PostMapping("/id-card")
+    public ApiResponseEntity<IdCardDto> recognizeIdCard(@RequestParam("file") MultipartFile file) {
+        IdCardDto idCard = authService.recognizeIdCard(file);
+        System.out.println("idCard = " + idCard.getName());
+        return ApiResponseEntity.onSuccess(idCard);
     }
 
     @Operation(summary = "본인인증 SMS 전송")
