@@ -72,42 +72,48 @@ public class AssetConnectionService {
         MemberEntity member = getMember(memberId);
 
         // 은행 자산 연결
-        for (String bankName : bankNames) {
-            BankEntity bank = bankRepository.findByBankName(bankName)
-                    .orElseThrow(() -> new IllegalArgumentException("은행을 찾을 수 없습니다: " + bankName));
-            connectDeposits(bank, member);
-            connectFunds(bank, member);
-            connectTrusts(bank, member);
+        if(bankNames.size() > 0) {
+            for (String bankName : bankNames) {
+                BankEntity bank = bankRepository.findByBankName(bankName)
+                        .orElseThrow(() -> new IllegalArgumentException("은행을 찾을 수 없습니다: " + bankName));
+                connectDeposits(bank, member);
+                connectFunds(bank, member);
+                connectTrusts(bank, member);
+            }
+
+            BigDecimal totalDeposits = calculateTotalDepositsForBanks(member, bankNames);
+            updateAssetEntity(member, AssetType.DEPOSIT, totalDeposits);
+
+            BigDecimal totalFunds = calculateTotalFundsForBanks(member, bankNames);
+            updateAssetEntity(member, AssetType.FUND, totalFunds);
+
+            BigDecimal totalTrusts = calculateTotalTrustsForBanks(member, bankNames);
+            updateAssetEntity(member, AssetType.TRUST, totalTrusts);
         }
-
-        BigDecimal totalDeposits = calculateTotalDepositsForBanks(member, bankNames);
-        updateAssetEntity(member, AssetType.DEPOSIT, totalDeposits);
-
-        BigDecimal totalFunds = calculateTotalFundsForBanks(member, bankNames);
-        updateAssetEntity(member, AssetType.FUND, totalFunds);
-
-        BigDecimal totalTrusts = calculateTotalTrustsForBanks(member, bankNames);
-        updateAssetEntity(member, AssetType.TRUST, totalTrusts);
 
         // 증권 자산 연결
-        for (String securitiesCompanyName : securitiesCompanyNames) {
-            SecuritiesCompanyEntity company = securitiesCompanyRepository.findBySecuritiesCompanyName(securitiesCompanyName)
-                    .orElseThrow(() -> new IllegalArgumentException("증권회사를 찾을 수 없습니다: " + securitiesCompanyName));
-            connectSecuritiesAccounts(company, member);
-        }
+        if(securitiesCompanyNames.size() > 0) {
+            for (String securitiesCompanyName : securitiesCompanyNames) {
+                SecuritiesCompanyEntity company = securitiesCompanyRepository.findBySecuritiesCompanyName(securitiesCompanyName)
+                        .orElseThrow(() -> new IllegalArgumentException("증권회사를 찾을 수 없습니다: " + securitiesCompanyName));
+                connectSecuritiesAccounts(company, member);
+            }
 
-        BigDecimal totalSecurities = calculateTotalSecuritiesForCompanies(member, securitiesCompanyNames);
-        updateAssetEntity(member, AssetType.SECURITIES, totalSecurities);
+            BigDecimal totalSecurities = calculateTotalSecuritiesForCompanies(member, securitiesCompanyNames);
+            updateAssetEntity(member, AssetType.SECURITIES, totalSecurities);
+        }
 
         // 가상자산 연결
-        for (String exchangeName : exchangeNames) {
-            ExchangeEntity exchange = exchangeRepository.findByExchangeName(exchangeName)
-                    .orElseThrow(() -> new IllegalArgumentException("거래소를 찾을 수 없습니다: " + exchangeName));
-            connectVirtualAssets(exchange, member);
-        }
+        if(exchangeNames.size() > 0) {
+            for (String exchangeName : exchangeNames) {
+                ExchangeEntity exchange = exchangeRepository.findByExchangeName(exchangeName)
+                        .orElseThrow(() -> new IllegalArgumentException("거래소를 찾을 수 없습니다: " + exchangeName));
+                connectVirtualAssets(exchange, member);
+            }
 
-        BigDecimal totalVirtualAssets = calculateTotalVirtualAssetsForExchanges(member, exchangeNames);
-        updateAssetEntity(member, AssetType.VIRTUAL_ASSET, totalVirtualAssets);
+            BigDecimal totalVirtualAssets = calculateTotalVirtualAssetsForExchanges(member, exchangeNames);
+            updateAssetEntity(member, AssetType.VIRTUAL_ASSET, totalVirtualAssets);
+        }
 
         // 기타 자산 연결
         connectCars(member);

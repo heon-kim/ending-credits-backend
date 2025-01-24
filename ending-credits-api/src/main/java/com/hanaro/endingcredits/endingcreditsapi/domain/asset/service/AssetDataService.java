@@ -337,8 +337,8 @@ public class AssetDataService {
             securitiesAccountRepository.save(accountUSD);
 
             // KRW 및 USD 금액을 합산하여 자산 총액 업데이트
-            totalAmount = totalAmount.add(depositKRW.add(principalKRW)); // KRW 금액 추가
-            totalAmount = totalAmount.add(depositUSD.add(principalUSD).multiply(EXCHANGE_RATE)); // USD 금액을 KRW로 변환 후 추가
+//            totalAmount = totalAmount.add(depositKRW.add(principalKRW)); // KRW 금액 추가
+//            totalAmount = totalAmount.add(depositUSD.add(principalUSD).multiply(EXCHANGE_RATE)); // USD 금액을 KRW로 변환 후 추가
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -386,8 +386,8 @@ public class AssetDataService {
             virtualAssetRepository.save(assetUSD);
 
             // KRW 및 USD 금액을 합산하여 자산 총액 계산
-            totalAmount = totalAmount.add(quantity.multiply(currentPriceKRW)); // KRW 총 가치 추가
-            totalAmount = totalAmount.add(quantity.multiply(currentPriceUSD).multiply(EXCHANGE_RATE)); // USD 총 가치를 KRW로 변환 후 추가
+//            totalAmount = totalAmount.add(quantity.multiply(currentPriceKRW)); // KRW 총 가치 추가
+//            totalAmount = totalAmount.add(quantity.multiply(currentPriceUSD).multiply(EXCHANGE_RATE)); // USD 총 가치를 KRW로 변환 후 추가
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -432,8 +432,8 @@ public class AssetDataService {
             fundRepository.save(fundUSD);
 
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
-            totalAmount = totalAmount.add(fundAmountKRW);
-            totalAmount = totalAmount.add(fundAmountUSD.multiply(EXCHANGE_RATE));
+//            totalAmount = totalAmount.add(fundAmountKRW);
+//            totalAmount = totalAmount.add(fundAmountUSD.multiply(EXCHANGE_RATE));
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -471,8 +471,8 @@ public class AssetDataService {
             trustRepository.save(trustUSD);
 
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
-            totalAmount = totalAmount.add(amountKRW);
-            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
+//            totalAmount = totalAmount.add(amountKRW);
+//            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -511,8 +511,8 @@ public class AssetDataService {
 
             deposit = depositRepository.save(depositUSD);
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
-            totalAmount = totalAmount.add(amountKRW);
-            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
+//            totalAmount = totalAmount.add(amountKRW);
+//            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
         }
 
         createLoan(deposit);
