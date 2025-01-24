@@ -19,6 +19,7 @@ services:
     environment:
       - POSTGRES_USER=endingcredits
       - POSTGRES_PASSWORD=endingcredits
+      - POSTGRES_DB=endingcredits
     ports:
       - "5432:5432"
     networks:
