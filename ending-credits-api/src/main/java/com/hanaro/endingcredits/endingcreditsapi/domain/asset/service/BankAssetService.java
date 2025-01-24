@@ -7,6 +7,8 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.Fu
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.TrustRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
+import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +80,7 @@ public class BankAssetService {
 
     private MemberEntity getMember(UUID memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다. ID: " + memberId));
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 }
 
