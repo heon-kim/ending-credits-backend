@@ -1,6 +1,7 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RecommendProductResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Strategy;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,14 +24,26 @@ public class RecommendService {
 
     // 가장 높은 점수를 가진 상품을 반환
     @Transactional
-    public PensionSavingsResponseComparisonDto recommendProduct(Strategy strategy) {
-        List<PensionSavingsProductEntity> products = pensionSavingsJpaRepository.findAll();
+    public List<RecommendProductResponseDto> recommendProduct() {
 
-        PensionSavingsProductEntity bestProduct = products.stream()
-                .max((p1, p2) -> Double.compare(calculateScore(p1, strategy), calculateScore(p2, strategy)))
-                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+        List<RecommendProductResponseDto> recommendProductList = new ArrayList<>();
 
-        return buildResponseDto(bestProduct);
+        for (Strategy strategy : Strategy.values()) {
+            // 추천된 상품 반환
+            List<PensionSavingsProductEntity> products = pensionSavingsJpaRepository.findAll();
+
+            PensionSavingsProductEntity bestProduct = products.stream()
+                    .max((p1, p2) -> Double.compare(calculateScore(p1, strategy), calculateScore(p2, strategy)))
+                    .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+
+            RecommendProductResponseDto recommendProductResponseDto = RecommendProductResponseDto.builder()
+                    .productId(bestProduct.getProductId())
+                    .strategyType(strategy.getDescription())
+                    .build();
+
+            recommendProductList.add(recommendProductResponseDto);
+        }
+        return recommendProductList;
     }
 
     private double getDoubleValue(Object value) {
