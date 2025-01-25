@@ -9,6 +9,8 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.hand
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -198,22 +200,17 @@ public class RetirementPensionService {
 
 
     @Transactional(readOnly = true)
-    public List<RetirementPensionCompanySummaryDto> getAllCompany() {
-        return retirementPensionJpaRepository.findAll()
-                .stream()
-                .collect(Collectors.toMap(
-                        companyYield -> companyYield.getCompany(),
-                        Function.identity(),
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream()
-                .map(companyYield -> RetirementPensionCompanySummaryDto.builder()
-                        .companyId(companyYield.getCompanyId())
-                        .company(companyYield.getCompany())
-                        .build()
-                )
-                .collect(Collectors.toList());
+    public SliceResponse<RetirementPensionCompanySummaryDto> getAllCompany(Pageable pageable) {
+        Slice<RetirementPensionCompanyEntity> retirementPensionCompanies = retirementPensionJpaRepository.findAllBy(pageable);
+
+        Slice<RetirementPensionCompanySummaryDto> mappedCompanies = retirementPensionCompanies.map(companyYield ->
+                        RetirementPensionCompanySummaryDto.builder()
+                                .companyId(companyYield.getCompanyId())
+                                .company(companyYield.getCompany())
+                                .build()
+                );
+
+        return new SliceResponse<>(mappedCompanies);
     }
 
     @Transactional(readOnly = true)
