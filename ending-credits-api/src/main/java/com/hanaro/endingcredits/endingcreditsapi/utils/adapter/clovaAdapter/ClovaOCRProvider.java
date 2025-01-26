@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanaro.endingcredits.endingcreditsapi.domain.auth.dto.IdCardDto;
 import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.ClovaDLResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.ClovaICResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.tmp._ClovaDriversLicenseResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.tmp._ClovaRegistrationCardResultDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -38,8 +36,15 @@ public class ClovaOCRProvider {
         return Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf('.') + 1);
     }
 
+    public String extractPersonalNum(String personalNum) {
+        String[] parts = personalNum.split("-");
+        if (parts.length > 1) {
+            return parts[0] + "-" + parts[1].charAt(0);
+        }
+        return personalNum;
+    }
+
     public IdCardDto recognizeIdCard(MultipartFile file) {
-        System.out.println("ClovaOCRProvider.recognizeIdCard");
         String fileExtension = extractFileExtension(file);
 
         // Create the request body
@@ -68,19 +73,17 @@ public class ClovaOCRProvider {
         // Send the POST request
         String url = invokeUrl + "/document/id-card";
         ResponseEntity<Object> response = restTemplate.postForEntity(url, entity, Object.class);
-        System.out.println("response.getBody() = " + response.getBody());
 
         // Parse the response and map to IdCardDto
         if (response.getBody() != null) {
             Map<String, Object> responseBody = objectMapper.convertValue(response.getBody(), Map.class);
             String idType = (String) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) ((List<Object>) responseBody.get("images")).get(0)).get("idCard")).get("result")).get("idtype");
-            System.out.println("idType = " + idType);
             if ("ID Card".equals(idType)) {
                 ClovaICResponseDto clovaICResponseDto = objectMapper.convertValue(responseBody, ClovaICResponseDto.class);
                 return new IdCardDto(
                         clovaICResponseDto.getImages().get(0).getIdCard().getResult().getIc().getName().get(0).getFormatted().getValue(),
                         clovaICResponseDto.getImages().get(0).getIdCard().getResult().getIc().getAddress().get(0).getFormatted().getValue(),
-                        clovaICResponseDto.getImages().get(0).getIdCard().getResult().getIc().getPersonalNum().get(0).getFormatted().getValue()
+                        extractPersonalNum(clovaICResponseDto.getImages().get(0).getIdCard().getResult().getIc().getPersonalNum().get(0).getFormatted().getValue())
                 );
             }
             else if ("Driver's License".equals(idType)) {
@@ -88,7 +91,7 @@ public class ClovaOCRProvider {
                 return new IdCardDto(
                         clovaDLResponseDto.getImages().get(0).getIdCard().getResult().getDl().getName().get(0).getFormatted().getValue(),
                         clovaDLResponseDto.getImages().get(0).getIdCard().getResult().getDl().getAddress().get(0).getFormatted().getValue(),
-                        clovaDLResponseDto.getImages().get(0).getIdCard().getResult().getDl().getPersonalNum().get(0).getFormatted().getValue()
+                        extractPersonalNum(clovaDLResponseDto.getImages().get(0).getIdCard().getResult().getDl().getPersonalNum().get(0).getFormatted().getValue())
                 );
 
             }
