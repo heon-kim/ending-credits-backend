@@ -134,7 +134,6 @@ public class AuthController {
     @PostMapping("/id-card")
     public ApiResponseEntity<IdCardDto> recognizeIdCard(@RequestParam("file") MultipartFile file) {
         IdCardDto idCard = authService.recognizeIdCard(file);
-        System.out.println("idCard = " + idCard.getName());
         return ApiResponseEntity.onSuccess(idCard);
     }
 

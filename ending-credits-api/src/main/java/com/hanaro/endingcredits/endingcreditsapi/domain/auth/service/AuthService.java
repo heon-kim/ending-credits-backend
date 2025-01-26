@@ -260,7 +260,6 @@ public class AuthService {
     }
 
     public IdCardDto recognizeIdCard(MultipartFile file) {
-        System.out.println("AuthService.recognizeIdCard");
         return ocrPort.recognizeIdCard(file);
 
     }
