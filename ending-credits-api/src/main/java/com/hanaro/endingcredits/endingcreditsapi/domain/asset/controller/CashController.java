@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.controller;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.CashResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.CashService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +21,9 @@ public class CashController {
 
     @GetMapping("/cash")
     @Operation(summary= "현금 자산 조회", description = "보유하고 있는 현금 자산을 조회합니다.")
-    public ApiResponseEntity<BigDecimal> getMemberCash(@AuthenticationPrincipal UUID memberId) {
-        BigDecimal cash = cashService.getCashBalanceByMemberId(memberId);
-        return ApiResponseEntity.onSuccess("현금 자산 조회에 성공하였습니다", cash);
+    public ApiResponseEntity<CashResponseDto> getMemberCash(@AuthenticationPrincipal UUID memberId) {
+        CashResponseDto responseDto = cashService.getCashBalanceByMemberId(memberId);
+        return ApiResponseEntity.onSuccess("현금 자산 조회에 성공하였습니다", responseDto);
     }
 
     @PatchMapping("/cash")

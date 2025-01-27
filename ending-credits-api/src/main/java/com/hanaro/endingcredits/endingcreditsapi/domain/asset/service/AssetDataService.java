@@ -17,6 +17,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.virtual.V
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.PensionType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.RealEstateType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.LoanRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.BankRepository;
@@ -239,6 +240,8 @@ public class AssetDataService {
     private void createMultipleRealEstatesForAsset(AssetEntity asset) {
         long totalAmount = 0;
 
+        RealEstateType[] realEstateTypes = RealEstateType.values();
+
         for (int i = 0; i < 5; i++) {
             // 구매 가격 및 현재 시장 가격
             long purchasePrice = 100_000_000L + i * 10_000_000L; // 구매 가격
@@ -247,6 +250,8 @@ public class AssetDataService {
             // 총 금액 계산 (현재 가격 합산)
             totalAmount += currentPrice;
 
+            RealEstateType realEstateType = realEstateTypes[i % realEstateTypes.length];
+
             // 부동산 데이터 생성
             RealEstateEntity realEstate = RealEstateEntity.builder()
                     .asset(asset)
@@ -254,6 +259,7 @@ public class AssetDataService {
                     .address("123 Main St, City " + i) // 부동산 주소
                     .purchasePrice(purchasePrice) // 구매 가격
                     .currentPrice(currentPrice) // 현재 시장 가격
+                    .realEstateType(realEstateType) // 부동산 타입
                     .build();
 
             // 부동산 데이터 저장
