@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.service;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto.CashResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.CashEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.CashRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
@@ -22,10 +23,13 @@ public class CashService {
     private final MemberRepository memberRepository;
     private final CashRepository cashRepository;
 
-    public BigDecimal getCashBalanceByMemberId(UUID memberId) {
+    public CashResponseDto getCashBalanceByMemberId(UUID memberId) {
         CashEntity cashEntity = cashRepository.findByAsset_Member_MemberId(memberId)
                 .orElseThrow(() -> new AssetHandler(ErrorStatus.CASH_NOT_FOUND));
-        return cashEntity.getAmount();
+        return CashResponseDto.builder()
+                .id(cashEntity.getCashId())
+                .amount(cashEntity.getAmount())
+                .build();
     }
 
     public void updateCashAmount(UUID memberId, BigDecimal amount) {

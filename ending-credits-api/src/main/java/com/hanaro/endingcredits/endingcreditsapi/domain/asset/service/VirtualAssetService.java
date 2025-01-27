@@ -27,6 +27,7 @@ public class VirtualAssetService {
         return virtualAssetRepository.findByAsset_MemberAndIsConnectedTrue(member)
                 .stream()
                 .map(asset -> VirtualAssetDto.builder()
+                        .virtualAssetId(asset.getVirtualAssetId())
                         .exchangeName(asset.getExchange().getExchangeName())
                         .virtualAssetName(asset.getVirtualAssetName())
                         .quantity(asset.getQuantity())
