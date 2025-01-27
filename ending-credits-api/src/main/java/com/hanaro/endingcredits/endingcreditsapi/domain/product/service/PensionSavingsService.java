@@ -9,6 +9,8 @@ import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.hand
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -67,16 +69,18 @@ public class PensionSavingsService {
     }
 
     @Transactional(readOnly = true)
-    public List<PensionSavingsListResponseDto> getAllSavingsProductList() {
+    public SliceResponse<PensionSavingsListResponseDto> getAllSavingsProductList(Pageable pageable) {
+        Slice<PensionSavingsProductEntity> pensionSavingsProducts = pensionProductRepository.findAllBy(pageable);
 
-        return pensionProductRepository.findAll()
-                .stream()
-                .map(product -> PensionSavingsListResponseDto.builder()
+        Slice<PensionSavingsListResponseDto> mappedProducts = pensionSavingsProducts.map(product ->
+                PensionSavingsListResponseDto.builder()
                         .productId(product.getProductId())
                         .productName(product.getProductName())
                         .company(product.getCompany())
-                        .build())
-                .collect(Collectors.toList());
+                        .build()
+        );
+
+        return new SliceResponse<>(mappedProducts);
     }
 
     @Transactional(readOnly = true)
