@@ -3,7 +3,7 @@ version: "3.8"
 services:
   spring:
     container_name: spring
-    image: insoo0111/ending-credits
+    image: rladlsdud678/ending-credits
     ports:
       - "8080:8080"
     volumes:
