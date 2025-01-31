@@ -150,7 +150,7 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "신분증 OCR@")
+    @Operation(summary = "신분증 OCR")
     @PostMapping("/id-card")
     public ApiResponseEntity<IdCardDto> recognizeIdCard(@RequestParam("file") MultipartFile file) {
         IdCardDto idCard = authService.recognizeIdCard(file);
