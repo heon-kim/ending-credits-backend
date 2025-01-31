@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 public class RealEstateDetailDto {
     private UUID realEstateId;
+    private String realEstateType;
     private String realEstateName;
     private String address;
     private Long purchasePrice;
@@ -16,6 +17,7 @@ public class RealEstateDetailDto {
     public static RealEstateDetailDto fromEntity(RealEstateEntity entity) {
         RealEstateDetailDto dto = new RealEstateDetailDto();
         dto.setRealEstateId(entity.getRealEstateId());
+        dto.setRealEstateType(entity.getRealEstateType().getDescription());
         dto.setRealEstateName(entity.getRealEstateName());
         dto.setAddress(entity.getAddress());
         dto.setPurchasePrice(entity.getPurchasePrice());

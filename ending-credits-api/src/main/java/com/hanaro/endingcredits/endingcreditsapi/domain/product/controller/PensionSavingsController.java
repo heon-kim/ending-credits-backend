@@ -1,15 +1,14 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.controller;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsDetailResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsEstimateDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsListResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsSearchItems;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +23,8 @@ public class PensionSavingsController {
 
     @GetMapping("/all")
     @Operation(summary = "연금저축 상품 전체 목록 조회", description = "상품 연금저축 상품 목록을 조회합니다.")
-    public ApiResponseEntity<List<PensionSavingsListResponseDto>> getAllPensionProductList() {
-        List<PensionSavingsListResponseDto> responseDto = pensionSavingsService.getAllSavingsProductList();
+    public ApiResponseEntity<SliceResponse<PensionSavingsListResponseDto>> getAllPensionProductList(@PageableDefault(size = 8) Pageable pageable) {
+        SliceResponse<PensionSavingsListResponseDto> responseDto = pensionSavingsService.getAllSavingsProductList(pageable);
         return ApiResponseEntity.onSuccess(responseDto);
     }
 

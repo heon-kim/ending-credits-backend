@@ -30,6 +30,7 @@ public class SecuritiesAssetService {
         return securitiesAccountRepository.findByAsset_MemberAndIsConnectedTrue(member)
                 .stream()
                 .map(account -> SecuritiesAssetDto.builder()
+                        .securitiesAssetId(account.getSecuritiesAccountId())
                         .securitiesCompanyName(account.getSecuritiesCompany().getSecuritiesCompanyName())
                         .stockName(account.getSecuritiesAccountName()) // 주식 이름
                         .accountNumber(account.getSecuritiesAccountNumber())

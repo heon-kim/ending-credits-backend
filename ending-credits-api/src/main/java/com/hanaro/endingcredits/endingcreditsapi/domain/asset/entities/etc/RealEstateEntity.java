@@ -1,6 +1,8 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc;
 
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.PensionType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.RealEstateType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -25,6 +27,10 @@ public class RealEstateEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id")
     private AssetEntity asset;
+
+    @Column(nullable = false, name = "realestate_type")
+    @Comment("APARTMENT: 아파트, VILLA: 빌라, OFFICETEL: 오피스텔, HOUSE: 주택, LAND: 토지")
+    private RealEstateType realEstateType;
 
     @Column(nullable = false, name = "purchase_price",columnDefinition = "INTEGER DEFAULT 0")
     @Comment("원화뿐이므로 default: 0")
