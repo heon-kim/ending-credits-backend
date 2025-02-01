@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         basePackages = {
                 "com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa",
                 "com.hanaro.endingcredits.endingcreditsapi.domain.member.repository",
-                "com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository"
+                "com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository",
+                "com.hanaro.endingcredits.endingcreditsapi.domain.will.repository",
         }
 )
 public class JpaConfig {
