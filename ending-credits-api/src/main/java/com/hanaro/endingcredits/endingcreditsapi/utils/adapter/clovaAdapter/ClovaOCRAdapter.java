@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class ClovaOCRAdapter implements OCRPort {
@@ -15,5 +17,10 @@ public class ClovaOCRAdapter implements OCRPort {
     @Override
     public IdCardDto recognizeIdCard(MultipartFile file) {
         return clovaOCRProvider.recognizeIdCard(file);
+    }
+
+    @Override
+    public String recognizeWill(List<String> filePath) {
+        return clovaOCRProvider.recognizeWill(filePath);
     }
 }

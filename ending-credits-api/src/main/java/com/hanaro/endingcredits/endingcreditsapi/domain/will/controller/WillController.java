@@ -1,9 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.will.controller;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.ExecutorDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.FinalMessageDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.InheritanceDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.PurposeDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.will.service.WillService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,5 +51,12 @@ public class WillController {
     public ApiResponseEntity<Boolean> extractWillConfirmation(@RequestParam String fileUrl) {
         Boolean confirmation = willService.extractWillConfirmation(fileUrl);
         return ApiResponseEntity.onSuccess(confirmation);
+    }
+
+    @Operation(summary = "자필로 유언장 생성")
+    @PostMapping("/ocr")
+    public ApiResponseEntity<WillDto> extractWillByOCR(@RequestParam List<String> fileUrls) {
+        WillDto will = willService.extractWillByOCR(fileUrls);
+        return ApiResponseEntity.onSuccess(will);
     }
 }
