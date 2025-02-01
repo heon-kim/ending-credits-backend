@@ -19,4 +19,12 @@ public class StorageService {
         return storagePort.uploadFile(file);
     }
 
+    public String[] uploadFiles(MultipartFile[] files) throws IOException {
+        String[] fileUrls = new String[files.length];
+        int index = 0;
+        for (MultipartFile file : files) {
+            fileUrls[index++] = storagePort.uploadFile(file);
+        }
+        return fileUrls;
+    }
 }
