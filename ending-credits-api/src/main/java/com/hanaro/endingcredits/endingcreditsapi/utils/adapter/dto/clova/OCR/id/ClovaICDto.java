@@ -1,4 +1,4 @@
-package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR;
+package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.id;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,15 +11,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClovaDLDto {
-    private List<Object> type;
-    private List<Object> num;
+public class ClovaICDto {
     private List<ClovaIdCardDetailDto> name;
     private List<ClovaIdCardDetailDto> personalNum;
     private List<ClovaIdCardDetailDto> address;
-    private List<Object> renewStartDate;
-    private List<Object> renewEndDate;
-    private List<Object> code;
     private List<Object> issueDate;
     private List<Object> authority;
 }
