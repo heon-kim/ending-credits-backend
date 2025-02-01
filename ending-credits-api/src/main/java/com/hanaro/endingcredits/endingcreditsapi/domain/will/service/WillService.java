@@ -1,15 +1,15 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.will.service;
 
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.ExecutorDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.FinalMessageDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.InheritanceDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.PurposeDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.LLMPort;
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.OCRPort;
 import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.STTPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +18,7 @@ public class WillService {
 
     private final LLMPort llmPort;
     private final STTPort sttPort;
+    private final OCRPort ocrPort;
 
     public PurposeDto extractWillPurpose(String fileUrl) {
         String content = sttPort.transferSpeechToText(fileUrl);
@@ -42,5 +43,10 @@ public class WillService {
     public Boolean extractWillConfirmation(String fileUrl) {
         String content = sttPort.transferSpeechToText(fileUrl);
         return llmPort.extractWillConfirmation(content);
+    }
+
+    public WillDto extractWillByOCR(List<String> fileUrls) {
+        String will = ocrPort.recognizeWill(fileUrls);
+        return llmPort.extractWillByOCR(will);
     }
 }

@@ -1,9 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.clovaAdapter;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.ExecutorDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.FinalMessageDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.InheritanceDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.PurposeDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.LLMPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -37,6 +34,11 @@ public class ClovaLLMAdapter implements LLMPort {
     @Override
     public Boolean extractWillConfirmation(String content) {
         return clovaLLMProvider.extractWillConfirmation(content);
+    }
+
+    @Override
+    public WillDto extractWillByOCR(String content) {
+        return clovaLLMProvider.extractWillByOCR(content);
     }
 
 }
