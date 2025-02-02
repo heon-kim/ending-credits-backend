@@ -5,18 +5,31 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.will.service.WillService
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/will")
 public class WillController {
     private final WillService willService;
+
+    @Operation(summary = "유언장 조회")
+    @GetMapping("")
+    public ApiResponseEntity<WillInfoDto> getWillInfo(@AuthenticationPrincipal UUID memberId) {
+        WillInfoDto willInfo = willService.getWillInfo(memberId);
+        return ApiResponseEntity.onSuccess(willInfo);
+    }
+
+    @Operation(summary = "유언장 생성")
+    @PostMapping("")
+    public ApiResponseEntity<Void> createWillInfo(@AuthenticationPrincipal UUID memberId, @RequestBody WillInfoDto willinfoDto) {
+        willService.createWillInfo(memberId, willinfoDto);
+        return ApiResponseEntity.onSuccess(null);
+    }
 
     @Operation(summary = "step1. 취지")
     @PostMapping("/speech/purpose")
