@@ -8,6 +8,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.LoanRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.bank.DepositRepository;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.CashRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.member.repository.MemberRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
@@ -27,6 +28,7 @@ public class AssetService {
     private final MemberRepository memberRepository;
     private final DepositRepository depositRepository;
     private final LoanRepository loanRepository;
+    private final CashRepository cashRepository;
 
     /**
      * 연결된 자산 모두 조회 (대출 상세 제외)
@@ -48,6 +50,13 @@ public class AssetService {
                     totalAmounts.get(asset.getAssetType()) + asset.getAmount());
             assetTotalAmount += asset.getAmount();
         }
+
+        Long cashAmount = cashRepository.findByAsset_Member_MemberId(memberId)
+                .map(cashEntity -> cashEntity.getAmount().longValue())
+                .orElse(0L);
+
+        totalAmounts.put(AssetType.CASH, cashAmount);
+        assetTotalAmount += cashAmount;
 
         return AssetsDetailDto.builder()
                 .bank(formatAmount(
