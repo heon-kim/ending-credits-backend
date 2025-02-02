@@ -2,8 +2,11 @@ package com.hanaro.endingcredits.endingcreditsapi.utils.config;
 
 //import com.hanaro.endingcredits.endingcreditsapi.domain.product.mapper.PensionSavingsProductMapper;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.service.AssetDataService;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsSearchItems;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionSearchItems;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
+import com.hanaro.endingcredits.endingcreditsapi.utils.ElasticsearchInitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
@@ -20,6 +23,7 @@ public class DataInitializer {
     private final PensionSavingsService pensionSavingsService;
     private final RetirementPensionService retirementPensionService;
     private final AssetDataService assetDataService;
+    private final ElasticsearchInitService elasticsearchInitService;
 
     @Bean
     public ApplicationRunner initAssetData() {
@@ -40,6 +44,8 @@ public class DataInitializer {
     @Bean
     public ApplicationRunner initPensionSavingsData() {
         return args -> {
+            elasticsearchInitService.resetIndex("pension_savings_search_items", PensionSavingsSearchItems .class);
+
             List<Integer> areaCodes = List.of(1, 3, 4, 5);
 
             for (int areaCode : areaCodes) {
@@ -61,6 +67,8 @@ public class DataInitializer {
     @Bean
     public ApplicationRunner initRetirementPensionEarningRateData() {
         return args -> {
+            elasticsearchInitService.resetIndex("retirement_pension_search_items", RetirementPensionSearchItems.class);
+
             int year = 2024;
             int quarter = 3;
             int feeYear = 2023;
