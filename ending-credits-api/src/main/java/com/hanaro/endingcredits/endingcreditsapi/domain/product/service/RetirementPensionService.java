@@ -29,7 +29,6 @@ public class RetirementPensionService {
     private final RestTemplate restTemplate;
     private final RetirementPensionJpaRepository retirementPensionJpaRepository;
     private final RetirementPensionSearchRepository retirementPensionSearchRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
 
     @Transactional
     public void fetchAndSaveAnnuityYields(String apiUrl) {

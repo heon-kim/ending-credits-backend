@@ -39,7 +39,7 @@ public class PensionSavingsService {
 
         List<Map<String, Object>> limitedList = response.getList()
                 .stream()
-                .limit(50)  // 리스트에서 50개만 가져옴
+                .limit(100)  // 리스트에서 100개만 가져옴
                 .collect(Collectors.toList());
 
         if (response.getList() != null && !response.getList().isEmpty()) {
