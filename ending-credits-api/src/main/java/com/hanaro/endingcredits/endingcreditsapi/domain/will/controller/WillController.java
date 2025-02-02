@@ -21,6 +21,9 @@ public class WillController {
     @GetMapping("")
     public ApiResponseEntity<WillInfoDto> getWillInfo(@AuthenticationPrincipal UUID memberId) {
         WillInfoDto willInfo = willService.getWillInfo(memberId);
+        if (willInfo == null) {
+            return ApiResponseEntity.onNoContentSuccess();
+        }
         return ApiResponseEntity.onSuccess(willInfo);
     }
 
