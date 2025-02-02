@@ -4,6 +4,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
+import com.hanaro.endingcredits.endingcreditsapi.utils.ElasticsearchInitService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
@@ -38,7 +39,7 @@ public class PensionSavingsService {
 
         List<Map<String, Object>> limitedList = response.getList()
                 .stream()
-                .limit(50)  // 리스트에서 50개만 가져옴
+                .limit(100)  // 리스트에서 100개만 가져옴
                 .collect(Collectors.toList());
 
         if (response.getList() != null && !response.getList().isEmpty()) {
