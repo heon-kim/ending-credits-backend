@@ -28,7 +28,16 @@ public class StorageController {
         } catch (IOException e) {
             return ApiResponseEntity.onFailure("UPLOAD4001", "파일 업로드에 실패했습니다.", null);
         }
-
     }
 
+    @Operation(summary = "원격 저장소에 다중 파일 업로드")
+    @PostMapping("/files")
+    public ApiResponseEntity<String[]> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+        try {
+            String[] fileUrls = storageService.uploadFiles(files);
+            return ApiResponseEntity.onSuccess(fileUrls);
+        } catch (IOException e) {
+            return ApiResponseEntity.onFailure("UPLOAD4001", "파일 업로드에 실패했습니다.", null);
+        }
+    }
 }

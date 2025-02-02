@@ -1,4 +1,4 @@
-package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR;
+package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.id;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

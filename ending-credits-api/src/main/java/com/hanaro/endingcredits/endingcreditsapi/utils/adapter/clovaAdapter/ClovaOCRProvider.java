@@ -2,8 +2,10 @@ package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.clovaAdapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanaro.endingcredits.endingcreditsapi.domain.auth.dto.IdCardDto;
-import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.ClovaDLResponseDto;
-import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.ClovaICResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.id.ClovaDLResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.id.ClovaICResponseDto;
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.will.ClovaOCRWillFieldDto;
+import com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.will.ClovaOCRWillResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -22,11 +24,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ClovaOCRProvider {
 
-    @Value("${clova.ocr.invoke-url}")
-    private String invokeUrl;
+    @Value("${clova.ocr.id.invoke-url}")
+    private String idInvokeUrl;
 
-    @Value("${clova.ocr.secret-key}")
-    private String secretKey;
+    @Value("${clova.ocr.id.secret-key}")
+    private String idSecretKey;
+
+    @Value("${clova.ocr.will.invoke-url}")
+    private String willInvokeUrl;
+
+    @Value("${clova.ocr.will.secret-key}")
+    private String willSecretKey;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -59,7 +67,7 @@ public class ClovaOCRProvider {
 
         // Create the headers
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-OCR-SECRET", secretKey);
+        headers.set("X-OCR-SECRET", idSecretKey);
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         // Create the form data
@@ -71,7 +79,7 @@ public class ClovaOCRProvider {
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(formData, headers);
 
         // Send the POST request
-        String url = invokeUrl + "/document/id-card";
+        String url = idInvokeUrl + "/document/id-card";
         ResponseEntity<Object> response = restTemplate.postForEntity(url, entity, Object.class);
 
         // Parse the response and map to IdCardDto
@@ -98,5 +106,67 @@ public class ClovaOCRProvider {
         }
 
         return null;
+    }
+
+    public static String[] splitFileName(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            throw new IllegalArgumentException("Invalid file name: no extension found.");
+        }
+        String uuid = fileName.substring(0, lastDotIndex);
+        String extension = fileName.substring(lastDotIndex + 1);
+        return new String[]{uuid, extension};
+    }
+
+    public String recognizeText(String filePath) {
+        String[] file = splitFileName(filePath);
+        String uuid = file[0];
+        String extension = file[1];
+        String imageUrl = "https://kr.object.ncloudstorage.com/ending-credits/" + filePath;
+
+        // Create the request body
+        Map<String, Object> message = new HashMap<>();
+        message.put("version", "V2");
+        message.put("requestId", "UUID");
+        message.put("timestamp", 0);
+        Map<String, String> images = new HashMap<>();
+        images.put("format", extension);
+        images.put("name", uuid);
+        images.put("url", imageUrl);
+        message.put("images", new Map[]{images});
+
+        // Create the headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-OCR-SECRET", willSecretKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the HttpEntity
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(message, headers);
+
+        // Send the POST request
+        String url = willInvokeUrl + "/general";
+        ResponseEntity<ClovaOCRWillResponseDto> response = restTemplate.postForEntity(url, entity, ClovaOCRWillResponseDto.class);
+
+        // Parse the response and return the result
+        StringBuilder result = new StringBuilder();
+        if (response.getBody() != null) {
+            for (ClovaOCRWillFieldDto field : response.getBody().getImages()[0].getFields()) {
+                result.append(field.getInferText());
+                if (field.isLineBreak()) {
+                    result.append("\n");
+                } else {
+                    result.append(" ");
+                }
+            }
+        }
+        return result.toString().trim();
+    }
+
+    public String recognizeWill(List<String> filePaths) {
+        StringBuilder will = new StringBuilder();
+        for (String filePath : filePaths) {
+            will.append(recognizeText(filePath));
+        }
+        return will.toString().trim();
     }
 }
