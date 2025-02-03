@@ -28,9 +28,9 @@ public class AuthController {
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public ApiResponseEntity<TokenPairResponseDto> login(LoginDto loginDto) {
+    public ApiResponseEntity<LoginResponseDto> login(LoginDto loginDto) {
         try {
-            TokenPairResponseDto tokenPair = authService.generateTokenPairWithLoginDto(loginDto);
+            LoginResponseDto tokenPair = authService.generateTokenPairWithLoginDto(loginDto);
             return ApiResponseEntity.onSuccess(tokenPair);
         } catch (MemberHandler e) {
             // MemberHandler 예외 처리
@@ -122,16 +122,16 @@ public class AuthController {
     @GetMapping("/kakao")
     public ResponseEntity<ApiResponseEntity<TokenPairResponseDto>>  kakaoLoginCallback(@RequestParam String code, HttpServletResponse response) {
         try {
-            TokenPairResponseDto tokenPair = authService.processKakaoLogin(code);
+            LoginResponseDto loginResponseDto = authService.processKakaoLogin(code);
 
             // Access Token Cookie 설정
-            Cookie accessTokenCookie = new Cookie("accessToken", tokenPair.getAccessToken());
+            Cookie accessTokenCookie = new Cookie("accessToken", loginResponseDto.getTokenPairResponseDto().getAccessToken());
             accessTokenCookie.setHttpOnly(false); // 필요에 따라 HttpOnly 설정
             accessTokenCookie.setSecure(false);   // 개발 환경에서는 Secure=false
             accessTokenCookie.setPath("/");       // 모든 경로에서 접근 가능
 
             // Refresh Token Cookie 설정
-            Cookie refreshTokenCookie = new Cookie("refreshToken", tokenPair.getRefreshToken());
+            Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponseDto.getTokenPairResponseDto().getRefreshToken());
             refreshTokenCookie.setHttpOnly(false);
             refreshTokenCookie.setSecure(false);
             refreshTokenCookie.setPath("/");

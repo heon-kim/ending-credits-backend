@@ -85,7 +85,7 @@ public class AuthService {
                 .build();
     }
 
-    public TokenPairResponseDto generateTokenPairWithLoginDto(LoginDto loginDto) {
+    public LoginResponseDto generateTokenPairWithLoginDto(LoginDto loginDto) {
         MemberEntity member = memberRepository.findByIdentifier(loginDto.getIdentifier()).orElse(null);
         if (member == null) {
             throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
@@ -94,10 +94,15 @@ public class AuthService {
         }
         Map<String, Object> memberClaims = Map.of("identifier", loginDto.getIdentifier(),
                 "id", member.getMemberId());
-        return generateTokenPair(memberClaims);
+        TokenPairResponseDto tokenPairResponseDto = generateTokenPair(memberClaims);
+
+        return LoginResponseDto.builder()
+                .name(member.getName())
+                .tokenPairResponseDto(tokenPairResponseDto)
+                .build();
     }
 
-    public TokenPairResponseDto generateTokenPairWithKaKaoLogin(String email) {
+    public LoginResponseDto generateTokenPairWithKaKaoLogin(String email) {
         MemberEntity member = memberRepository.findByEmail(email).orElse(null);
 
         if (member == null) {
@@ -106,7 +111,12 @@ public class AuthService {
 
         Map<String, Object> memberClaims = Map.of("identifier", member.getIdentifier(),
                 "id", member.getMemberId());
-        return generateTokenPair(memberClaims);
+        TokenPairResponseDto tokenPairResponseDto = generateTokenPair(memberClaims);
+
+        return LoginResponseDto.builder()
+                .name(member.getName())
+                .tokenPairResponseDto(tokenPairResponseDto)
+                .build();
     }
 
     public TokenPairResponseDto refreshTokenPair(String oldRefreshToken) {
@@ -170,7 +180,7 @@ public class AuthService {
         memberRepository.save(member);
     }
 
-    public TokenPairResponseDto processKakaoLogin(String code) {
+    public LoginResponseDto processKakaoLogin(String code) {
         // 카카오 서버에서 Access Token 요청
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
