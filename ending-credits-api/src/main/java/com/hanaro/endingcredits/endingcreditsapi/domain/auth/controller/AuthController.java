@@ -125,13 +125,13 @@ public class AuthController {
             LoginResponseDto loginResponseDto = authService.processKakaoLogin(code);
 
             // Access Token Cookie 설정
-            Cookie accessTokenCookie = new Cookie("accessToken", loginResponseDto.getTokenPairResponseDto().getAccessToken());
+            Cookie accessTokenCookie = new Cookie("accessToken", loginResponseDto.getTokenPair().getAccessToken());
             accessTokenCookie.setHttpOnly(false); // 필요에 따라 HttpOnly 설정
             accessTokenCookie.setSecure(false);   // 개발 환경에서는 Secure=false
             accessTokenCookie.setPath("/");       // 모든 경로에서 접근 가능
 
             // Refresh Token Cookie 설정
-            Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponseDto.getTokenPairResponseDto().getRefreshToken());
+            Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponseDto.getTokenPair().getRefreshToken());
             refreshTokenCookie.setHttpOnly(false);
             refreshTokenCookie.setSecure(false);
             refreshTokenCookie.setPath("/");
