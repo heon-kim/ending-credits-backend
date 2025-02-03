@@ -4,7 +4,6 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.RetirementPensionSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.RetirementPensionJpaRepository;
-import com.hanaro.endingcredits.endingcreditsapi.utils.ElasticsearchInitService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
@@ -12,14 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

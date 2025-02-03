@@ -10,7 +10,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Document(indexName = "pension_savings_search_items")
+@Document(indexName = "pension_savings_index")
 public class PensionSavingsSearchItems {
 
     @Id

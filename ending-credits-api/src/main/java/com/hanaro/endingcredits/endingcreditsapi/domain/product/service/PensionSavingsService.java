@@ -4,7 +4,6 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.elasticsearch.PensionSavingsSearchRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
-import com.hanaro.endingcredits.endingcreditsapi.utils.ElasticsearchInitService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
 import com.hanaro.endingcredits.endingcreditsapi.utils.mapper.ProductMapper;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,36 +35,59 @@ public class PensionSavingsService {
         PensionSavingsResponse response = restTemplate.getForObject(apiUrl, PensionSavingsResponse.class);
         if (response == null) return;
 
-        List<Map<String, Object>> limitedList = response.getList()
-                .stream()
-                .limit(100)  // 리스트에서 100개만 가져옴
+        List<Map<String, Object>> productList = response.getList();
+        if (productList == null || productList.isEmpty()) {
+            log.warn("외부 API에서 데이터를 가져오지 못했습니다.");
+            return;
+        }
+
+        compareWritePerformance(productList, areaCode);
+    }
+
+    /**
+     *  PostgreSQL vs Elasticsearch 쓰기 성능 비교
+     */
+    private void compareWritePerformance(List<Map<String, Object>> productList, int areaCode) {
+        List<PensionSavingsProductEntity> products = productList.stream()
+                .map(data -> PensionSavingsProductEntity.builder()
+                        .productName((String) data.get("product"))
+                        .company((String) data.get("company"))
+                        .productArea(ProductArea.fromCode(areaCode))
+                        .productDetail(List.of(data))
+                        .build())
                 .collect(Collectors.toList());
 
-        if (response.getList() != null && !response.getList().isEmpty()) {
-            for (Map<String, Object> productData : response.getList()) {
-                String productName = (String) productData.get("product");
-                String company = (String) productData.get("company");
+        long postgresTime = testPostgreSQLWriteSpeed(products);
+        long elasticTime = testElasticsearchWriteSpeed(products);
 
-                if (productName == null || company == null) {
-                    log.warn("product 또는 company가 존재하지 않습니다." + productData);
-                    continue;
-                }
+        log.info(" PostgreSQL 삽입 성능: {}ms", postgresTime);
+        log.info(" Elasticsearch 삽입 성능: {}ms", elasticTime);
+    }
 
-                List<Map<String, Object>> productDetail = new ArrayList<>();
-                productDetail.add(productData);
-                ProductArea productArea = ProductArea.fromCode(areaCode);
+    /**
+     *  PostgreSQL 대량 삽입 성능 측정
+     */
+    @Transactional
+    public long testPostgreSQLWriteSpeed(List<PensionSavingsProductEntity> products) {
+        long startTime = System.currentTimeMillis();
+        pensionProductRepository.saveAll(products);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
 
-                PensionSavingsProductEntity entity = PensionSavingsProductEntity.builder()
-                        .productName(productName)
-                        .productArea(productArea)
-                        .company(company)
-                        .productDetail(productDetail)
-                        .build();
-                pensionProductRepository.save(entity);
-                PensionSavingsSearchItems document = productMapper.toPensionSavingsSearchItems(entity);
-                pensionSavingsSearchRepository.save(document);
-            }
-        }
+    /**
+     *  Elasticsearch 대량 삽입 성능 측정
+     */
+    @Transactional
+    public long testElasticsearchWriteSpeed(List<PensionSavingsProductEntity> products) {
+        List<PensionSavingsSearchItems> documents = products.stream()
+                .map(productMapper::toPensionSavingsSearchItems)
+                .collect(Collectors.toList());
+
+        long startTime = System.currentTimeMillis();
+        pensionSavingsSearchRepository.saveAll(documents);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     @Transactional(readOnly = true)
