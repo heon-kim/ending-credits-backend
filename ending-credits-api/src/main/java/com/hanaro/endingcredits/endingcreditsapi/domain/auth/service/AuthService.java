@@ -98,7 +98,7 @@ public class AuthService {
 
         return LoginResponseDto.builder()
                 .name(member.getName())
-                .tokenPairResponseDto(tokenPairResponseDto)
+                .tokenPair(tokenPairResponseDto)
                 .build();
     }
 
@@ -115,7 +115,7 @@ public class AuthService {
 
         return LoginResponseDto.builder()
                 .name(member.getName())
-                .tokenPairResponseDto(tokenPairResponseDto)
+                .tokenPair(tokenPairResponseDto)
                 .build();
     }
 
