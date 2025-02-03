@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(indexName = "retirement_pension_search_items")
+@Document(indexName = "retirement_pension_index")
 public class RetirementPensionSearchItems {
 
     @Id

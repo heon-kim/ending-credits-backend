@@ -6,7 +6,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Pension
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.RetirementPensionSearchItems;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.PensionSavingsService;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.RetirementPensionService;
-import com.hanaro.endingcredits.endingcreditsapi.utils.ElasticsearchInitService;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.service.ElasticsearchInitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
@@ -44,7 +44,7 @@ public class DataInitializer {
     @Bean
     public ApplicationRunner initPensionSavingsData() {
         return args -> {
-            elasticsearchInitService.resetIndex("pension_savings_search_items", PensionSavingsSearchItems .class);
+            elasticsearchInitService.resetIndex("pension_savings_index", PensionSavingsSearchItems .class);
 
             List<Integer> areaCodes = List.of(1, 3, 4, 5);
 
@@ -67,7 +67,7 @@ public class DataInitializer {
     @Bean
     public ApplicationRunner initRetirementPensionEarningRateData() {
         return args -> {
-            elasticsearchInitService.resetIndex("retirement_pension_search_items", RetirementPensionSearchItems.class);
+            elasticsearchInitService.resetIndex("retirement_pension_index", RetirementPensionSearchItems.class);
 
             int year = 2024;
             int quarter = 3;
