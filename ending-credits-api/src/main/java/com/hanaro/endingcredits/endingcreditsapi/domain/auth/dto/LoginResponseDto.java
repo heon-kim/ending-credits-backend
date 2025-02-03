@@ -7,5 +7,5 @@ import lombok.Getter;
 @Builder
 public class LoginResponseDto {
     private String name;
-    private TokenPairResponseDto tokenPairResponseDto;
+    private TokenPairResponseDto tokenPair;
 }
