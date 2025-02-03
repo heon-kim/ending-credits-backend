@@ -141,11 +141,11 @@ public class AuthController {
 
             // 리다이렉트 처리
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .header(HttpHeaders.LOCATION, "http://localhost:5173/") // 프론트엔드 URL
+                    .header(HttpHeaders.LOCATION, "https://localhost:5173/") // 프론트엔드 URL
                     .build();
         } catch (MemberHandler e) {
             return ResponseEntity.status(HttpStatus.FOUND) // 302로 리다이렉트 처리
-                    .header(HttpHeaders.LOCATION, "http://localhost:5173/signup")
+                    .header(HttpHeaders.LOCATION, "https://localhost:5173/signup")
                     .body(ApiResponseEntity.onFailure(e.getErrorReason().getCode(), e.getErrorReason().getMessage(), null));
         }
     }
