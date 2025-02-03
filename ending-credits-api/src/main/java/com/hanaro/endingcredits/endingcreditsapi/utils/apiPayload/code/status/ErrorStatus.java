@@ -27,6 +27,7 @@ public enum ErrorStatus implements BaseErrorCode {
     SEARCH_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4003", "검색 중 오류가 발생했습니다."),
     YIELD_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4004", "수익률 결과 요청 중 오류가 발생했습니다."),
     FEE_DETAILS_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4005", "수수료율 상세 정보가 존재하지 않습니다."),
+    YIELD_DETAILS_NOT_FOUND(HttpStatus.BAD_REQUEST, "FINANCE4006", "수익률 상세 정보가 존재하지 않습니다."),
 
     // 토근 관련 에러
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 토큰입니다."),
