@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -152,13 +153,13 @@ public class PensionSavingsService {
                 .previousYearReserve(formatter.format(detail.get("reserve1")))  // 과거 1년 적립금
                 .twoYearsAgoReserve(formatter.format(detail.get("reserve2")))  // 과거 2년 적립금
                 .threeYearsAgoReserve(formatter.format(detail.get("reserve3")))  // 과거 3년 적립금
-                .currentEarnRate((Double) detail.get("earnRate"))  // 현재 수익률
-                .previousYearEarnRate((Double) detail.get("earnRate1"))  // 과거 1년 수익률
-                .twoYearsAgoEarnRate((Double) detail.get("earnRate2"))  // 과거 2년 수익률
-                .threeYearsAgoEarnRate((Double) detail.get("earnRate3"))  // 과거 3년 수익률
-                .previousYearFeeRate((Double) detail.get("feeRate1"))  // 과거 1년 수수료율
-                .twoYearsAgoFeeRate((Double) detail.get("feeRate2"))  // 과거 2년 수수료율
-                .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
+                .currentEarnRate(getDoubleValue(detail,"earnRate"))  // 현재 수익률
+                .previousYearEarnRate(getDoubleValue(detail,"earnRate1"))  // 과거 1년 수익률
+                .twoYearsAgoEarnRate(getDoubleValue(detail,"earnRate2"))  // 과거 2년 수익률
+                .threeYearsAgoEarnRate(getDoubleValue(detail,"earnRate3"))  // 과거 3년 수익률
+                .previousYearFeeRate(getDoubleValue(detail,"feeRate1"))  // 과거 1년 수수료율
+                .twoYearsAgoFeeRate(getDoubleValue(detail,"feeRate2"))  // 과거 2년 수수료율
+                .threeYearsAgoFeeRate(getDoubleValue(detail,"feeRate3"))  // 과거 3년 수수료율
                 .build();
     }
 
@@ -187,13 +188,13 @@ public class PensionSavingsService {
                 .productName(product.getProductName())  // 상품명
                 .productType((String) detail.get("productType"))  // 상품 유형
                 .withdraws(((String) detail.get("withdraws")).equals("Y") ? "가능" : "불가능")  // 중도 해지
-                .currentEarnRate((Double) detail.get("earnRate"))  // 현재 수익률
-                .previousYearEarnRate((Double) detail.get("earnRate1"))  // 과거 1년 수익률
-                .twoYearsAgoEarnRate((Double) detail.get("earnRate2"))  // 과거 2년 수익률
-                .threeYearsAgoEarnRate((Double) detail.get("earnRate3"))  // 과거 3년 수익률
-                .previousYearFeeRate((Double) detail.get("feeRate1"))  // 과거 1년 수수료율
-                .twoYearsAgoFeeRate((Double) detail.get("feeRate2"))  // 과거 2년 수수료율
-                .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
+                .currentEarnRate(getDoubleValue(detail,"earnRate"))  // 현재 수익률
+                .previousYearEarnRate(getDoubleValue(detail,"earnRate1"))  // 과거 1년 수익률
+                .twoYearsAgoEarnRate(getDoubleValue(detail,"earnRate2"))  // 과거 2년 수익률
+                .threeYearsAgoEarnRate(getDoubleValue(detail,"earnRate3"))  // 과거 3년 수익률
+                .previousYearFeeRate(getDoubleValue(detail,"feeRate1"))  // 과거 1년 수수료율
+                .twoYearsAgoFeeRate(getDoubleValue(detail,"feeRate2"))  // 과거 2년 수수료율
+                .threeYearsAgoFeeRate(getDoubleValue(detail,"feeRate3"))  // 과거 3년 수수료율
                 .build();
     }
 
@@ -238,5 +239,12 @@ public class PensionSavingsService {
                 .monthlyAdditionalUsage(monthlyAdditionalUsage)
                 .expectedEarnRate(currentEarnRate * 100)
                 .build();
+    }
+
+    private double getDoubleValue(Map<String, Object> map, String key) {
+        return Optional.ofNullable(map.get(key))
+                .filter(value -> value instanceof Number)
+                .map(value -> ((Number) value).doubleValue())
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.YIELD_DETAILS_NOT_FOUND));
     }
 }
