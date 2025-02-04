@@ -136,8 +136,15 @@ public class AuthController {
             refreshTokenCookie.setSecure(false);
             refreshTokenCookie.setPath("/");
 
+            // 이름 설정
+            Cookie name = new Cookie("name", loginResponseDto.getName());
+            name.setHttpOnly(false);
+            name.setSecure(false);
+            name.setPath("/");
+
             response.addCookie(accessTokenCookie);
             response.addCookie(refreshTokenCookie);
+            response.addCookie(name);
 
             // 리다이렉트 처리
             return ResponseEntity.status(HttpStatus.FOUND)
