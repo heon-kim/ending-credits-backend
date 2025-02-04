@@ -1,9 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.utils.adapter;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.ExecutorDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.FinalMessageDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.InheritanceDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.PurposeDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.*;
 
 public interface LLMPort {
     /**
@@ -45,4 +42,11 @@ public interface LLMPort {
      * @return 법적 유효성
      */
     Boolean extractWillConfirmation(String content);
+
+    /**
+     * OCR 기반 생성 유언장 추출
+     * @param content OCR 기반 생성 유언장 정보
+     * @return 유언장 정보
+     */
+    WillDto extractWillByOCR(String content);
 }

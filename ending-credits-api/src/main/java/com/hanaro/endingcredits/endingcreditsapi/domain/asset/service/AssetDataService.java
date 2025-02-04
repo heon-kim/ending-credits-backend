@@ -425,17 +425,17 @@ public class AssetDataService {
             fundRepository.save(fundKRW);
 
             // USD 펀드 생성
-            FundEntity fundUSD = FundEntity.builder()
-                    .bank(banks.get(i))
-                    .asset(asset)
-                    .accountName("Fund USD " + i)
-                    .accountNumber("FUND-123-USD-" + i)
-                    .investmentPrincipal(principalUSD)
-                    .fundAmount(fundAmountUSD.multiply(EXCHANGE_RATE)) // 수익 포함 금액을 KRW로 환산
-                    .profitRatio(calculateProfitRatio(principalUSD, fundAmountUSD)) // 수익률
-                    .currencyCode(CurrencyCodeType.USD)
-                    .build();
-            fundRepository.save(fundUSD);
+//            FundEntity fundUSD = FundEntity.builder()
+//                    .bank(banks.get(i))
+//                    .asset(asset)
+//                    .accountName("Fund USD " + i)
+//                    .accountNumber("FUND-123-USD-" + i)
+//                    .investmentPrincipal(principalUSD)
+//                    .fundAmount(fundAmountUSD.multiply(EXCHANGE_RATE)) // 수익 포함 금액을 KRW로 환산
+//                    .profitRatio(calculateProfitRatio(principalUSD, fundAmountUSD)) // 수익률
+//                    .currencyCode(CurrencyCodeType.USD)
+//                    .build();
+//            fundRepository.save(fundUSD);
 
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
 //            totalAmount = totalAmount.add(fundAmountKRW);
@@ -503,19 +503,19 @@ public class AssetDataService {
                     .amount(amountKRW)
                     .currencyCode(CurrencyCodeType.KRW)
                     .build();
-            depositRepository.save(depositKRW);
+            deposit = depositRepository.save(depositKRW);
 
-            // USD 예금 생성
-            DepositEntity depositUSD = DepositEntity.builder()
-                    .bank(banks.get(i))
-                    .asset(asset)
-                    .accountName("Deposit USD " + i)
-                    .accountNumber("DEPOSIT-USD-" + i)
-                    .amount(amountUSD)
-                    .currencyCode(CurrencyCodeType.USD)
-                    .build();
-
-            deposit = depositRepository.save(depositUSD);
+//            // USD 예금 생성
+//            DepositEntity depositUSD = DepositEntity.builder()
+//                    .bank(banks.get(i))
+//                    .asset(asset)
+//                    .accountName("Deposit USD " + i)
+//                    .accountNumber("DEPOSIT-USD-" + i)
+//                    .amount(amountUSD)
+//                    .currencyCode(CurrencyCodeType.USD)
+//                    .build();
+//
+//            deposit = depositRepository.save(depositUSD);
             // 총 금액 계산 (KRW 및 USD 환산 후 합산)
 //            totalAmount = totalAmount.add(amountKRW);
 //            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));

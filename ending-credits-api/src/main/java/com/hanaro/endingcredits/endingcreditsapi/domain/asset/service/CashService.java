@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -32,10 +33,18 @@ public class CashService {
                 .build();
     }
 
+    @Transactional
     public void updateCashAmount(UUID memberId, BigDecimal amount) {
         CashEntity cashEntity = cashRepository.findByAsset_Member_MemberId(memberId)
                 .orElseThrow(() -> new AssetHandler(ErrorStatus.CASH_NOT_FOUND));
-        cashEntity.updateAmount(amount);
-        cashRepository.save(cashEntity);
+
+        // 새로운 CashEntity 객체를 생성하여 불변성을 유지
+        CashEntity updatedCash = CashEntity.builder()
+                .cashId(cashEntity.getCashId())
+                .asset(cashEntity.getAsset())
+                .amount(amount)
+                .build();
+
+        cashRepository.save(updatedCash);
     }
 }

@@ -1,4 +1,4 @@
-package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR;
+package com.hanaro.endingcredits.endingcreditsapi.utils.adapter.dto.clova.OCR.id;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClovaDLResponseDto {
+public class ClovaICResponseDto {
     private String version;
     private String requestId;
     private Long timestamp;
-    private List<ClovaDLImageDto> images;
+    private List<ClovaICImageDto> images;
 }

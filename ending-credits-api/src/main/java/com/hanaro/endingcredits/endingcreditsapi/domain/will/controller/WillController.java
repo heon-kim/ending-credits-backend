@@ -1,23 +1,38 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.will.controller;
 
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.ExecutorDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.FinalMessageDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.InheritanceDto;
-import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.PurposeDto;
+import com.hanaro.endingcredits.endingcreditsapi.domain.will.dto.*;
 import com.hanaro.endingcredits.endingcreditsapi.domain.will.service.WillService;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.ApiResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/will")
 public class WillController {
     private final WillService willService;
+
+    @Operation(summary = "유언장 조회")
+    @GetMapping("")
+    public ApiResponseEntity<WillInfoDto> getWillInfo(@AuthenticationPrincipal UUID memberId) {
+        WillInfoDto willInfo = willService.getWillInfo(memberId);
+        if (willInfo == null) {
+            return ApiResponseEntity.onNoContentSuccess();
+        }
+        return ApiResponseEntity.onSuccess(willInfo);
+    }
+
+    @Operation(summary = "유언장 생성")
+    @PostMapping("")
+    public ApiResponseEntity<Void> createWillInfo(@AuthenticationPrincipal UUID memberId, @RequestBody WillRequestDto willRequestDto) {
+        willService.createWillInfo(memberId, willRequestDto);
+        return ApiResponseEntity.onSuccess(null);
+    }
 
     @Operation(summary = "step1. 취지")
     @PostMapping("/speech/purpose")
@@ -52,5 +67,12 @@ public class WillController {
     public ApiResponseEntity<Boolean> extractWillConfirmation(@RequestParam String fileUrl) {
         Boolean confirmation = willService.extractWillConfirmation(fileUrl);
         return ApiResponseEntity.onSuccess(confirmation);
+    }
+
+    @Operation(summary = "자필로 유언장 생성")
+    @PostMapping("/ocr")
+    public ApiResponseEntity<WillDto> extractWillByOCR(@RequestParam List<String> fileUrls) {
+        WillDto will = willService.extractWillByOCR(fileUrls);
+        return ApiResponseEntity.onSuccess(will);
     }
 }

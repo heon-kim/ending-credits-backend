@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -217,5 +215,6 @@ public class RetirementPensionService {
     public List<RetirementPensionSearchItems> searchCompany(String keyword) {
         return retirementPensionSearchRepository.findByCompanyContaining(keyword);
     }
+
 }
 

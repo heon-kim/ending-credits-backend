@@ -24,6 +24,10 @@ public class ApiResponseEntity<T> {
         return new ApiResponseEntity<>(SuccessStatus._OK.getCode(), message, result);
     }
 
+    public static <T> ApiResponseEntity<T> onNoContentSuccess() {
+        return new ApiResponseEntity<>(SuccessStatus._NO_CONTENT.getCode(), SuccessStatus._NO_CONTENT.getMessage(), null);
+    }
+
     public static <T> ApiResponseEntity<T> onFailure(String code, String message, T result) {
         return new ApiResponseEntity<>(code, message, result);
     }

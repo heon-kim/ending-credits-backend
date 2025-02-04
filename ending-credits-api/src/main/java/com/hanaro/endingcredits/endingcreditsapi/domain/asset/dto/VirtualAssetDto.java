@@ -1,5 +1,6 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.asset.dto;
 
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.CurrencyCodeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,5 +22,6 @@ public class VirtualAssetDto {
     private BigDecimal profitRatio;   // 수익률
     private BigDecimal quantity;      // 보유 수량
     private BigDecimal totalValue;    // 총 평가 금액
+    private CurrencyCodeType currencyCode; // 화폐
 }
 

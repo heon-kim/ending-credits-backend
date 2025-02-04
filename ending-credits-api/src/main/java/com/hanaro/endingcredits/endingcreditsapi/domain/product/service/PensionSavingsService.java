@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,36 +36,59 @@ public class PensionSavingsService {
         PensionSavingsResponse response = restTemplate.getForObject(apiUrl, PensionSavingsResponse.class);
         if (response == null) return;
 
-        List<Map<String, Object>> limitedList = response.getList()
-                .stream()
-                .limit(50)  // 리스트에서 50개만 가져옴
+        List<Map<String, Object>> productList = response.getList();
+        if (productList == null || productList.isEmpty()) {
+            log.warn("외부 API에서 데이터를 가져오지 못했습니다.");
+            return;
+        }
+
+        compareWritePerformance(productList, areaCode);
+    }
+
+    /**
+     *  PostgreSQL vs Elasticsearch 쓰기 성능 비교
+     */
+    private void compareWritePerformance(List<Map<String, Object>> productList, int areaCode) {
+        List<PensionSavingsProductEntity> products = productList.stream()
+                .map(data -> PensionSavingsProductEntity.builder()
+                        .productName((String) data.get("product"))
+                        .company((String) data.get("company"))
+                        .productArea(ProductArea.fromCode(areaCode))
+                        .productDetail(List.of(data))
+                        .build())
                 .collect(Collectors.toList());
 
-        if (response.getList() != null && !response.getList().isEmpty()) {
-            for (Map<String, Object> productData : response.getList()) {
-                String productName = (String) productData.get("product");
-                String company = (String) productData.get("company");
+        long postgresTime = testPostgreSQLWriteSpeed(products);
+        long elasticTime = testElasticsearchWriteSpeed(products);
 
-                if (productName == null || company == null) {
-                    log.warn("product 또는 company가 존재하지 않습니다." + productData);
-                    continue;
-                }
+        log.info(" PostgreSQL 삽입 성능: {}ms", postgresTime);
+        log.info(" Elasticsearch 삽입 성능: {}ms", elasticTime);
+    }
 
-                List<Map<String, Object>> productDetail = new ArrayList<>();
-                productDetail.add(productData);
-                ProductArea productArea = ProductArea.fromCode(areaCode);
+    /**
+     *  PostgreSQL 대량 삽입 성능 측정
+     */
+    @Transactional
+    public long testPostgreSQLWriteSpeed(List<PensionSavingsProductEntity> products) {
+        long startTime = System.currentTimeMillis();
+        pensionProductRepository.saveAll(products);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
 
-                PensionSavingsProductEntity entity = PensionSavingsProductEntity.builder()
-                        .productName(productName)
-                        .productArea(productArea)
-                        .company(company)
-                        .productDetail(productDetail)
-                        .build();
-                pensionProductRepository.save(entity);
-                PensionSavingsSearchItems document = productMapper.toPensionSavingsSearchItems(entity);
-                pensionSavingsSearchRepository.save(document);
-            }
-        }
+    /**
+     *  Elasticsearch 대량 삽입 성능 측정
+     */
+    @Transactional
+    public long testElasticsearchWriteSpeed(List<PensionSavingsProductEntity> products) {
+        List<PensionSavingsSearchItems> documents = products.stream()
+                .map(productMapper::toPensionSavingsSearchItems)
+                .collect(Collectors.toList());
+
+        long startTime = System.currentTimeMillis();
+        pensionSavingsSearchRepository.saveAll(documents);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     @Transactional(readOnly = true)
@@ -130,13 +153,13 @@ public class PensionSavingsService {
                 .previousYearReserve(formatter.format(detail.get("reserve1")))  // 과거 1년 적립금
                 .twoYearsAgoReserve(formatter.format(detail.get("reserve2")))  // 과거 2년 적립금
                 .threeYearsAgoReserve(formatter.format(detail.get("reserve3")))  // 과거 3년 적립금
-                .currentEarnRate((Double) detail.get("earnRate"))  // 현재 수익률
-                .previousYearEarnRate((Double) detail.get("earnRate1"))  // 과거 1년 수익률
-                .twoYearsAgoEarnRate((Double) detail.get("earnRate2"))  // 과거 2년 수익률
-                .threeYearsAgoEarnRate((Double) detail.get("earnRate3"))  // 과거 3년 수익률
-                .previousYearFeeRate((Double) detail.get("feeRate1"))  // 과거 1년 수수료율
-                .twoYearsAgoFeeRate((Double) detail.get("feeRate2"))  // 과거 2년 수수료율
-                .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
+                .currentEarnRate(getDoubleValue(detail,"earnRate"))  // 현재 수익률
+                .previousYearEarnRate(getDoubleValue(detail,"earnRate1"))  // 과거 1년 수익률
+                .twoYearsAgoEarnRate(getDoubleValue(detail,"earnRate2"))  // 과거 2년 수익률
+                .threeYearsAgoEarnRate(getDoubleValue(detail,"earnRate3"))  // 과거 3년 수익률
+                .previousYearFeeRate(getDoubleValue(detail,"feeRate1"))  // 과거 1년 수수료율
+                .twoYearsAgoFeeRate(getDoubleValue(detail,"feeRate2"))  // 과거 2년 수수료율
+                .threeYearsAgoFeeRate(getDoubleValue(detail,"feeRate3"))  // 과거 3년 수수료율
                 .build();
     }
 
@@ -165,13 +188,13 @@ public class PensionSavingsService {
                 .productName(product.getProductName())  // 상품명
                 .productType((String) detail.get("productType"))  // 상품 유형
                 .withdraws(((String) detail.get("withdraws")).equals("Y") ? "가능" : "불가능")  // 중도 해지
-                .currentEarnRate((Double) detail.get("earnRate"))  // 현재 수익률
-                .previousYearEarnRate((Double) detail.get("earnRate1"))  // 과거 1년 수익률
-                .twoYearsAgoEarnRate((Double) detail.get("earnRate2"))  // 과거 2년 수익률
-                .threeYearsAgoEarnRate((Double) detail.get("earnRate3"))  // 과거 3년 수익률
-                .previousYearFeeRate((Double) detail.get("feeRate1"))  // 과거 1년 수수료율
-                .twoYearsAgoFeeRate((Double) detail.get("feeRate2"))  // 과거 2년 수수료율
-                .threeYearsAgoFeeRate((Double) detail.get("feeRate3"))  // 과거 3년 수수료율
+                .currentEarnRate(getDoubleValue(detail,"earnRate"))  // 현재 수익률
+                .previousYearEarnRate(getDoubleValue(detail,"earnRate1"))  // 과거 1년 수익률
+                .twoYearsAgoEarnRate(getDoubleValue(detail,"earnRate2"))  // 과거 2년 수익률
+                .threeYearsAgoEarnRate(getDoubleValue(detail,"earnRate3"))  // 과거 3년 수익률
+                .previousYearFeeRate(getDoubleValue(detail,"feeRate1"))  // 과거 1년 수수료율
+                .twoYearsAgoFeeRate(getDoubleValue(detail,"feeRate2"))  // 과거 2년 수수료율
+                .threeYearsAgoFeeRate(getDoubleValue(detail,"feeRate3"))  // 과거 3년 수수료율
                 .build();
     }
 
@@ -216,5 +239,12 @@ public class PensionSavingsService {
                 .monthlyAdditionalUsage(monthlyAdditionalUsage)
                 .expectedEarnRate(currentEarnRate * 100)
                 .build();
+    }
+
+    private double getDoubleValue(Map<String, Object> map, String key) {
+        return Optional.ofNullable(map.get(key))
+                .filter(value -> value instanceof Number)
+                .map(value -> ((Number) value).doubleValue())
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.YIELD_DETAILS_NOT_FOUND));
     }
 }
