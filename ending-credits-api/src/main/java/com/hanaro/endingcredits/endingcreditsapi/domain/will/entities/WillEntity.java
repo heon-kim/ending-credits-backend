@@ -4,6 +4,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.member.entities.MemberEn
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +37,9 @@ public class WillEntity {
 
     @Column(nullable = false)
     private Integer shareAt;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "will")
     private List<WillFileEntity> willFiles = new ArrayList<>();

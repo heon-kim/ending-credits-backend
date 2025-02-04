@@ -1,6 +1,5 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.will.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hanaro.endingcredits.endingcreditsapi.domain.will.entities.WillCreatedType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,11 +13,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WillInfoDto {
+public class WillRequestDto {
     private String willCodeId;
     private WillCreatedType createdType;
     private List<String> files;
     private Integer shareAt;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDateTime createdAt;
 }
