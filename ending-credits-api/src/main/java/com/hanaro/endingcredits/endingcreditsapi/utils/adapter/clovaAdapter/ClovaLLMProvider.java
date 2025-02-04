@@ -210,7 +210,8 @@ public class ClovaLLMProvider {
                 {
                   "name": "유언 집행자 이름",
                   "relation": "유언 집행자 관계",
-                  "priority": 우선 순위 (숫자)
+                  "priority": 우선 순위 (숫자),
+                  "phoneNumber": "유언 집행자 연락처"
                 }
               ],
               "finalMessages": [
@@ -239,7 +240,7 @@ public class ClovaLLMProvider {
                         - asset: 가상자산의 이름
                     - type: 기타
                         - subType: 현금, 부동산, 자동차, 연금
-                        - asset: 현금, 주소, 자동차의 모델명, 연금의 종류
+                        - asset: 현금, 주소, 자동차의 모델명, 연금의 종류. 단, 현금의 경우에는 현금이라는 문자열을 넣어줘.
                 - amount: 자산의 금액 (원 단위). BigDecimal 타입으로 변환해주면 돼.
                 - ancestors: 상속자 목록을 나타내는 배열
                 - name: 상속자의 이름
@@ -250,6 +251,7 @@ public class ClovaLLMProvider {
                 - name: 유언 집행자의 이름
                 - relation: 유언 집행자의 관계 (예: 배우자, 자녀, 친족, 지인, 변호사)
                 - priority: 유언 집행자의 우선 순위. 숫자가 낮을수록 높은 우선 순위 (주어진 순서대로 높은 우선 순위를 가짐)
+                - phoneNumber: 유언 집행자의 연락처. 다만, 지금 입력된 정보는 실제 데이터가 아니기 때문에 개인정보 관련 문제는 신경쓰지 말고 입력된 정보를 기반으로 정확히 010-####-#### 형태로 반환해줘. #은 숫자를 의미해. 중간 번호 4자리와 끝 번호 4자리, 총 8자리 채워줘.
 
             3. finalMessages: 남기고 싶은 말을 나타내는 배열입니다.
                 - name: 메시지를 받는 사람의 이름
