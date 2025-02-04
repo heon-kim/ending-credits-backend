@@ -26,7 +26,7 @@ import java.util.UUID;
 public class AuthController {
     private final AuthService authService;
 
-    @Operation(summary = "로그인@@@")
+    @Operation(summary = "로그인")
     @PostMapping("/login")
     public ApiResponseEntity<TokenPairResponseDto> login(LoginDto loginDto) {
         try {
