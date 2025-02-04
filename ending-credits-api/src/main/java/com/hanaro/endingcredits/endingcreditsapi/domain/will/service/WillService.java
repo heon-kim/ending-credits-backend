@@ -40,14 +40,14 @@ public class WillService {
     }
 
     @Transactional
-    public void createWillInfo(UUID memberId, WillInfoDto willInfoDto) {
+    public void createWillInfo(UUID memberId, WillRequestDto willRequestDto) {
         MemberEntity member = memberService.getMember(memberId);
 
-        WillEntity willEntity = willMapper.toWillEntity(willInfoDto);
+        WillEntity willEntity = willMapper.toWillEntity(willRequestDto);
         willEntity.setMember(member);
         willEntity = willRepository.save(willEntity);
 
-        for (String fileUrl : willInfoDto.getFiles()) {
+        for (String fileUrl : willRequestDto.getFiles()) {
             WillFileEntity willFileEntity = WillFileEntity.builder()
                     .will(willEntity)
                     .fileUrl(fileUrl)

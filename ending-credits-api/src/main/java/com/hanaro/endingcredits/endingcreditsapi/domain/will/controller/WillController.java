@@ -29,8 +29,8 @@ public class WillController {
 
     @Operation(summary = "유언장 생성")
     @PostMapping("")
-    public ApiResponseEntity<Void> createWillInfo(@AuthenticationPrincipal UUID memberId, @RequestBody WillInfoDto willinfoDto) {
-        willService.createWillInfo(memberId, willinfoDto);
+    public ApiResponseEntity<Void> createWillInfo(@AuthenticationPrincipal UUID memberId, @RequestBody WillRequestDto willRequestDto) {
+        willService.createWillInfo(memberId, willRequestDto);
         return ApiResponseEntity.onSuccess(null);
     }
 
