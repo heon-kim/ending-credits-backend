@@ -12,11 +12,11 @@ services:
       - 80:80
       - 443:443
     depends_on:
-      - spring
+      - spring-blue
+      - spring-green
     networks:
       - api-net
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-
 
   certbot:
     image: certbot/certbot
@@ -25,12 +25,26 @@ services:
       - ./data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
-
-  spring:
-    container_name: spring
+  spring-blue:
+    container_name: spring-blue
     image: rladlsdud678/ending-credits
     ports:
-      - "8080:8080"
+      - "8081:8080"
+    volumes:
+      - /var/log/:/logs/
+    depends_on:
+      es:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - api-net
+
+  spring-green:
+    container_name: spring-green
+    image: rladlsdud678/ending-credits
+    ports:
+      - "8082:8080"
     volumes:
       - /var/log/:/logs/
     depends_on:
