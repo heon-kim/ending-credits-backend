@@ -7,6 +7,7 @@ import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.AssetEnti
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.CarEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.entities.etc.RealEstateEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.AssetType;
+import com.hanaro.endingcredits.endingcreditsapi.domain.asset.enums.RealEstateType;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.AssetRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.CarRepository;
 import com.hanaro.endingcredits.endingcreditsapi.domain.asset.repository.etc.PensionRepository;
@@ -97,6 +98,7 @@ public class EtcDetailService {
                 .address(address)
                 .purchasePrice(purchasePrice)
                 .currentPrice(currentPrice)
+                .realEstateType(RealEstateType.HOUSE)
                 .isConnected(true)
                 .build();
 
