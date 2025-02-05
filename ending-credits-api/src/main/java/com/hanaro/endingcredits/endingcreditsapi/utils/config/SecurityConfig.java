@@ -36,6 +36,7 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> {
                     authorize
+                            .requestMatchers("/actuator/**").permitAll()
                             .requestMatchers("/auth/**").permitAll()
                             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                             .requestMatchers("/**").authenticated();

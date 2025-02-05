@@ -35,7 +35,7 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     public boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        if(path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
+        if(path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/actuator")) {
             return true;
         }
 
