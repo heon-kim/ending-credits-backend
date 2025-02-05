@@ -21,14 +21,13 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
-                .connectedTo("localhost:9200")
-                .withBasicAuth("elastic", "endingcredits")
+                .connectedTo("es:9200")
                 .build();
     }
 
     @Bean
     public ElasticsearchClient elasticsearchClient() {
-        RestClient restClient = RestClient.builder(HttpHost.create("http://localhost:9200")).build();
+        RestClient restClient = RestClient.builder(HttpHost.create("http://es:9200")).build();
         RestClientTransport transport = new RestClientTransport(restClient, new co.elastic.clients.json.jackson.JacksonJsonpMapper());
         return new ElasticsearchClient(transport);
     }
