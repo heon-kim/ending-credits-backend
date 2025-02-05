@@ -1,16 +1,57 @@
 version: "3.8"
 
 services:
-  spring:
-    container_name: spring
-    image: insoo0111/ending-credits
+  nginx:
+    container_name: nginx
+    image: nginx
+    volumes:
+      - ./nginx/:/etc/nginx/
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     ports:
-      - "8080:8080"
+      - 80:80
+      - 443:443
+    depends_on:
+      - spring-blue
+      - spring-green
+    networks:
+      - api-net
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  spring-blue:
+    container_name: spring-blue
+    image: rladlsdud678/ending-credits
+    ports:
+      - "8081:8080"
     volumes:
       - /var/log/:/logs/
     depends_on:
-      - db
-      - es
+      es:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - api-net
+
+  spring-green:
+    container_name: spring-green
+    image: rladlsdud678/ending-credits
+    ports:
+      - "8082:8080"
+    volumes:
+      - /var/log/:/logs/
+    depends_on:
+      es:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     networks:
       - api-net
 
@@ -19,10 +60,18 @@ services:
     environment:
       - POSTGRES_USER=endingcredits
       - POSTGRES_PASSWORD=endingcredits
+      - POSTGRES_DB=endingcredits
     ports:
       - "5432:5432"
+    volumes:
+      - ./postgresql/mount:/var/lib/postgresql/data
     networks:
       - api-net
+    healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U endingcredits" ]
+        interval: 10s
+        retries: 5
+        timeout: 5s
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
@@ -30,13 +79,19 @@ services:
       - node.name=single-node
       - cluster.name=ending-credits
       - discovery.type=single-node
-      - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=endingcredits
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
     ports:
       - "9200:9200"
       - "9300:9300"
     networks:
       - api-net
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
 networks:
   api-net:
