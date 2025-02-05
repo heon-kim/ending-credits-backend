@@ -245,7 +245,7 @@ public class ClovaLLMProvider {
                 - ancestors: 상속자 목록을 나타내는 배열
                 - name: 상속자의 이름
                 - relation: 상속자의 관계 (예: 자녀, 배우자, 법정상속인, 기부)
-                - ratio: 상속 비율 (퍼센트)
+                - ratio: 상속 비율. %는 제외하고 숫자로만 구성해줘. (예: 100)
 
             2. executors: 유언 집행자 목록을 나타내는 배열입니다.
                 - name: 유언 집행자의 이름
