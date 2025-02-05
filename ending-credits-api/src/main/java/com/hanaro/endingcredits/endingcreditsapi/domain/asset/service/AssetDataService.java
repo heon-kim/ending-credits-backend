@@ -77,7 +77,7 @@ public class AssetDataService {
                 MemberEntity.builder()
                         .identifier("rladlsdud789")
                         .password(passwordEncoder.encode("12345"))
-                        .simplePassword("1234")
+                        .simplePassword("123400")
                         .email("rladlsdud789@naver.com")
                         .loginType(LoginType.NORMAL)
                         .birthDate(LocalDate.of(1999, 6, 28))

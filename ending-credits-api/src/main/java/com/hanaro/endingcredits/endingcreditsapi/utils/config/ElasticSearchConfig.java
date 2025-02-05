@@ -37,4 +37,3 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
         return new ElasticsearchTemplate(elasticsearchClient());
     }
 }
-
