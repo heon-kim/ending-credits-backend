@@ -44,6 +44,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -101,8 +102,9 @@ public class AssetDataService {
     }
 
     private List<BankEntity> createBanks() {
-        String[] bankNames = {"KB국민은행", "카카오뱅크", "신한은행", "NH농협은행", "지역농협",
-                "하나은행", "우리은행", "IBK기업은행", "케이뱅크", "새마을금고",
+        String[] bankNames = {"KB국민은행", "신한은행", "하나은행", "우리은행", "IBK기업은행",
+                "카카오뱅크", "NH농협은행", "지역농협",
+                "케이뱅크", "새마을금고",
                 "우체국", "신협", "SC제일은행", "iM뱅크", "BNK부산은행",
                 "BNK경남은행", "광주은행", "전북은행", "수협은행", "수협중앙회",
                 "씨티은행", "제주은행", "KDB산업은행", "산림조합중앙회",
@@ -146,7 +148,7 @@ public class AssetDataService {
 
     private List<SecuritiesCompanyEntity> createSecuritiesCompanies() {
         String[] securitiesCompanyNames = {"한국투자증권", "키움증권", "미래에셋증권", "신한투자증권",
-                "NH투자증권", "KB증권", "삼성증권", "카카오페이증권", "하나증권",
+                "삼성증권", "KB증권", "NH투자증권", "카카오페이증권", "하나증권",
                 "대신증권", "유안타증권", "한화투자증권", "DB금융투자",
                 "유진투자증권", "SK증권", "현대차증권", "IBK투자증권",
                 "하이투자증권", "신영증권", "LS증권", "우리종합금융",
@@ -236,92 +238,128 @@ public class AssetDataService {
     }
 
 
-
     private void createMultipleRealEstatesForAsset(AssetEntity asset) {
         long totalAmount = 0;
 
-        RealEstateType[] realEstateTypes = RealEstateType.values();
+        // 부동산 1: 역삼동 비엘106
+        String realEstateName1 = "역삼동 비엘106";
+        String address1 = "서울 강남구 역삼동 123-45";
+        long purchasePrice1 = 295_000_000L; // 2억 9천 500만원
+        long currentPrice1 = 295_000_000L;
 
-        for (int i = 0; i < 5; i++) {
-            // 구매 가격 및 현재 시장 가격
-            long purchasePrice = 100_000_000L + i * 10_000_000L; // 구매 가격
-            long currentPrice = purchasePrice + (5_000_000L * i); // 현재 시장 가격
+        RealEstateEntity realEstate1 = RealEstateEntity.builder()
+                .asset(asset)
+                .realEstateName(realEstateName1)
+                .address(address1)
+                .purchasePrice(purchasePrice1)
+                .currentPrice(currentPrice1)
+                .realEstateType(RealEstateType.OFFICETEL) // 아파트 유형 예시
+                .build();
 
-            // 총 금액 계산 (현재 가격 합산)
-            totalAmount += currentPrice;
+        realEstateRepository.save(realEstate1);
+        totalAmount += currentPrice1;
 
-            RealEstateType realEstateType = realEstateTypes[i % realEstateTypes.length];
+        // 부동산 2: 신도림3차 e-편한세상
+        String realEstateName2 = "신도림3차 e-편한세상";
+        String address2 = "서울 구로구 신도림동 678-90";
+        long purchasePrice2 = 1_165_000_000L; // 11억 6천 500만원
+        long currentPrice2 = 1_165_000_000L;
 
-            // 부동산 데이터 생성
-            RealEstateEntity realEstate = RealEstateEntity.builder()
-                    .asset(asset)
-                    .realEstateName("Real Estate " + i) // 부동산 이름
-                    .address("123 Main St, City " + i) // 부동산 주소
-                    .purchasePrice(purchasePrice) // 구매 가격
-                    .currentPrice(currentPrice) // 현재 시장 가격
-                    .realEstateType(realEstateType) // 부동산 타입
-                    .build();
+        RealEstateEntity realEstate2 = RealEstateEntity.builder()
+                .asset(asset)
+                .realEstateName(realEstateName2)
+                .address(address2)
+                .purchasePrice(purchasePrice2)
+                .currentPrice(currentPrice2)
+                .realEstateType(RealEstateType.APARTMENT) // 아파트 유형 예시
+                .build();
 
-            // 부동산 데이터 저장
-            realEstateRepository.save(realEstate);
-        }
+        realEstateRepository.save(realEstate2);
+        totalAmount += currentPrice2;
 
         // AssetEntity의 총 자산 업데이트
         asset.setAmount(totalAmount);
         assetRepository.save(asset);
     }
+
 
 
     private void createMultipleCarsForAsset(AssetEntity asset) {
         long totalAmount = 0;
 
-        for (int i = 0; i < 5; i++) {
-            // 자동차 구매 가격 및 현재 시장 가격
-            long purchasePrice = 30_000_000L + i * 2_000_000L; // 구매 가격
-            long currentMarketPrice = generateRandomMarketPrice(purchasePrice, 0.8, 1.2); // 현재 시장 가격
+        // 자동차 1: 현대 i30 (소형차)
+        String model1 = "현대 i30";
+        String carNumber1 = "33가 1234";
+        long purchasePrice1 = 25_000_000L; // 2천 5백만 원
+        long currentMarketPrice1 = generateRandomMarketPrice(purchasePrice1, 0.8, 1.2); // 현재 시장 가격
+        int mileage1 = 30_000; // 주행거리 (30,000km)
+        int manufactureYear1 = 2019; // 제조연도
 
-            // 총 금액 계산 (현재 시장 가격)
-            totalAmount += currentMarketPrice;
+        CarEntity car1 = CarEntity.builder()
+                .asset(asset)
+                .model(model1)
+                .carNumber(carNumber1)
+                .purchasePrice(purchasePrice1)
+                .currentMarketPrice(currentMarketPrice1)
+                .mileage(mileage1)
+                .manufactureYear(manufactureYear1)
+                .build();
 
-            // 자동차 데이터 생성
-            CarEntity car = CarEntity.builder()
-                    .asset(asset)
-                    .model("Car Model " + i) // 자동차 모델명
-                    .carNumber("33루 867" + i) // 자동차 번호
-                    .purchasePrice(purchasePrice) // 구매 가격
-                    .currentMarketPrice(currentMarketPrice) // 현재 시장 가격
-                    .mileage(10_000 + i * 1_000) // 주행 거리
-                    .manufactureYear(2020 + i) // 제조 연도
-                    .build();
+        carRepository.save(car1);
+        totalAmount += currentMarketPrice1;
 
-            // 자동차 데이터 저장
-            carRepository.save(car);
-        }
+        // 자동차 2: 기아 쏘렌토 (SUV)
+        String model2 = "기아 쏘렌토";
+        String carNumber2 = "88나 5678";
+        long purchasePrice2 = 38_000_000L; // 3천 8백만 원
+        long currentMarketPrice2 = generateRandomMarketPrice(purchasePrice2, 0.8, 1.2); // 현재 시장 가격
+        int mileage2 = 50_000; // 주행거리 (50,000km)
+        int manufactureYear2 = 2021; // 제조연도
+
+        CarEntity car2 = CarEntity.builder()
+                .asset(asset)
+                .model(model2)
+                .carNumber(carNumber2)
+                .purchasePrice(purchasePrice2)
+                .currentMarketPrice(currentMarketPrice2)
+                .mileage(mileage2)
+                .manufactureYear(manufactureYear2)
+                .build();
+
+        carRepository.save(car2);
+        totalAmount += currentMarketPrice2;
 
         // AssetEntity의 총 자산 업데이트
         asset.setAmount(totalAmount);
         assetRepository.save(asset);
     }
 
-
     private void createMultipleSecuritiesAssetsForAsset(AssetEntity asset, List<SecuritiesCompanyEntity> securitiesCompanies) {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (int i = 0; i < securitiesCompanies.size(); i++) {
-            BigDecimal depositKRW = BigDecimal.valueOf(1_000_000 + i * 100_000); // 예수금 (KRW)
-            BigDecimal principalKRW = BigDecimal.valueOf(5_000_000 + i * 500_000); // 원금 (KRW)
+        // 선택할 증권사 5개
+        List<SecuritiesCompanyEntity> selectedCompanies = securitiesCompanies.subList(0, 5);
+
+        for (int i = 0; i < selectedCompanies.size(); i++) {
+            BigDecimal depositKRW = BigDecimal.valueOf(2_000_000 + i * 500_000); // 예수금 (KRW)
+            BigDecimal principalKRW = BigDecimal.valueOf(7_000_000 + i * 1_000_000); // 원금 (KRW)
 
             BigDecimal depositUSD = depositKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 예수금 (USD)
             BigDecimal principalUSD = principalKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 원금 (USD)
 
-            BigDecimal profitRatio = BigDecimal.valueOf(5 + i); // 수익률 예시
+            BigDecimal profitRatio = BigDecimal.valueOf(3 + i * 1.5); // 수익률 예시
+
+            // 증권사명에 맞는 실제 계좌번호 형식 적용
+            String securitiesCompanyName = selectedCompanies.get(i).getSecuritiesCompanyName();
+            String krwAccountNumber = generateKoreanAccountNumber(securitiesCompanyName);
+            String usdAccountNumber = generateUSDAccountNumber();
 
             // KRW 증권 계좌 생성
             SecuritiesAccountEntity accountKRW = SecuritiesAccountEntity.builder()
                     .asset(asset)
-                    .securitiesCompany(securitiesCompanies.get(i))
-                    .securitiesAccountNumber("KRW-1234-" + i)
-                    .securitiesAccountName("Securities KRW " + i)
+                    .securitiesCompany(selectedCompanies.get(i))
+                    .securitiesAccountNumber(krwAccountNumber)
+                    .securitiesAccountName(securitiesCompanyName + " 종합계좌")
                     .deposit(depositKRW)
                     .principal(principalKRW)
                     .currencyCode(CurrencyCodeType.KRW)
@@ -332,9 +370,9 @@ public class AssetDataService {
             // USD 증권 계좌 생성
             SecuritiesAccountEntity accountUSD = SecuritiesAccountEntity.builder()
                     .asset(asset)
-                    .securitiesCompany(securitiesCompanies.get(i))
-                    .securitiesAccountNumber("USD-5678-" + i)
-                    .securitiesAccountName("Securities USD " + i)
+                    .securitiesCompany(selectedCompanies.get(i))
+                    .securitiesAccountNumber(usdAccountNumber)
+                    .securitiesAccountName(securitiesCompanyName + " 해외주식계좌")
                     .deposit(depositUSD)
                     .principal(principalUSD)
                     .currencyCode(CurrencyCodeType.USD)
@@ -343,8 +381,8 @@ public class AssetDataService {
             securitiesAccountRepository.save(accountUSD);
 
             // KRW 및 USD 금액을 합산하여 자산 총액 업데이트
-//            totalAmount = totalAmount.add(depositKRW.add(principalKRW)); // KRW 금액 추가
-//            totalAmount = totalAmount.add(depositUSD.add(principalUSD).multiply(EXCHANGE_RATE)); // USD 금액을 KRW로 변환 후 추가
+            totalAmount = totalAmount.add(depositKRW.add(principalKRW)); // KRW 금액 추가
+            totalAmount = totalAmount.add(depositUSD.add(principalUSD).multiply(EXCHANGE_RATE)); // USD를 KRW로 변환 후 추가
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -352,48 +390,81 @@ public class AssetDataService {
         assetRepository.save(asset);
     }
 
+    // 한국 증권사별 계좌번호 생성 (실제 계좌 형식 반영)
+    private String generateKoreanAccountNumber(String securitiesCompanyName) {
+        switch (securitiesCompanyName) {
+            case "한국투자증권": return "028-12-345678";
+            case "키움증권": return "546-34-123456";
+            case "미래에셋증권": return "238-56-789012";
+            case "신한투자증권": return "112-77-654321";
+            case "삼성증권": return "102-99-876543";
+            default: return "000-00-000000"; // 기본값
+        }
+    }
+
+    // 해외 증권 계좌 번호 생성
+    private String generateUSDAccountNumber() {
+        return "USD-" + (100000 + (int) (Math.random() * 900000)); // 랜덤 6자리
+    }
     private void createMultipleVirtualAssetsForAsset(AssetEntity asset, List<ExchangeEntity> exchanges) {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (int i = 0; i < exchanges.size(); i++) {
-            BigDecimal quantity = BigDecimal.valueOf(1.5 + i * 0.5); // 보유량
-            BigDecimal purchasePriceKRW = BigDecimal.valueOf(1_000_000 + i * 200_000); // 구매 가격 (KRW)
-            BigDecimal currentPriceKRW = BigDecimal.valueOf(1_200_000 + i * 300_000); // 현재 가격 (KRW)
+        // 선택할 거래소 5개
+        List<ExchangeEntity> selectedExchanges = exchanges.subList(0, 5);
 
-            BigDecimal purchasePriceUSD = purchasePriceKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 구매 가격 (USD)
-            BigDecimal currentPriceUSD = currentPriceKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 현재 가격 (USD)
+        // 가상자산 목록 (거래소별 대표 가상자산)
+        Map<String, List<String>> exchangeCryptoMap = Map.of(
+                "업비트", List.of("비트코인 (BTC)", "이더리움 (ETH)"),
+                "빗썸", List.of("리플 (XRP)", "솔라나 (SOL)"),
+                "코인원", List.of("에이다 (ADA)", "도지코인 (DOGE)"),
+                "코빗", List.of("폴카닷 (DOT)", "체인링크 (LINK)"),
+                "고팍스", List.of("샌드박스 (SAND)", "디센트럴랜드 (MANA)")
+        );
 
-            // KRW 가상 자산 생성
-            VirtualAsset assetKRW = VirtualAsset.builder()
-                    .asset(asset)
-                    .exchange(exchanges.get(i))
-                    .virtualAssetName("Crypto KRW " + i)
-                    .quantity(quantity)
-                    .purchasePrice(purchasePriceKRW)
-                    .currentPrice(currentPriceKRW)
-                    .profitRatio(calculateProfitRatio(purchasePriceKRW, currentPriceKRW))
-                    .totalValue(quantity.multiply(currentPriceKRW)) // 총 가치 (KRW)
-                    .currencyCode(CurrencyCodeType.KRW)
-                    .build();
-            virtualAssetRepository.save(assetKRW);
+        for (int i = 0; i < selectedExchanges.size(); i++) {
+            ExchangeEntity exchange = selectedExchanges.get(i);
+            List<String> cryptoNames = exchangeCryptoMap.getOrDefault(exchange.getExchangeName(), List.of("알트코인 (ALT)", "스테이블코인 (STB)"));
 
-            // USD 가상 자산 생성
-            VirtualAsset assetUSD = VirtualAsset.builder()
-                    .asset(asset)
-                    .exchange(exchanges.get(i))
-                    .virtualAssetName("Crypto USD " + i)
-                    .quantity(quantity)
-                    .purchasePrice(purchasePriceUSD)
-                    .currentPrice(currentPriceUSD)
-                    .profitRatio(calculateProfitRatio(purchasePriceUSD, currentPriceUSD))
-                    .totalValue(quantity.multiply(currentPriceUSD).multiply(EXCHANGE_RATE)) // 총 가치 (KRW 환산)
-                    .currencyCode(CurrencyCodeType.USD)
-                    .build();
-            virtualAssetRepository.save(assetUSD);
+            for (String cryptoName : cryptoNames) {
+                BigDecimal quantity = BigDecimal.valueOf(1.5 + i * 0.5); // 보유량
+                BigDecimal purchasePriceKRW = BigDecimal.valueOf(2_000_000 + i * 500_000); // 구매 가격 (KRW)
+                BigDecimal currentPriceKRW = BigDecimal.valueOf(2_500_000 + i * 700_000); // 현재 가격 (KRW)
 
-            // KRW 및 USD 금액을 합산하여 자산 총액 계산
-//            totalAmount = totalAmount.add(quantity.multiply(currentPriceKRW)); // KRW 총 가치 추가
-//            totalAmount = totalAmount.add(quantity.multiply(currentPriceUSD).multiply(EXCHANGE_RATE)); // USD 총 가치를 KRW로 변환 후 추가
+                BigDecimal purchasePriceUSD = purchasePriceKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 구매 가격 (USD)
+                BigDecimal currentPriceUSD = currentPriceKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 현재 가격 (USD)
+
+                // KRW 가상 자산 생성
+                VirtualAsset assetKRW = VirtualAsset.builder()
+                        .asset(asset)
+                        .exchange(exchange)
+                        .virtualAssetName(cryptoName) // 가상자산명 적용
+                        .quantity(quantity)
+                        .purchasePrice(purchasePriceKRW)
+                        .currentPrice(currentPriceKRW)
+                        .profitRatio(calculateProfitRatio(purchasePriceKRW, currentPriceKRW))
+                        .totalValue(quantity.multiply(currentPriceKRW)) // 총 가치 (KRW)
+                        .currencyCode(CurrencyCodeType.KRW)
+                        .build();
+                virtualAssetRepository.save(assetKRW);
+
+                // USD 가상 자산 생성
+                VirtualAsset assetUSD = VirtualAsset.builder()
+                        .asset(asset)
+                        .exchange(exchange)
+                        .virtualAssetName(cryptoName) // 가상자산명 동일 적용
+                        .quantity(quantity)
+                        .purchasePrice(purchasePriceUSD)
+                        .currentPrice(currentPriceUSD)
+                        .profitRatio(calculateProfitRatio(purchasePriceUSD, currentPriceUSD))
+                        .totalValue(quantity.multiply(currentPriceUSD).multiply(EXCHANGE_RATE)) // 총 가치 (KRW 환산)
+                        .currencyCode(CurrencyCodeType.USD)
+                        .build();
+                virtualAssetRepository.save(assetUSD);
+
+                // KRW 및 USD 금액을 합산하여 자산 총액 계산
+                totalAmount = totalAmount.add(quantity.multiply(currentPriceKRW)); // KRW 총 가치 추가
+                totalAmount = totalAmount.add(quantity.multiply(currentPriceUSD).multiply(EXCHANGE_RATE)); // USD 총 가치를 KRW로 변환 후 추가
+            }
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -404,42 +475,41 @@ public class AssetDataService {
     private void createMultipleFundsForAsset(AssetEntity asset, List<BankEntity> banks) {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (int i = 0; i < banks.size(); i++) {
-            BigDecimal principalKRW = BigDecimal.valueOf(2_000_000 + i * 200_000); // 투자 원금 (KRW)
-            BigDecimal principalUSD = principalKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 투자 원금 (USD)
+        // 선택할 은행 5개만 사용
+        List<BankEntity> selectedBanks = banks.subList(0, 5);
 
-            BigDecimal fundAmountKRW = principalKRW.multiply(BigDecimal.valueOf(1.1)); // 수익 포함 (KRW)
-            BigDecimal fundAmountUSD = principalUSD.multiply(BigDecimal.valueOf(1.1)); // 수익 포함 (USD)
+        // 은행별 펀드 상품명 매핑
+        Map<String, String> fundNames = Map.of(
+                "KB국민은행", "KB국민 펀드",
+                "신한은행", "신한 글로벌 펀드",
+                "하나은행", "하나 미래 펀드",
+                "우리은행", "우리 가치 성장 펀드",
+                "IBK기업은행", "IBK 혁신 펀드"
+        );
 
-            // KRW 펀드 생성
+        for (int i = 0; i < selectedBanks.size(); i++) {
+            BankEntity bank = selectedBanks.get(i);
+            String fundName = fundNames.getOrDefault(bank.getBankName(), "일반 펀드");
+
+            BigDecimal principalKRW = BigDecimal.valueOf(5_000_000 + i * 500_000); // 투자 원금 (KRW)
+            BigDecimal fundAmountKRW = principalKRW.multiply(BigDecimal.valueOf(1.12)); // 수익 포함 (KRW)
+
+            // 펀드 자산 생성
             FundEntity fundKRW = FundEntity.builder()
-                    .bank(banks.get(i))
+                    .bank(bank)
                     .asset(asset)
-                    .accountName("Fund KRW " + i)
-                    .accountNumber("FUND-123-KRW-" + i)
+                    .accountName(fundName) // ✅ 현실적인 펀드명 적용
+                    .accountNumber("펀드-" + bank.getBankName().replace("은행", "") + "-65" + (30 + i)) // ✅ 계좌번호 변경
                     .investmentPrincipal(principalKRW)
                     .fundAmount(fundAmountKRW) // 수익 포함 금액 (KRW)
                     .profitRatio(calculateProfitRatio(principalKRW, fundAmountKRW)) // 수익률
                     .currencyCode(CurrencyCodeType.KRW)
                     .build();
+
             fundRepository.save(fundKRW);
 
-            // USD 펀드 생성
-//            FundEntity fundUSD = FundEntity.builder()
-//                    .bank(banks.get(i))
-//                    .asset(asset)
-//                    .accountName("Fund USD " + i)
-//                    .accountNumber("FUND-123-USD-" + i)
-//                    .investmentPrincipal(principalUSD)
-//                    .fundAmount(fundAmountUSD.multiply(EXCHANGE_RATE)) // 수익 포함 금액을 KRW로 환산
-//                    .profitRatio(calculateProfitRatio(principalUSD, fundAmountUSD)) // 수익률
-//                    .currencyCode(CurrencyCodeType.USD)
-//                    .build();
-//            fundRepository.save(fundUSD);
-
-            // 총 금액 계산 (KRW 및 USD 환산 후 합산)
-//            totalAmount = totalAmount.add(fundAmountKRW);
-//            totalAmount = totalAmount.add(fundAmountUSD.multiply(EXCHANGE_RATE));
+            // 총 금액 업데이트
+            totalAmount = totalAmount.add(fundAmountKRW);
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -450,35 +520,38 @@ public class AssetDataService {
     private void createMultipleTrustsForAsset(AssetEntity asset, List<BankEntity> banks) {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (int i = 0; i < banks.size(); i++) {
-            BigDecimal amountKRW = BigDecimal.valueOf(1_500_000 + i * 100_000); // 신탁 금액 (KRW)
-            BigDecimal amountUSD = amountKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 신탁 금액 (USD)
+        // 선택할 은행 5개만 사용
+        List<BankEntity> selectedBanks = banks.subList(0, 5);
 
-            // KRW 신탁 생성
+        // 은행별 신탁 상품명 매핑
+        Map<String, String> trustNames = Map.of(
+                "KB국민은행", "KB국민 신탁",
+                "신한은행", "신한 자산 신탁",
+                "하나은행", "하나 프리미엄 신탁",
+                "우리은행", "우리 플러스 신탁",
+                "IBK기업은행", "IBK 기업 자산 신탁"
+        );
+
+        for (int i = 0; i < selectedBanks.size(); i++) {
+            BankEntity bank = selectedBanks.get(i);
+            String trustName = trustNames.getOrDefault(bank.getBankName(), "일반 신탁");
+
+            BigDecimal amountKRW = BigDecimal.valueOf(3_000_000 + i * 200_000); // 신탁 금액 (KRW)
+
+            // 신탁 자산 생성
             TrustEntity trustKRW = TrustEntity.builder()
-                    .bank(banks.get(i))
+                    .bank(bank)
                     .asset(asset)
-                    .accountName("Trust KRW " + i)
-                    .accountNumber("TRUST-123-KRW-" + i)
+                    .accountName(trustName) // ✅ 현실적인 신탁명 적용
+                    .accountNumber("신탁-" + bank.getBankName().replace("은행", "") + "-65" + (30 + i)) // ✅ 계좌번호 변경
                     .amount(amountKRW)
                     .currencyCode(CurrencyCodeType.KRW)
                     .build();
+
             trustRepository.save(trustKRW);
 
-            // USD 신탁 생성
-            TrustEntity trustUSD = TrustEntity.builder()
-                    .bank(banks.get(i))
-                    .asset(asset)
-                    .accountName("Trust USD " + i)
-                    .accountNumber("TRUST-123-USD-" + i)
-                    .amount(amountUSD)
-                    .currencyCode(CurrencyCodeType.USD)
-                    .build();
-            trustRepository.save(trustUSD);
-
-            // 총 금액 계산 (KRW 및 USD 환산 후 합산)
-//            totalAmount = totalAmount.add(amountKRW);
-//            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
+            // 총 금액 업데이트
+            totalAmount = totalAmount.add(amountKRW);
         }
 
         // AssetEntity의 총 자산 업데이트
@@ -490,38 +563,42 @@ public class AssetDataService {
         BigDecimal totalAmount = BigDecimal.ZERO;
         DepositEntity deposit = null;
 
-        for (int i = 0; i < banks.size(); i++) {
-            BigDecimal amountKRW = BigDecimal.valueOf(2_000_000 + i * 200_000); // 예금 금액 (KRW)
-            BigDecimal amountUSD = amountKRW.divide(EXCHANGE_RATE, 2, BigDecimal.ROUND_HALF_UP); // 예금 금액 (USD)
+        // 선택할 은행 5개만 사용
+        List<BankEntity> selectedBanks = banks.subList(0, 5);
 
-            // KRW 예금 생성
+        // 은행별 예금 상품명 매핑
+        Map<String, String> depositNames = Map.of(
+                "KB국민은행", "KB국민 주거래 예금",
+                "신한은행", "신한 스마트 예금",
+                "하나은행", "하나 플러스 예금",
+                "우리은행", "우리 프리미엄 예금",
+                "IBK기업은행", "IBK 기업 맞춤 예금"
+        );
+
+        for (int i = 0; i < selectedBanks.size(); i++) {
+            BankEntity bank = selectedBanks.get(i);
+            String depositName = depositNames.getOrDefault(bank.getBankName(), "일반 예금");
+
+            BigDecimal amountKRW = BigDecimal.valueOf(5_000_000 + i * 500_000); // 예금 금액 (KRW)
+
+            // 예금 자산 생성
             DepositEntity depositKRW = DepositEntity.builder()
-                    .bank(banks.get(i))
+                    .bank(bank)
                     .asset(asset)
-                    .accountName("Deposit KRW " + i)
-                    .accountNumber("DEPOSIT-KRW-" + i)
+                    .accountName(depositName) // ✅ 현실적인 예금명 적용
+                    .accountNumber("예금-" + bank.getBankName().replace("은행", "") + "-65" + (40 + i)) // ✅ 계좌번호 변경
                     .amount(amountKRW)
                     .currencyCode(CurrencyCodeType.KRW)
                     .build();
-            deposit = depositRepository.save(depositKRW);
 
-//            // USD 예금 생성
-//            DepositEntity depositUSD = DepositEntity.builder()
-//                    .bank(banks.get(i))
-//                    .asset(asset)
-//                    .accountName("Deposit USD " + i)
-//                    .accountNumber("DEPOSIT-USD-" + i)
-//                    .amount(amountUSD)
-//                    .currencyCode(CurrencyCodeType.USD)
-//                    .build();
-//
-//            deposit = depositRepository.save(depositUSD);
-            // 총 금액 계산 (KRW 및 USD 환산 후 합산)
-//            totalAmount = totalAmount.add(amountKRW);
-//            totalAmount = totalAmount.add(amountUSD.multiply(EXCHANGE_RATE));
+            deposit = depositRepository.save(depositKRW);
+            totalAmount = totalAmount.add(amountKRW);
         }
 
-        createLoan(deposit);
+        if (deposit != null) {
+            createLoan(deposit);
+        }
+
         // AssetEntity의 총 자산 업데이트
         asset.setAmount(totalAmount.longValue());
         assetRepository.save(asset);
@@ -535,20 +612,6 @@ public class AssetDataService {
                 .build();
         cashRepository.save(cash);
     }
-
-    private DepositEntity createSingleDeposit(MemberEntity member, BankEntity bank, String accountName, String accountNumber, BigDecimal amount) {
-        AssetEntity asset = createAsset(member, AssetType.DEPOSIT, amount.longValue());
-        DepositEntity deposit = DepositEntity.builder()
-                .bank(bank)
-                .asset(asset)
-                .accountName(accountName)
-                .accountNumber(accountNumber)
-                .amount(amount)
-                .currencyCode(CurrencyCodeType.KRW)
-                .build();
-        return depositRepository.save(deposit);
-    }
-
 
     private void createLoan(DepositEntity deposit) {
         for(int i = 0; i < 3; i++) {
