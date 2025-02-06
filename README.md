@@ -21,6 +21,8 @@
 ### 개요
 고령화 사회가 진행됨에 따라 증가하는 유언대용신탁 수요에 대응하여 블록체인 기술을 활용한 신뢰성 높은 자산 관리 및 상속 서비스를 제공하고자 합니다.
 
+<br />
+
 ### 주요 기능
 
 #### 1️⃣ 유언장 작성을 하는 상속 설계 기능
@@ -47,15 +49,21 @@
 ---
 
 ### 화면 구성
-|Screen #1 초기 화면|Screen #2 로그인 |Screen #3 자산 현황 확인|Screen #4 맞춤 상품 추천|
+|Screen #1 온보딩 1|Screen #2 온보딩 2|Screen #3 온보딩 3|Screen #4 온보딩 4|
 |:---:|:---:|:---:|:---:|
-|<img src="https://github.com/user-attachments/assets/2c1384b6-cd58-4600-a0b1-fc82a7857d89" width="200"/>|<img src="https://github.com/user-attachments/assets/e055042f-792b-4ae2-80d3-0f6cc7286bcc" width="200"/>|<img src="https://github.com/user-attachments/assets/bfa79805-27de-465d-815a-ffb6b52b5523" width="200"/>|<img src="https://github.com/user-attachments/assets/11f17c03-5f38-4bc2-9c2b-e39e868bc2c8" width="200"/>|
+|<img src="https://github.com/user-attachments/assets/a47d1c42-0c33-4a1e-94e4-f18d15c91ded" width="200"/>|<img src="https://github.com/user-attachments/assets/24646141-2958-48ae-b052-aafe88cf4b4c" width="200"/>|<img src="https://github.com/user-attachments/assets/d9f9a7ec-e8b1-47ee-ae49-1ce94a65b32f" width="200"/>|<img src="https://github.com/user-attachments/assets/11f5d733-f423-439c-a783-461c87de0cbb" width="200"/>|
 
-<br />
+|Screen #5 초기 화면|Screen #6 로그인 |Screen #7 신분증 OCR|Screen #8 간편 비밀번호 설정|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/2c1384b6-cd58-4600-a0b1-fc82a7857d89" width="200"/>|<img src="https://github.com/user-attachments/assets/e055042f-792b-4ae2-80d3-0f6cc7286bcc" width="200"/>|<img src="https://github.com/user-attachments/assets/ee57676c-5fdf-439a-a230-6b35495bd8c8" width="200"/>|<img src="https://github.com/user-attachments/assets/3550b4c9-87a8-4520-b7cd-6a80f238a0bc" width="200"/>|
 
----
+|Screen #9 상속 설계 전|Screen #10 상속 설계 후|
+|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/0451b910-9dda-4c11-ab7e-c32624da2c38" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|
 
-## 🗂️ APIs
+|Screen #11 자산 현황 확인|Screen #12 맞춤 상품 추천|
+|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/bfa79805-27de-465d-815a-ffb6b52b5523" width="200"/>|<img src="https://github.com/user-attachments/assets/11f17c03-5f38-4bc2-9c2b-e39e868bc2c8" width="200"/>|
 
 <br />
 
@@ -67,6 +75,11 @@
   <img src="https://github.com/user-attachments/assets/537544e9-852a-4107-ba03-b84573ae03bf" width="100">
   <img src="https://github.com/user-attachments/assets/081c8713-4211-4bb9-a62f-f6ba95afdea4" width="100">
   <img src="https://github.com/user-attachments/assets/472b2fbb-04fc-4809-aca2-2987eacdae41" width="100">
+  <img src="https://github.com/user-attachments/assets/b3f3aab7-dede-4c1e-ba8d-e9fe3e34b3a3" width="100">
+  <img src="https://github.com/user-attachments/assets/1767dbb1-f99d-4a10-bdcd-e27a1ee017da" width="100">
+  <img src="https://github.com/user-attachments/assets/e2f86b76-b315-4229-8af6-0b11ed9f929d" width="100">
+  <img src="https://github.com/user-attachments/assets/877d2a0d-8a38-4c7c-8b88-023db3c36409" width="100">
+  <img src="https://github.com/user-attachments/assets/a688de1b-db76-4ef2-813d-58739324f694" width="100">
 </div>
 
 ### Back-end
@@ -79,8 +92,20 @@
   <img src="https://github.com/user-attachments/assets/4341b647-9a81-4b21-ad15-dcd1d47226c1" width="100">
 </div>
 
+### Blockchain Network
+<div>
+  <img src="https://github.com/user-attachments/assets/73ff9b95-c9c2-4b33-80e9-371fe2ad6d9c" width="100">
+  <img src="https://github.com/user-attachments/assets/14492eae-8244-4eba-b319-fc1b434fce0b" width="100">
+</div>
+
 ### Infra
 <div>
+  <img src="https://github.com/user-attachments/assets/086a49ac-ab14-42d2-9542-92d08f13deed" width="100">
+  <img src="https://github.com/user-attachments/assets/0f7ea0e1-ebf6-4714-85df-146d603f5248" width="100">
+  <img src="https://github.com/user-attachments/assets/accbce88-7f0c-4d99-9fb7-d53398e54762" width="100">
+  <img src="https://github.com/user-attachments/assets/c7fe7bf7-6dc2-4c31-8aa1-9e8382642240" width="100">
+  <img src="https://github.com/user-attachments/assets/b2cc673d-2bd2-4de3-b95e-3e4e0696ff05" width="100">
+  <img src="https://github.com/user-attachments/assets/f6167683-2a1e-4089-b946-8c6155e367df" width="100">
 </div>
 
 ### Tools
@@ -89,6 +114,13 @@
   <img src="https://github.com/user-attachments/assets/f46c7add-a15d-416f-a87b-30d96fe14c66" width="100">
   <img src="https://github.com/user-attachments/assets/333ad2f7-ed4e-4913-b41e-56cf8cae170e" width="100">
 </div>
+
+<br />
+
+---
+
+## 🧩 E-R 다이어그램
+<img src="https://github.com/user-attachments/assets/40c0d020-f45b-4388-bc1a-4e1557928d71">
 
 <br />
 
