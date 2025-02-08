@@ -57,13 +57,28 @@
 |:---:|:---:|:---:|:---:|
 |<img src="https://github.com/user-attachments/assets/2c1384b6-cd58-4600-a0b1-fc82a7857d89" width="200"/>|<img src="https://github.com/user-attachments/assets/e055042f-792b-4ae2-80d3-0f6cc7286bcc" width="200"/>|<img src="https://github.com/user-attachments/assets/ee57676c-5fdf-439a-a230-6b35495bd8c8" width="200"/>|<img src="https://github.com/user-attachments/assets/3550b4c9-87a8-4520-b7cd-6a80f238a0bc" width="200"/>|
 
-|Screen #9 상속 설계 전|Screen #10 상속 설계 후|
-|:---:|:---:|
-|<img src="https://github.com/user-attachments/assets/0451b910-9dda-4c11-ab7e-c32624da2c38" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|
+|Screen #9 메인 페이지|Screen #10 상속 설계 후|Screen #9 상속 설계 전|Screen #10 상속 설계 후|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/043c8857-00dd-40c3-b050-fe767c7deb97" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|<img src="https://github.com/user-attachments/assets/0451b910-9dda-4c11-ab7e-c32624da2c38" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|
 
-|Screen #11 자산 현황 확인|Screen #12 맞춤 상품 추천|
-|:---:|:---:|
-|<img src="https://github.com/user-attachments/assets/bfa79805-27de-465d-815a-ffb6b52b5523" width="200"/>|<img src="https://github.com/user-attachments/assets/11f17c03-5f38-4bc2-9c2b-e39e868bc2c8" width="200"/>|
+1. 클릭 설계
+
+|Screen #1 가이드 화면|Screen #2 인적정보 조회|Screen #3 재산정보 조회|Screen #4 상속인 지정|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/16243c5b-930e-45b8-9e97-d3f7233d32b5" width="200"/>|<img src="https://github.com/user-attachments/assets/acc128e3-eb7b-48d2-80ca-b36e94e89f74" width="200"/>|<img src="https://github.com/user-attachments/assets/32008e2e-ec0b-487e-b24d-a10e74f94f91" width="200"/>|<img src="https://github.com/user-attachments/assets/fab85e3c-7e2b-435b-8565-2500664aa56c" width="200"/>|
+
+|Screen #5 유언집행자 지정|Screen #6 공유시점 선택|Screen #7 유언장 화면|Screen #8 유언장 생성 완료|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/4bb8a917-0caf-41f7-89ee-8bc81285bbbe" width="200"/>|<img src="https://github.com/user-attachments/assets/a222c727-e2b0-4c17-86d8-011b52aacb0c" width="200"/>|<img src="https://github.com/user-attachments/assets/978aeafc-9fc3-4f2f-9cd3-183f7a1d682e" width="200"/>|<img src="https://github.com/user-attachments/assets/f7948520-a8bc-49d2-8ec7-e737c04d6010" width="200"/>|
+
+2. 음성 녹음
+3. 사진 업로드
+
+4. 자산 운용
+   
+|Screen #1 자산 연결하기|Screen #2 자산 현황 확인|Screen #3 자산상세 보기|Screen #4 맞춤 상품 추천|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/43f43b33-0eb8-4157-9caf-154e1a35927e" width="200"/>|<img src="https://github.com/user-attachments/assets/bfa79805-27de-465d-815a-ffb6b52b5523" width="200"/>|<img src="https://github.com/user-attachments/assets/f784f702-1fd5-46b0-85f6-e0e3ce2b9522" width="200"/>|<img src="https://github.com/user-attachments/assets/11f17c03-5f38-4bc2-9c2b-e39e868bc2c8" width="200"/>|
 
 <br />
 
