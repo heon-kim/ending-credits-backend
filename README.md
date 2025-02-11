@@ -57,9 +57,9 @@
 |:---:|:---:|:---:|:---:|
 |<img src="https://github.com/user-attachments/assets/2c1384b6-cd58-4600-a0b1-fc82a7857d89" width="200"/>|<img src="https://github.com/user-attachments/assets/e055042f-792b-4ae2-80d3-0f6cc7286bcc" width="200"/>|<img src="https://github.com/user-attachments/assets/ee57676c-5fdf-439a-a230-6b35495bd8c8" width="200"/>|<img src="https://github.com/user-attachments/assets/3550b4c9-87a8-4520-b7cd-6a80f238a0bc" width="200"/>|
 
-|Screen #9 메인 페이지|Screen #10 상속 설계 후|Screen #9 상속 설계 전|Screen #10 상속 설계 후|
-|:---:|:---:|:---:|:---:|
-|<img src="https://github.com/user-attachments/assets/043c8857-00dd-40c3-b050-fe767c7deb97" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|<img src="https://github.com/user-attachments/assets/0451b910-9dda-4c11-ab7e-c32624da2c38" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|
+|Screen #9 메인 페이지|Screen #10 상속 설계 전|Screen #11 상속 설계 후|
+|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/043c8857-00dd-40c3-b050-fe767c7deb97" width="200"/>|<img src="https://github.com/user-attachments/assets/0451b910-9dda-4c11-ab7e-c32624da2c38" width="200"/>|<img src="https://github.com/user-attachments/assets/f9ea6f6f-68ab-4b7d-a578-0fef14dc6782" width="200"/>|
 
 1. 클릭 설계
 
@@ -72,10 +72,18 @@
 |<img src="https://github.com/user-attachments/assets/4bb8a917-0caf-41f7-89ee-8bc81285bbbe" width="200"/>|<img src="https://github.com/user-attachments/assets/a222c727-e2b0-4c17-86d8-011b52aacb0c" width="200"/>|<img src="https://github.com/user-attachments/assets/978aeafc-9fc3-4f2f-9cd3-183f7a1d682e" width="200"/>|<img src="https://github.com/user-attachments/assets/f7948520-a8bc-49d2-8ec7-e737c04d6010" width="200"/>|
 
 2. 음성 녹음
+|Screen #1 가이드 화면|Screen #2 인적정보 조회|Screen #3 유언 녹음|Screen #4 유언 녹음|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/079e6a46-e742-4c25-a6fc-4f371a5c03e1" width="200"/>|<img src="https://github.com/user-attachments/assets/f368be17-2e0f-444f-a7fb-8c3c1762dd26" width="200"/>|
+|<img src="https://github.com/user-attachments/assets/a224836d-6753-490c-8061-079e3c60fb2e" width="200"/>|<img src="https://github.com/user-attachments/assets/9eb238f8-c398-44c3-8df1-8183fc3c4c61" width="200"/>|
+
 3. 사진 업로드
+|Screen #1 가이드 화면|Screen #2 사진 업로드|Screen #3 사진 업로드|Screen #4 사진 업로드|
+|:---:|:---:|:---:|:---:|
+|<img src="https://github.com/user-attachments/assets/cb157a19-908e-4ac6-8ead-3f5d26402752" width="200"/>|<img src="https://github.com/user-attachments/assets/e94d0fcb-746a-4e5a-a1e8-383701c45062" width="200"/>|
+|<img src="https://github.com/user-attachments/assets/144837d2-66e4-4f43-8e96-f9236baa20fe" width="200"/>|<img src="https://github.com/user-attachments/assets/300d883a-dc15-4edb-8d7a-46744a2a47e2" width="200"/>|
 
 4. 자산 운용
-   
 |Screen #1 자산 연결하기|Screen #2 자산 현황 확인|Screen #3 자산상세 보기|Screen #4 맞춤 상품 추천|
 |:---:|:---:|:---:|:---:|
 |<img src="https://github.com/user-attachments/assets/43f43b33-0eb8-4157-9caf-154e1a35927e" width="200"/>|<img src="https://github.com/user-attachments/assets/bfa79805-27de-465d-815a-ffb6b52b5523" width="200"/>|<img src="https://github.com/user-attachments/assets/f784f702-1fd5-46b0-85f6-e0e3ce2b9522" width="200"/>|<img src="https://github.com/user-attachments/assets/11f17c03-5f38-4bc2-9c2b-e39e868bc2c8" width="200"/>|
