@@ -47,7 +47,9 @@ public enum ErrorStatus implements BaseErrorCode {
     NEGATIVE_AMOUNT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "CASH4002", "금액은 음수일 수 없습니다."),
 
     CAR_NOT_FOUND(HttpStatus.BAD_REQUEST, "CAR4001" , "차 자산이 존재하지 않습니다."),
-    REALESTATE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REAL_ESTATES4001", "부동산이 존재하지 않습니다.");
+    REALESTATE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REAL_ESTATES4001", "부동산이 존재하지 않습니다."),
+
+    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "데이터베이스 오류가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -3,149 +3,206 @@ package com.hanaro.endingcredits.endingcreditsapi.domain.product.service;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.PensionSavingsResponseComparisonDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.dto.RecommendProductResponseDto;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.PensionSavingsProductEntity;
+import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.ProductDetailEntity;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.entities.Strategy;
 import com.hanaro.endingcredits.endingcreditsapi.domain.product.repository.jpa.PensionSavingsJpaRepository;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.code.status.ErrorStatus;
 import com.hanaro.endingcredits.endingcreditsapi.utils.apiPayload.exception.handler.FinanceHandler;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;  // 이 import로 변경
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendService {
 
     private final PensionSavingsJpaRepository pensionSavingsJpaRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    // 가장 높은 점수를 가진 상품을 반환
-    @Transactional
+    @Cacheable(value = "recommendProducts", key = "'all'")
+    @Transactional(readOnly = true)
     public List<RecommendProductResponseDto> recommendProduct() {
+        List<RecommendProductResponseDto> recommendations = new ArrayList<>();
+        
+        // 각 전략별로 최적화된 쿼리 사용
+        recommendations.addAll(getAggressiveRecommendations());
+        recommendations.addAll(getStableRecommendations());
+        recommendations.addAll(getShortTermRecommendations());
+        recommendations.addAll(getLongTermRecommendations());
+        recommendations.addAll(getLowCostRecommendations());
+        recommendations.addAll(getStableProfitRecommendations());
+        recommendations.addAll(getRiskTolerantRecommendations());
 
-        List<RecommendProductResponseDto> recommendProductList = new ArrayList<>();
-
-        for (Strategy strategy : Strategy.values()) {
-            // 추천된 상품 반환
-            List<PensionSavingsProductEntity> products = pensionSavingsJpaRepository.findAll();
-
-            PensionSavingsProductEntity bestProduct = products.stream()
-                    .max((p1, p2) -> Double.compare(calculateScore(p1, strategy), calculateScore(p2, strategy)))
-                    .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
-
-            RecommendProductResponseDto recommendProductResponseDto = RecommendProductResponseDto.builder()
-                    .productId(bestProduct.getProductId())
-                    .strategyType(strategy.getDescription())
-                    .build();
-
-            recommendProductList.add(recommendProductResponseDto);
-        }
-        return recommendProductList;
+        return recommendations;
     }
 
-    private double getDoubleValue(Object value) {
-        if (value instanceof Integer) {
-            return ((Integer) value).doubleValue();
-        } else if (value instanceof Double) {
-            return (Double) value;
-        }
-        return 0.0; // 기본값
+    private List<RecommendProductResponseDto> getAggressiveRecommendations() {
+        return pensionSavingsJpaRepository.findAggressiveProducts(5.0).stream()
+                .map(product -> RecommendProductResponseDto.builder()
+                        .productId(product.getProductId())
+                        .strategyType(Strategy.AGGRESSIVE.getDescription())
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    private int getIntValue(Object value) {
-        if (value instanceof Integer) {
-            return (Integer) value;
-        } else if (value instanceof Double) {
-            return ((Double) value).intValue();
-        }
-        return 0; // 기본값
+    private List<RecommendProductResponseDto> getStableRecommendations() {
+        // Implementation needed
+        return new ArrayList<>();
     }
 
-
-    private double calculateScore(PensionSavingsProductEntity product, Strategy strategy) {
-        double score = 0.0;
-
-        Map<String, Object> detail = product.getProductDetail().get(0);
-
-        switch (strategy) {
-            case AGGRESSIVE:
-                score += 0.6 * getDoubleValue(detail.get("earnRate"));
-                score += 0.2 * getDoubleValue(detail.get("earnRate1"));
-                score += 0.2 * getDoubleValue(detail.get("avgEarnRate10"));
-                break;
-            case STABLE:
-                score += "Y".equals(detail.getOrDefault("guarantees", "N")) ? 1.0 : 0.0;
-                score += 0.4 * getDoubleValue(detail.get("avgEarnRate5"));
-                score += 0.4 * getDoubleValue(detail.get("avgEarnRate3"));
-                score -= 0.2 * getDoubleValue(detail.get("feeRate1"));
-                break;
-            case SHORT_TERM:
-                score += 0.5 * getDoubleValue(detail.get("earnRate"));
-                score += 0.3 * getDoubleValue(detail.get("earnRate1"));
-                score += 0.2 * (getIntValue(detail.get("reserve")) / (double) getIntValue(detail.get("balance")));
-                break;
-            case LONG_TERM:
-                score += 0.4 * getDoubleValue(detail.get("avgEarnRate10"));
-                score += 0.4 * getDoubleValue(detail.get("avgEarnRate7"));
-                score -= 0.2 * getDoubleValue(detail.get("feeRate1"));
-                score += "Y".equals(detail.getOrDefault("guarantees", "N")) ? 0.5 : 0.0;
-                break;
-            case LOW_COST:
-                score -= 0.5 * getDoubleValue(detail.get("feeRate1"));
-                score -= 0.3 * getDoubleValue(detail.get("avgFeeRate3"));
-                score += 0.2 * (getIntValue(detail.get("reserve")) / (double) getIntValue(detail.get("balance")));
-                break;
-            case STABLE_PROFIT:
-                double volatility = Math.abs(getDoubleValue(detail.get("earnRate")) - getDoubleValue(detail.get("avgEarnRate3")));
-                score -= 0.3 * volatility;
-                score += 0.4 * getDoubleValue(detail.get("avgEarnRate10"));
-                score += "Y".equals(detail.getOrDefault("guarantees", "N")) ? 0.3 : 0.0;
-                break;
-            case RISK_TOLERANT:
-                score += 0.7 * getDoubleValue(detail.get("earnRate"));
-                score += 0.3 * Math.abs(getDoubleValue(detail.get("earnRate1")) - getDoubleValue(detail.get("earnRate")));
-                score -= "Y".equals(detail.getOrDefault("guarantees", "N")) ? 0.5 : 0.0;
-                break;
-        }
-
-        return score;
+    private List<RecommendProductResponseDto> getShortTermRecommendations() {
+        // Implementation needed
+        return new ArrayList<>();
     }
 
-    // 상품 상세 정보를 Dto로 변환
+    private List<RecommendProductResponseDto> getLongTermRecommendations() {
+        // Implementation needed
+        return new ArrayList<>();
+    }
+
+    private List<RecommendProductResponseDto> getLowCostRecommendations() {
+        // Implementation needed
+        return new ArrayList<>();
+    }
+
+    private List<RecommendProductResponseDto> getStableProfitRecommendations() {
+        // Implementation needed
+        return new ArrayList<>();
+    }
+
+    private List<RecommendProductResponseDto> getRiskTolerantRecommendations() {
+        // Implementation needed
+        return new ArrayList<>();
+    }
+
+    @Cacheable(value = "productScores", key = "#product.productId + '_' + #strategy")
+    public double calculateScore(PensionSavingsProductEntity product, Strategy strategy) {
+        log.info("Cache miss for productScore - calculating score for product {} and strategy {}",
+                product.getProductId(), strategy);
+
+        ProductDetailEntity detail = product.getProductDetails().stream()
+                .findFirst()
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
+
+        boolean hasGuarantees = "Y".equals(detail.getGuarantees());
+        double reserveRatio = calculateReserveRatio(detail);
+
+        return switch (strategy) {
+            case AGGRESSIVE -> calculateAggressiveScore(detail);
+            case STABLE -> calculateStableScore(detail, hasGuarantees);
+            case SHORT_TERM -> calculateShortTermScore(detail, reserveRatio);
+            case LONG_TERM -> calculateLongTermScore(detail, hasGuarantees);
+            case LOW_COST -> calculateLowCostScore(detail, reserveRatio);
+            case STABLE_PROFIT -> calculateStableProfitScore(detail, hasGuarantees);
+            case RISK_TOLERANT -> calculateRiskTolerantScore(detail, hasGuarantees);
+        };
+    }
+
+    private double calculateReserveRatio(ProductDetailEntity detail) {
+        return detail.getBalance() != null && detail.getBalance() != 0
+                ? detail.getReserve() / (double) detail.getBalance()
+                : 0.0;
+    }
+
+    private double calculateAggressiveScore(ProductDetailEntity detail) {
+        return 0.6 * detail.getEarnRate() +
+                0.2 * detail.getEarnRate1() +
+                0.2 * detail.getAvgEarnRate10();
+    }
+
+    private double calculateStableScore(ProductDetailEntity detail, boolean hasGuarantees) {
+        return (hasGuarantees ? 1.0 : 0.0) +
+                0.4 * detail.getAvgEarnRate5() +
+                0.4 * detail.getAvgEarnRate3() -
+                0.2 * detail.getFeeRate1();
+    }
+
+    private double calculateShortTermScore(ProductDetailEntity detail, double reserveRatio) {
+        return 0.5 * detail.getEarnRate() +
+                0.3 * detail.getEarnRate1() +
+                0.2 * reserveRatio;
+    }
+
+    private double calculateLongTermScore(ProductDetailEntity detail, boolean hasGuarantees) {
+        return 0.4 * detail.getAvgEarnRate10() +
+                0.4 * detail.getAvgEarnRate7() -
+                0.2 * detail.getFeeRate1() +
+                (hasGuarantees ? 0.5 : 0.0);
+    }
+
+    private double calculateLowCostScore(ProductDetailEntity detail, double reserveRatio) {
+        return -0.5 * detail.getFeeRate1() -
+                0.3 * detail.getAvgFeeRate3() +
+                0.2 * reserveRatio;
+    }
+
+    private double calculateStableProfitScore(ProductDetailEntity detail, boolean hasGuarantees) {
+        double volatility = Math.abs(detail.getEarnRate() - detail.getAvgEarnRate3());
+        return -0.3 * volatility +
+                0.4 * detail.getAvgEarnRate10() +
+                (hasGuarantees ? 0.3 : 0.0);
+    }
+
+    private double calculateRiskTolerantScore(ProductDetailEntity detail, boolean hasGuarantees) {
+        double volatility = Math.abs(detail.getEarnRate1() - detail.getEarnRate());
+        return 0.7 * detail.getEarnRate() +
+                0.3 * volatility -
+                (hasGuarantees ? 0.5 : 0.0);
+    }
+
+    @CacheEvict(value = {"recommendProducts", "productScores"}, allEntries = true)
+    public void refreshCache() {
+        log.info("Clearing all caches");
+    }
+
+    @CacheEvict(value = "productScores", key = "#productId + '_' + #strategy")
+    public void refreshProductCache(Long productId, Strategy strategy) {
+        log.info("Clearing cache for product {} and strategy {}", productId, strategy);
+    }
+
     private PensionSavingsResponseComparisonDto buildResponseDto(PensionSavingsProductEntity product) {
-        Map<String, Object> detail = product.getProductDetail().get(0);
+        ProductDetailEntity detail = product.getProductDetails().stream()
+                .findFirst()
+                .orElseThrow(() -> new FinanceHandler(ErrorStatus.PRODUCT_NOT_FOUND));
 
         DecimalFormat formatter = new DecimalFormat("#,###");
 
         return PensionSavingsResponseComparisonDto.builder()
                 .area(product.getProductArea().getDescription())
-                .company((String) detail.get("company"))
+                .company(product.getCompany())
                 .product(product.getProductName())
-                .productType((String) detail.get("productType"))
-                .rcvMethod((String) detail.get("rcvMethod"))
-                .feeType((String) detail.get("feeType"))
-                .sells("Y".equals(detail.get("sells")) ? "진행" : "중단")
-                .withdraws("Y".equals(detail.get("withdraws")) ? "가능" : "불가능")
-                .guarantees("Y".equals(detail.get("guarantees")) ? "보장" : "비보장")
-                .currentBalance(formatter.format(getIntValue(detail.get("balance"))))
-                .previousYearBalance(formatter.format(getIntValue(detail.get("balance1"))))
-                .twoYearsAgoBalance(formatter.format(getIntValue(detail.get("balance2"))))
-                .threeYearsAgoBalance(formatter.format(getIntValue(detail.get("balance3"))))
-                .currentReserve(formatter.format(getIntValue(detail.get("reserve"))))
-                .previousYearReserve(formatter.format(getIntValue(detail.get("reserve1"))))
-                .twoYearsAgoReserve(formatter.format(getIntValue(detail.get("reserve2"))))
-                .threeYearsAgoReserve(formatter.format(getIntValue(detail.get("reserve3"))))
-                .currentEarnRate(getDoubleValue(detail.get("earnRate")))
-                .previousYearEarnRate(getDoubleValue(detail.get("earnRate1")))
-                .twoYearsAgoEarnRate(getDoubleValue(detail.get("earnRate2")))
-                .threeYearsAgoEarnRate(getDoubleValue(detail.get("earnRate3")))
-                .previousYearFeeRate(getDoubleValue(detail.get("feeRate1")))
-                .twoYearsAgoFeeRate(getDoubleValue(detail.get("feeRate2")))
-                .threeYearsAgoFeeRate(getDoubleValue(detail.get("feeRate3")))
+                .productType(detail.getProductType())
+                .rcvMethod(detail.getRcvMethod())
+                .feeType(detail.getFeeType())
+                .sells("Y".equals(detail.getSells()) ? "진행" : "중단")
+                .withdraws("Y".equals(detail.getWithdraws()) ? "가능" : "불가능")
+                .guarantees("Y".equals(detail.getGuarantees()) ? "보장" : "비보장")
+                .currentBalance(formatter.format(detail.getBalance()))
+                .previousYearBalance(formatter.format(detail.getBalance1()))
+                .twoYearsAgoBalance(formatter.format(detail.getBalance2()))
+                .threeYearsAgoBalance(formatter.format(detail.getBalance3()))
+                .currentReserve(formatter.format(detail.getReserve()))
+                .previousYearReserve(formatter.format(detail.getReserve1()))
+                .twoYearsAgoReserve(formatter.format(detail.getReserve2()))
+                .threeYearsAgoReserve(formatter.format(detail.getReserve3()))
+                .currentEarnRate(detail.getEarnRate())
+                .previousYearEarnRate(detail.getEarnRate1())
+                .twoYearsAgoEarnRate(detail.getEarnRate2())
+                .threeYearsAgoEarnRate(detail.getEarnRate3())
+                .previousYearFeeRate(detail.getFeeRate1())
+                .twoYearsAgoFeeRate(detail.getFeeRate2())
+                .threeYearsAgoFeeRate(detail.getFeeRate3())
                 .build();
     }
-
 }

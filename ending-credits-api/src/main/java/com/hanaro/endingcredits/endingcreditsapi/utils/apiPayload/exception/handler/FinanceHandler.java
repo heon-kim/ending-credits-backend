@@ -7,4 +7,9 @@ public class FinanceHandler extends GeneralException {
     public FinanceHandler(BaseErrorCode errorCode) {
         super(errorCode);
     }
+    
+    // 기본 생성자 추가
+    public FinanceHandler() {
+        super(null);
+    }
 }

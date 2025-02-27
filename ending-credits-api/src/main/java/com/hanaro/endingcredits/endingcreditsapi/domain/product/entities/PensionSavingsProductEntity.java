@@ -1,12 +1,10 @@
 package com.hanaro.endingcredits.endingcreditsapi.domain.product.entities;
 
-
-import com.hanaro.endingcredits.endingcreditsapi.utils.annotations.JsonListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -32,11 +30,12 @@ public class PensionSavingsProductEntity {
     @Column(name="product_area", nullable = false)
     private ProductArea productArea;
 
-    @Column(name="product_detail", length = 10000)
-    @Convert(converter = JsonListConverter.class)
-    private List<Map<String, Object>> productDetail;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<ProductDetailEntity> productDetails = new ArrayList<>();
 
-    public List<Map<String, Object>> getProductDetail() {
-        return this.productDetail;
+    public void addProductDetail(ProductDetailEntity detail) {
+        this.productDetails.add(detail);
+        detail.setProduct(this);
     }
 }
